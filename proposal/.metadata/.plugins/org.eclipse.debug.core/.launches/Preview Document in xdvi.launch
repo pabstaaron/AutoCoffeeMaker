@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="net.sourceforge.texlipse.viewer.launchConfigurationType">
+<stringAttribute key="viewerCurrent" value="xdvi"/>
+<stringAttribute key="xdvi.arguments" value="-editor &quot;echo %f:%l&quot; -sourceposition &quot;%line %texfile&quot; %file"/>
+<stringAttribute key="xdvi.command" value=""/>
+<stringAttribute key="xdvi.ddeCloseCommand" value=""/>
+<stringAttribute key="xdvi.ddeCloseServer" value=""/>
+<stringAttribute key="xdvi.ddeCloseTopic" value=""/>
+<stringAttribute key="xdvi.ddeViewCommand" value=""/>
+<stringAttribute key="xdvi.ddeViewServer" value=""/>
+<stringAttribute key="xdvi.ddeViewTopic" value=""/>
+</launchConfiguration>
