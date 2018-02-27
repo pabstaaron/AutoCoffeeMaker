@@ -159,33 +159,7 @@ ingredient information and user data.
 
 % What is the project motivation? 
 %
-% TODO - Could use a citation or two in here
-% TODO - Add more background information
-\section{Introduction} 
-
-There are many espresso machines available for commercial and
-consumer applications. The most frequent of which an average consumer will
-encounter is the manual espresso machine used by their local coffee shop. These
-machines require a substantial amount of training and practice to wield
-effectively. The operator must master the skills of grinding the coffee, tamping
-grounds, and physically pulling the espresso; tasks that are out of reach for
-the average consumer to perform on their own. What's more the operator must manually
-froth milk and dispense an appropriate amount of flavoring syrup for more
-complicated bevrages.
-
-However, there are an increasing number of espresso machines on the market that
-automate some of this process.  Most of these machines grind beans, tamp the
-grounds, and pull the espresso with little intervention from the user. The user,
-however, must still manually froth milk (a difficult task to master), deploy
-flavoring syrup, and mix the the beverage on their own.
- 
-There is not presently an \emph{eleqantly} implemented solution for a fully
-automated espresso machine that is easy and fast for the average consumer
-to use. This is largely due to the fact that there are certain mechanisms and
-control systems that would have to be created for such a device that are
-non-trivial to design and implement.
-
-This document discusses the design and implementation of such a device.
+\section{Introduction}
 
 \section{Project Overview}
 
@@ -205,7 +179,7 @@ This document discusses the design and implementation of such a device.
 % 
 % \end{thebibliography}
 
-\bibliography{biblio}{}
+\bibliography{biblio.bib}{}
 \bibliographystyle{plain}
 
 \end{document}
