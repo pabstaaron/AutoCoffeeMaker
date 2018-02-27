@@ -246,8 +246,7 @@ The plates are roatated manually or via an electric motor to crush the beans,
 which are then allowed to fall into a vessel containing the ground coffee. The
 space between the blades determines the fineness of the grind.
 
-The remainder of this document discusses the implementation of a fully
-automated, web connected espresso machine.
+%This document discusses the design and implementation of such a device.
 
 \section{Project Overview}
 

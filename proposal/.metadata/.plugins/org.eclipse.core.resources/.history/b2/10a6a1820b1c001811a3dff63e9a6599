@@ -227,27 +227,7 @@ Higher-end machines will generally introduce a second boiler for producing
 frothing steam. This boiler will operate at a much higher temprature than the
 brewing boiler in order to produce the necessary steam pressure.
 
-Another important task that plays a large role in
-producing high quality espresso is the grinding of the beans. While this task
-seems simple, there are many factors introduced in griding that can have a large
-impact in the flavor and consistency of the final product. 
-
-Coffee for espresso is usually ground to a very fine powder so that it can be
-densly packed into a puck. This is subject to personal preferance, however, and some
-may prefer the flavor of a coarser grind. In many modern espresso machines, the
-grinder is integrated into the machine. Many baristas, however, prefer to use a
-seperate grinder to give them more control over the process.
-
-Most grinders used in commercial and upscale domestic applications are burr
-grinders. Burr grinders have two vertically aligned steel plates with an air gap
-between them. A hopper containing coffee beans sits above these two plates and
-passes a handful of coffee beans at a time into the gap between the two plates.
-The plates are roatated manually or via an electric motor to crush the beans,
-which are then allowed to fall into a vessel containing the ground coffee. The
-space between the blades determines the fineness of the grind.
-
-The remainder of this document discusses the implementation of a fully
-automated, web connected espresso machine.
+%This document discusses the design and implementation of such a device.
 
 \section{Project Overview}
 

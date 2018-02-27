@@ -67,10 +67,3 @@ page 1466, reference #4.
  title     = "Wikipedia - Espresso Machine",
  url       = "https://en.wikipedia.org/wiki/Espresso_machine"
 }
-
-@electronic{howstuffworks,
- author   = "Nice, Karim",
- title     = "How Espresso Machines Work",
- url       = "https://home.howstuffworks.com/espresso-machine.htm"
-}
-
