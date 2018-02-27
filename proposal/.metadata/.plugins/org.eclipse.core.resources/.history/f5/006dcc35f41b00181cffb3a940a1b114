@@ -136,7 +136,7 @@ only a few options for dictating how they would like their coffee to be
 produced.
 Finally, most of these machines have very limited user interfaces and few have
 an option for remote control from a more user friendly device, such as a
-smart phone or tablet.
+smartphone or tablet.
 
 Our product differs by focusing on automation, personalization, and
 user-friendliness above all else. Our machine will house all ingredients
@@ -161,8 +161,6 @@ ingredient information and user data.
 %
 % TODO - Could use a citation or two in here
 % TODO - Add more background information
-% TODO - There are a couple machines out there that can froth milk on their own,
-% but they do so poorly
 \section{Introduction} 
 
 There are many espresso machines available for commercial and
@@ -187,47 +185,7 @@ to use. This is largely due to the fact that there are certain mechanisms and
 control systems that would have to be created for such a device that are
 non-trivial to design and implement.
 
-\subsection{How Espresso Machines Work}
-% TODO there may be some light plagerism in this section..
-
-There are many different types of coffee makers available. Each of these systems
-is unique in its own way and each has its pro's and con's. All coffee makers,
-however, have one thing in common; they all must push hot water through ground
-coffee beans in some way. In the case of espresso, hot water is heated to a near
-boiling temprature and pressurized in some way. This hot water is then forced
-through densely packed coffee grounds (known as a ``puck'') in order to produce
-a thick, creamy coffee \cite{wikiespresso}.  
-
-There are several different ways in which the water may be pressurized. One of
-the most common ways this is accomplished is to simply let the water pressurize
-as it heats in a sealed container and turns into steam. Once a suitable
-temprature is reached, the container is unsealed and the pressurized water
-passes through the puck. This approach is used in most low-end espresso machines
-as it requires few mechanical components and is generally inexpensive. It also
-tends to produce lower quality espresso as the water pressure is difficult to
-regulate and drops as the brewing cycle progresses.
-
-Higher end machines used in most commercial applications use an electric pump to
-force the water through the grounds, allowing for tighter control of the
-water pressure as well as faster brewing times.
-
-An optional, but important, component of an espresso machine is the frothing
-wand. The frothing wand is a hollow shaft of aluminium that is used to direct
-high pressure steam into milk (or a milk-like product), the effect of which is
-incorporating air into the milk that makes it light and foamy (or frothy, as
-the name suggestes). Most modern espresso machines have a built-in frothing
-mechanism. On lower end machines, the frothing wand connectes to the same boiler
-that produces the brewing water. This is undesirable due to the fact that
-frothing water needs to be heated to much higher tempratures than brewing water
-in order to produce the necessary high pressure steam. Machines that only have a
-single boiler therefore need to introduce a long delay between the brewing and
-frothing cycle while the boiler switches from one task to another.
-
-Higher-end machines will generally introduce a second boiler for producing
-frothing steam. This boiler will operate at a much higher temprature than the
-brewing boiler in order to produce the necessary steam pressure.
-
-%This document discusses the design and implementation of such a device.
+This document discusses the design and implementation of such a device.
 
 \section{Project Overview}
 
