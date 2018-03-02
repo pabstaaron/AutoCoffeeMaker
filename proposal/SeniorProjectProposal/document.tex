@@ -250,14 +250,40 @@ The remainder of this document discusses the implementation of a fully
 automated, web connected espresso machine.
 
 \section{Project Overview}
-
+% Flask Overview?
+ 
 \section{Project Tasks}
+% Just guessing here, but in an ideal world this would be the waterfall outward
+% Inidividual Components working
+% Components Controlled By I2C
+% Components Controlled via USART Serial
+% Components Controlled via Flask API Calls
+% Flush out Flask buffer and all calls
+%% We probably need a buffering system since the machine throughput will be low
+% Flask talking to DB
+% Flask talking to Android Device
+% DB Pushing valuable data downstream
+
 
 \section{Project Materials}
+% Raspberry Pi
+% Android Phone
 
 \section{Testing Approach}
+% Flask
+Testing against the Flask microframework part of our project will be heavily reliant on 'mocking'
+outputs and inputs of recieved calls. Flask as a microframework does not need to be tested, however
+our devices reaction to GPIO eventst needs to be tested. This can be occumplished using the python
+unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
+be able to flush out multiple tests without relying on any network or GPIO setup. 
+
 
 \section{Project Demonstration}
+The goal for our project demonstration is that we can show give a user a phone, let him customize a
+cup of coffee, and have it make a cup of coffee without anyone user interference. Our demonstration
+is meant to be simple, because our project is meant to simplify. If we can walk away from our
+machine and still have it function correctly in the hands on people unfamiliar we would completed
+what we set out to do.
 
 % \begin{thebibliography}{1}
 % 
