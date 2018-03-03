@@ -52,6 +52,7 @@
 
 
 \documentclass[conference]{IEEEtran}
+\usepackage{url}
 
 %
 \ifCLASSINFOpdf
@@ -88,6 +89,7 @@
 % use a multiple column layout for up to three different
 % affiliations
 \author{Aaron~Pabst, Ben~Nagel, Nathan~Donaldson, Elliot~CarrLee}
+\url{https://pabstaaron.github.io/AutoCoffeeMaker/}
 
 % conference papers do not typically use \thanks and this command
 % is locked out in conference mode. If really needed, such as for
@@ -187,6 +189,12 @@ to use. This is largely due to the fact that there are certain mechanisms and
 control systems that would have to be created for such a device that are
 non-trivial to design and implement.
 
+The remainder of this document discusses the functionality of various 
+modern coffee machines. We then compare our implementation of a fully
+automated, web connected espresso machine. The discussion itself will
+include the scope of the project, the design approach, some background, 
+and time estimates. 
+
 \subsection{How Espresso Machines Work}
 % TODO there may be some light plagerism in this section..
 
@@ -246,11 +254,20 @@ The plates are roatated manually or via an electric motor to crush the beans,
 which are then allowed to fall into a vessel containing the ground coffee. The
 space between the blades determines the fineness of the grind.
 
-The remainder of this document discusses the implementation of a fully
-automated, web connected espresso machine.
-
 \section{Project Overview}
 % Flask Overview?
+%Is it based on other things that have been done?
+Some "do it yourself" projects are out there for homemade coffee machines, 
+but none that are highly sophisticated. There are a few that have mobile application
+controllers, but none that are very pretty to look at or very customizable. By creating
+a simple UI with complex functions, we can personalize each users experience with
+customizable settings and profiles. Creating user profiles will allow us to recommend
+brews based on what has recently been selected by the current user, and what has been
+selected by other users that have similar taste. Searching of other brews other users
+have saved and shared may be selected as well. Scheduling times and days so
+you can wake up to a cup of coffee instead of wasting time making one every
+morning could make the difference between a good and bad morning.
+%The above is my outlook on the UI portion (Nathan) Just spitballing ideas.
  
 \section{Project Tasks}
 % Just guessing here, but in an ideal world this would be the waterfall outward
@@ -263,11 +280,22 @@ automated, web connected espresso machine.
 % Flask talking to DB
 % Flask talking to Android Device
 % DB Pushing valuable data downstream
+%Machine talking to Android Device
+
+%Nathan - I want to know if we want both the Android device and coffee machine communicating
+%with a web server? Say we connect the coffee machine to wifi, do we just want to be able to connect
+%the android device to the coffee machine via bluetooth and just have the info communicate to the phone
+%through that? Or do we want to connect to the coffee machine as router (so to speak) and have it recognize
+%commands from the app via wifi communication? We could also go the route of just having the phone
+%connected to a webserver only and have device just be bluetooth. There are many options actually.
 
 
 \section{Project Materials}
 % Raspberry Pi
 % Android Phone
+%Boilers
+%Coils
+%Reservoirs
 
 \section{Testing Approach}
 % Flask
