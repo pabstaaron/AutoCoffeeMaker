@@ -153,7 +153,7 @@ ability to tweak individual settings to make a personalized and reproducible
 cup of coffee. The machine itself will consist of a series of boilers,
 chillers, and pumps as well as a specially designed chamber for automatically
 frothing milk. These components will be driven from custom heater and chiller
-control circuitry as well as an embedded Linux controller. The physical device
+control circuitry as well as an embedded linux controller. The physical device
 will be backed by some remote user-interface and a database for storing
 ingredient information and user data.
 \end{abstract}
@@ -175,7 +175,7 @@ effectively. The operator must master the skills of grinding the coffee, tamping
 grounds, and physically pulling the espresso; tasks that are out of reach for
 the average consumer to perform on their own. What's more, the operator must
 manually froth milk and dispense an appropriate amount of flavoring syrup for more
-complicated beverages, such as lattes.
+complicated bevrages, such as lattes.
 
 However, there are an increasing number of espresso machines on the market that
 automate some of this process.  Most of these machines grind beans, tamp the
@@ -202,14 +202,14 @@ There are many different types of coffee makers available. Each of these systems
 is unique in its own way and each has its pro's and con's. All coffee makers,
 however, have one thing in common; they all must push hot water through ground
 coffee beans in some way. In the case of espresso, hot water is heated to a near
-boiling temperature and pressurized in some way. This hot water is then forced
+boiling temprature and pressurized in some way. This hot water is then forced
 through densely packed coffee grounds (known as a ``puck'') in order to produce
 a thick, creamy coffee \cite{wikiespresso}.  
 
 There are several different ways in which the water may be pressurized. One of
 the most common ways this is accomplished is to simply let the water pressurize
 as it heats in a sealed container and turns into steam. Once a suitable
-temperature is reached, the container is unsealed and the pressurized water
+temprature is reached, the container is unsealed and the pressurized water
 passes through the puck. This approach is used in most low-end espresso machines
 as it requires few mechanical components and is generally inexpensive. It also
 tends to produce lower quality espresso as the water pressure is difficult to
@@ -220,29 +220,29 @@ force the water through the grounds, allowing for tighter control of the
 water pressure as well as faster brewing times.
 
 An optional, but important, component of an espresso machine is the frothing
-wand. The frothing wand is a hollow shaft of aluminum that is used to direct
+wand. The frothing wand is a hollow shaft of aluminium that is used to direct
 high pressure steam into milk (or a milk-like product), the effect of which is
 incorporating air into the milk that makes it light and foamy (or frothy, as
-the name suggests). Most modern espresso machines have a built-in frothing
-mechanism. On lower end machines, the frothing wand connects to the same boiler
+the name suggestes). Most modern espresso machines have a built-in frothing
+mechanism. On lower end machines, the frothing wand connectes to the same boiler
 that produces the brewing water. This is undesirable due to the fact that
-frothing water needs to be heated to much higher temperatures than brewing water
+frothing water needs to be heated to much higher tempratures than brewing water
 in order to produce the necessary high pressure steam. Machines that only have a
 single boiler therefore need to introduce a long delay between the brewing and
 frothing cycle while the boiler switches from one task to another.
 
 Higher-end machines will generally introduce a second boiler for producing
-frothing steam. This boiler will operate at a much higher temperature than the
+frothing steam. This boiler will operate at a much higher temprature than the
 brewing boiler in order to produce the necessary steam pressure.
 
 Another important task that plays a large role in
 producing high quality espresso is the grinding of the beans. While this task
-seems simple, there are many factors introduced in grinding that can have a
-large impact in the flavor and consistency of the final product. 
+seems simple, there are many factors introduced in griding that can have a large
+impact in the flavor and consistency of the final product. 
 
 Coffee for espresso is usually ground to a very fine powder so that it can be
-densely packed into a puck. This is subject to personal preferance, however, and
-some may prefer the flavor of a coarser grind. In many modern espresso machines, the
+densly packed into a puck. This is subject to personal preferance, however, and some
+may prefer the flavor of a coarser grind. In many modern espresso machines, the
 grinder is integrated into the machine. Many baristas, however, prefer to use a
 seperate grinder to give them more control over the process.
 
@@ -261,7 +261,7 @@ The space between the plates determines the final fineness of the grind.
 
 This project will culminate in a device that can produce espresso drinks that
 consist of varying degrees of espresso, frothed milk, and flavoring syrup. The
-device will be capable of varying parameters that effect the brewing and
+device will be cabable of varying parameters that effect the brewing and
 frothing processes. The user will be able to define how hot the brewing water
 should be, the pressure with which it is pushed through the grounds, how fine of
 a grind is used, the ratio of water to coffee grounds, how much steam is used to
@@ -279,51 +279,9 @@ ingriedents (for example, it may provide optimal brew settings for a certain
 brand of coffee) and recommend beverages and settings to the user.
 
 The machine will be operated by some remote user interface running on an Android
-device to allow for a a streamlined user experience.
+device to allow for a a stream-lined user experience.
 
 \subsection{Physical Machine Overview}
-
-The physical espresso machine will consist of a brewing mechanism, a
-burr grinder, a tamping mechanism, a frother, several syrup dispensers, and
-storage tanks for water, milk and a non-dairy equivalent, and detergent.
-
-\subsubsection{Burr Grinder}
-The grinder will be based around flat (rather than conical) burr plates. The
-burr plates will first be designed in a 3D CAD system. The plates can then be
-fabricated in one of two ways, depending on cost and time constraints. 
-The plates may sent to a computer aided-machining service to be milled out of
-stainless steel.
-The plates may also be 3D printed in plastic. These plastic pieces will then be
-molded in silicone or urethane rubber. This mold will be used to slip cast
-ceramic (boron carbide, preferably) burrs. These slip cast plates will then need
-to be hardened in a kiln \cite{slip}. A similar process is used in the
-production of balistic body armor. Ceramic burrs have many advantages over steel burrs.
-
-\subsubsection{Tamping and Brewing Mechanism}
-The brewing mechanism will consist of the following major pieces: a boiler for
-heating brew water, a peristaltic pump for pushing the water through the
-grounds, and a valve for allowing water into the boiler from the storage tank.
-The boiler will be a cylindical structure built out of stainless steel. This
-boiler will have two threads for connecting it to the water source and to the
-pump. Another connection point will be present for attatching a thermocouple.
-
-\subsubsection{Automatic Frother}
-The frother will be implemented as a chamber sitting directly above the
-dispensing end of the device. Milk will be pumped into this chamber from the
-refridgeration tank. Inside this chamber there will be a telescoping pipe
-attatched to a servo acting as the frothing wand. This pipe will be able to
-autonomosly move into and out of the milk and will be connected to a boiler
-producing high pressure steam. In this manner, the machine will be able to froth
-exactly as a human barista would.
-
-The wand will be designed in a 3D CAD program and then 3D printed to verify
-functionality, at which point the device will be sent to a computer-aided
-machining service to fabricated in stainless steel or aluminium.
-
-The boiler will need to be capable of reaching much higher tempratures than the
-one used for producing brew water and will need to be capable of withstanding a
-large amount pressure. For this reason, a safety blow valve will be incorporated
-into the steam boiler.
 
 \subsection{User Interface Overview}
 

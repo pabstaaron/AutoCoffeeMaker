@@ -313,17 +313,11 @@ dispensing end of the device. Milk will be pumped into this chamber from the
 refridgeration tank. Inside this chamber there will be a telescoping pipe
 attatched to a servo acting as the frothing wand. This pipe will be able to
 autonomosly move into and out of the milk and will be connected to a boiler
-producing high pressure steam. In this manner, the machine will be able to froth
-exactly as a human barista would.
+producing high pressure steam.
 
-The wand will be designed in a 3D CAD program and then 3D printed to verify
+The wand will designed in a 3D CAD program and then 3D printed to verify
 functionality, at which point the device will be sent to a computer-aided
 machining service to fabricated in stainless steel or aluminium.
-
-The boiler will need to be capable of reaching much higher tempratures than the
-one used for producing brew water and will need to be capable of withstanding a
-large amount pressure. For this reason, a safety blow valve will be incorporated
-into the steam boiler.
 
 \subsection{User Interface Overview}
 

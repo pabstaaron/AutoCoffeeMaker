@@ -86,10 +86,4 @@ title = "26.5 unittest.mock - mock object library",
 url = "https://docs.python.org/3/library/unittest.mock.html"
 }
 
-@electronic{slip,
-author = "https://www.thespruce.com/how-to-slipcast-ceramics-4154220",
-title = " Sara D'Souza",
-url = "https://www.thespruce.com/how-to-slipcast-ceramics-4154220"
-}
-
 
