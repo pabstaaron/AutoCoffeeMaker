@@ -125,7 +125,7 @@ right in your own home or office, without ever having to trek to the coffee
 shop. A machine that allows you to specify exactly how you like your coffee
 with exacting detail and optional scheduling at which point it will flawlessly
 produce that beverage for you. A machine that can recommend new beverages based
-on your and other users’ past preferences.
+on your and other users past preferences.
 
 There are plenty of machines on the market that claim to be fully automatic,
 but none are capable of going all the way from raw ingredients to a finished
@@ -325,25 +325,25 @@ one used for producing brew water and will need to be capable of withstanding a
 large amount pressure. For this reason, a safety blow valve will be incorporated
 into the steam boiler.
 
-\subsection{User Interface Overview}
+\subsection{Mobile User Interface Overview}
+The UI will be only available to Android and will be written in Java. Upon opening the application, it will ask the user to pair their Android device to the coffee machine given it's serial number. Afterwards It will take the user to a login screen which will allow the user to register or not. Registering will allow the user to have a
+few extra options given from a database integration. These options will allow the user to search recent
+beverage choices, favorites, recommendations, schedules, and an online database. Each menu will include a similar list layout with searchable drinks. Upon clicking one of the listed items, it will show all of the settings and have descriptions based on what the user (whether it is yourself or another user) has written. It will then have the option of favoriting, brewing, and scheduling the drink right in that given screen. In the scheduling menu, drink schedules may be canceled or changed. The benefit of registering will allow a user to login on any application and have all of the features described above. Given the choice of not creating a login, a user will still have to pair their phone to the device through the database, but wont have to deal with any extra UI that comes with a registered user. A non-registered user that is will be allowed to brew coffee the way they want at that instant, and that will be the most basic functionality. Registering will be as simple as creating a loginName and password with an email verification to avoid non-human users from registering. After authentication you will be sent to a screen with multiple options, buttons that will take you to a menus such as: scheduling, beverage creation, recent beverages, recommended beverages, favorited beverages, or a searchable database. If the user is not registered, and the device is paired, it will take them to the beverage creation menu. For registered users, the schedule, recent, recommended, and favorited menus will be available and of the same list format. For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very precise, or general in their brew. Once all settings are selected, if registered, a user may have the decision to leave information on the drink created and post it in a searchable database and/or their recents/favorites. Information may be a title, description, bean of choice, etc. If the user is not registered, it will not prompt them for anything and brew their drink.
 
 \subsection{Data Aggregation and Processing Overview}
-
-% Flask Overview?
-%Is it based on other things that have been done?
-% Some "do it yourself" projects are out there for homemade coffee machines, 
-% but none that are highly sophisticated. There are a few that have mobile application
-% controllers, but none that are very pretty to look at or very customizable. By creating
-% a simple UI with complex functions, we can personalize each users experience with
-% customizable settings and profiles. Creating user profiles will allow us to recommend
-% brews based on what has recently been selected by the current user, and what has been
-% selected by other users that have similar taste. Searching of other brews other users
-% have saved and shared may be selected as well. Scheduling times and days so
-% you can wake up to a cup of coffee instead of wasting time making one every
-% morning could make the difference between a good and bad morning.
-%The above is my outlook on the UI portion (Nathan) Just spitballing ideas.
  
 \section{Project Tasks}
+\subsection{Mobile User Interface}
+\begin{itemize}
+  \item Device pairing main screen
+  \item Login screen which allows optional user login/registration or not.
+  \item Main menu screen, allowing decision of brew creation, recommendations, recents, favorites, and a search menu.
+  \item Brew creation screen, with an advanced/basic toggle button and sliders, value inputs, and other selections based on mechanical aspect
+  \item Recommendations, Scheduling, Recents, Favorites, and Search sharing same UI layout (minor difference in scheduling), will query different data structures.
+  \item Database integration with Firebase
+  \item Communication with Flask
+  \item Communication between application, Flask, Firebase, and coffee machine.
+\end{itemize}
 % Just guessing here, but in an ideal world this would be the waterfall outward
 % Inidividual Components working
 % Components Controlled By I2C -> Aaron: At the end of the day, everything will
@@ -358,15 +358,10 @@ into the steam boiler.
 % DB Pushing valuable data downstream
 %Machine talking to Android Device
 
-%Nathan - I want to know if we want both the Android device and coffee machine communicating
-%with a web server? Say we connect the coffee machine to wifi, do we just want to be able to connect
-%the android device to the coffee machine via bluetooth and just have the info communicate to the phone
-%through that? Or do we want to connect to the coffee machine as router (so to speak) and have it recognize
-%commands from the app via wifi communication? We could also go the route of just having the phone
-%connected to a webserver only and have device just be bluetooth. There are many options actually.
-
-
 \section{Project Materials}
+\begin{itemize}
+\item Android Device
+\end{itemize}
 % Raspberry Pi -> compute module, specifically
 %Boilers -> Built from raw materials, stainless steel
 %Coils -> Cartridge heaters
@@ -383,11 +378,15 @@ outputs and inputs of recieved calls. Flask as a microframework does not need to
 our devices reaction to GPIO eventst needs to be tested. This can be occumplished using the python
 unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
 be able to flush out multiple tests without relying on any network or GPIO setup. 
-
+\subsection{Mobile User Interface Testing}
+Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time, moving in the flow as a user would. Afterward another pass will be taken, adding data. Starting with the login screen, communication between Firebase, Flask, and the device will be established and pairing/login data will be tested and verified on every side. We then move to the basic function of non registered user: creating a drink. If the mechanical portions are not ready yet, then data collection will be done next on all of the other menus: scheduling, favorites, recommendations, recents, and online searching. During all of these integrations, testing with the actual coffee machine will take place, ensuring communication is working on all ends.
 
 \section{Project Demonstration}
-The goal for our project demonstration is that we can show give a user a phone, let him customize a
-cup of coffee, and have it make a cup of coffee without anyone user interference. Our demonstration
+The goal of our project is to simplify making a cup of coffee for both connoisseurs and laypersons. 
+\subsection{Mobile Demonstration}
+We will first demonstrate functionality with non registered user implementation (the basics on mobile) and how the mobile device can communicate with the machine properly to make a cup of coffee that is asked for. Then we will demonstrate how data collection offers different options to users. Grabbing information from the database and laying it out in multiple menu's will give users the ease of quickly making what they need or searching for something new. Using these different menu's, we will show that the data integrity holds and creates the drink as it should. 
+\subsection{SOME OTHER SUBSECTION}
+Our demonstration
 is meant to be simple, because our project is meant to simplify. If we can walk away from our
 machine and still have it function correctly in the hands on people unfamiliar we would completed
 what we set out to do.
