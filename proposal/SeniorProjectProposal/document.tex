@@ -380,11 +380,19 @@ android application and the components inside the coffee machine.
 \item DataBase Recommendations and Statistics
 \end{itemize}
 
+%Nathan - I want to know if we want both the Android device and coffee machine communicating
+%with a web server? Say we connect the coffee machine to wifi, do we just want to be able to connect
+%the android device to the coffee machine via bluetooth and just have the info communicate to the phone
+%through that? Or do we want to connect to the coffee machine as router (so to speak) and have it recognize
+%commands from the app via wifi communication? We could also go the route of just having the phone
+%connected to a webserver only and have device just be bluetooth. There are many options actually.
+
+
 \section{Project Materials}
 \begin {itemize}
 \item Raspberry Pi
-\item Android Device
 \item Boilers
+\item Android Device
 \item Coils
 \item Resevoirs
 \item Custom PCBs
@@ -392,6 +400,7 @@ android application and the components inside the coffee machine.
 \item Copper, brass, or silicon tubes
 \item Custom Machines Peices
 \end {itemize}
+
 % Raspberry Pi -> compute module, specifically
 %Boilers -> Built from raw materials, stainless steel
 %Coils -> Cartridge heaters
@@ -410,6 +419,7 @@ unittest.mock framework  \cite{mock} where we can create tests that will 'mock' 
 be able to flush out multiple tests without relying on any network or GPIO setup. 
 \subsection{Mobile User Interface Testing}
 Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time, moving in the flow as a user would. Afterward another pass will be taken, adding data. Starting with the login screen, communication between Firebase, Flask, and the device will be established and pairing/login data will be tested and verified on every side. We then move to the basic function of non registered user: creating a drink. If the mechanical portions are not ready yet, then data collection will be done next on all of the other menus: scheduling, favorites, recommendations, recents, and online searching. During all of these integrations, testing with the actual coffee machine will take place, ensuring communication is working on all ends. 
+
 
 \section{Project Demonstration}
 The goal of our project is to simplify making a cup of coffee for both connoisseurs and laypersons. 
