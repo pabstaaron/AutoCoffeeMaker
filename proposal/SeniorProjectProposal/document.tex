@@ -331,7 +331,16 @@ few extra options given from a database integration. These options will allow th
 beverage choices, favorites, recommendations, schedules, and an online database. Each menu will include a similar list layout with searchable drinks. Upon clicking one of the listed items, it will show all of the settings and have descriptions based on what the user (whether it is yourself or another user) has written. It will then have the option of favoriting, brewing, and scheduling the drink right in that given screen. In the scheduling menu, drink schedules may be canceled or changed. The benefit of registering will allow a user to login on any application and have all of the features described above. Given the choice of not creating a login, a user will still have to pair their phone to the device through the database, but wont have to deal with any extra UI that comes with a registered user. A non-registered user that is will be allowed to brew coffee the way they want at that instant, and that will be the most basic functionality. Registering will be as simple as creating a loginName and password with an email verification to avoid non-human users from registering. After authentication you will be sent to a screen with multiple options, buttons that will take you to a menus such as: scheduling, beverage creation, recent beverages, recommended beverages, favorited beverages, or a searchable database. If the user is not registered, and the device is paired, it will take them to the beverage creation menu. For registered users, the schedule, recent, recommended, and favorited menus will be available and of the same list format. For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very precise, or general in their brew. Once all settings are selected, if registered, a user may have the decision to leave information on the drink created and post it in a searchable database and/or their recents/favorites. Information may be a title, description, bean of choice, etc. If the user is not registered, it will not prompt them for anything and brew their drink.
 
 \subsection{Data Aggregation and Processing Overview}
- 
+
+\subsection{Flask}
+Flask is a web framework that provides tools to allow you to build a web application.
+Flask is a micro-framework, so it requires no outside dependencies or external libraries.
+This means that the Flask is lightweight. Flask is designed for creating web applications,
+with a databse backend that operates through the browser. We will be using it to open
+a port on the local wifi network that will act as a REST server. We will use this server to send
+commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
+android application and the components inside the coffee machine.
+
 \section{Project Tasks}
 \subsection{Mobile User Interface}
 \begin{itemize}
@@ -344,6 +353,7 @@ beverage choices, favorites, recommendations, schedules, and an online database.
   \item Communication with Flask
   \item Communication between application, Flask, Firebase, and coffee machine.
 \end{itemize}
+
 % Just guessing here, but in an ideal world this would be the waterfall outward
 % Inidividual Components working
 % Components Controlled By I2C -> Aaron: At the end of the day, everything will
@@ -357,11 +367,31 @@ beverage choices, favorites, recommendations, schedules, and an online database.
 % Flask talking to Android Device
 % DB Pushing valuable data downstream
 %Machine talking to Android Device
+\subsection{SOME OTHER SUBSECTION}
+\begin{itemize}
+\item Individual Components
+\item All Components Controlled By I2C or SPI
+\item Commands Send via Python
+\item Flask archetecture setup
+\item Flask CMD Buffer
+\item DataBase setup
+\item Android talking to Flask
+\item DataBase talking to Android and Flask
+\item DataBase Recommendations and Statistics
+\end{itemize}
 
 \section{Project Materials}
-\begin{itemize}
+\begin {itemize}
+\item Raspberry Pi
 \item Android Device
-\end{itemize}
+\item Boilers
+\item Coils
+\item Resevoirs
+\item Custom PCBs
+\item Various IC's and Discretes
+\item Copper, brass, or silicon tubes
+\item Custom Machines Peices
+\end {itemize}
 % Raspberry Pi -> compute module, specifically
 %Boilers -> Built from raw materials, stainless steel
 %Coils -> Cartridge heaters
@@ -379,7 +409,7 @@ our devices reaction to GPIO eventst needs to be tested. This can be occumplishe
 unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
 be able to flush out multiple tests without relying on any network or GPIO setup. 
 \subsection{Mobile User Interface Testing}
-Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time, moving in the flow as a user would. Afterward another pass will be taken, adding data. Starting with the login screen, communication between Firebase, Flask, and the device will be established and pairing/login data will be tested and verified on every side. We then move to the basic function of non registered user: creating a drink. If the mechanical portions are not ready yet, then data collection will be done next on all of the other menus: scheduling, favorites, recommendations, recents, and online searching. During all of these integrations, testing with the actual coffee machine will take place, ensuring communication is working on all ends.
+Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time, moving in the flow as a user would. Afterward another pass will be taken, adding data. Starting with the login screen, communication between Firebase, Flask, and the device will be established and pairing/login data will be tested and verified on every side. We then move to the basic function of non registered user: creating a drink. If the mechanical portions are not ready yet, then data collection will be done next on all of the other menus: scheduling, favorites, recommendations, recents, and online searching. During all of these integrations, testing with the actual coffee machine will take place, ensuring communication is working on all ends. 
 
 \section{Project Demonstration}
 The goal of our project is to simplify making a cup of coffee for both connoisseurs and laypersons. 
