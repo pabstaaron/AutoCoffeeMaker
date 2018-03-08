@@ -480,7 +480,9 @@ Testing against the Flask microframework part of our project will be heavily rel
 outputs and inputs of recieved calls. Flask as a microframework does not need to be tested, however
 our devices reaction to GPIO eventst needs to be tested. This can be occumplished using the python
 unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
-be able to flush out multiple tests without relying on any network or GPIO setup.
+be able to flush out multiple tests without relying on any network or GPIO setup. We will also have to 
+test a buffer system to make sure 'real' requests are getting recieved and queued and multiple requests
+of the same requests are discarded.
 
 \subsection{Physical Machine Testing}
 
