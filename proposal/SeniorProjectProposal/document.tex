@@ -279,7 +279,7 @@ ingriedents (for example, it may provide optimal brew settings for a certain
 brand of coffee) and recommend beverages and settings to the user.
 
 The machine will be operated by some remote user interface running on an Android
-device to allow for a a streamlined user experience.
+device to allow for a more  streamlined user experience.
 
 \subsection{Physical Machine Overview}
 
@@ -289,11 +289,11 @@ storage tanks for water, milk and a non-dairy equivalent, and detergent.
 
 \subsubsection{Burr Grinder}
 The grinder will be based around flat (rather than conical) burr plates. The
-burr plates will first be designed in a 3D CAD system. The plates can then be
+burr plates will first be designed in a 3D CAD system and then be
 fabricated in one of two ways, depending on cost and time constraints.
 
 The plates may be sent to a computer aided-machining service to be milled out of
-stainless steel.
+stainless steel. 
 
 The 3D design may alternatively be used to 3D print a negative impression (mold) of the plates.
 This mold will be used to slip cast
@@ -301,6 +301,11 @@ ceramic (boron carbide, preferably) burrs. These slip cast plates will then need
 to be hardened in a kiln \cite{slip}. A similar process is used in the
 production of balistic body armor. Ceramic burrs have many advantages over steel burrs.
 %TODO why are ceramic plates better?
+
+The top-most of the burrs will be stationary (with respect to rotary motion)
+while the lower burr is connected to a sufficently powerful dc moter. The
+vertical distance between the two plates will be adjustable via a stepper motor coupled
+to a threaded shaft that will raise or lower the upper plate.
 
 \subsubsection{Tamping and Brewing Mechanism}
 The brewing mechanism will consist of the following major pieces: a boiler for
@@ -321,13 +326,12 @@ exactly as a human barista would.
 
 The wand will be designed in a 3D CAD program and then 3D printed to verify
 functionality, at which point the device will be sent to a computer-aided
-machining service to fabricated in stainless steel or aluminium.
+machining service to be fabricated in stainless steel or aluminium.
 
 The boiler will need to be capable of reaching much higher tempratures than the
 one used for producing brew water and will need to be capable of withstanding a
 large amount pressure. For this reason, a safety blow valve will be incorporated
 into the steam boiler.
-
 
 % We can do better than forcing the user to puch in a serial number - Aaron
 % We don't need an account system for our prototype. In fact, that doesn't make
@@ -362,10 +366,12 @@ searchable database and/or their recents/favorites. Information may be a title, 
 
 \subsection{Data Aggregation and Processing Overview}
 
+%TODO This is written as if there will be microcontroller in conjunction with
+% the RPI. I don't think that will wind up being the case - Aaron
 \subsection{Flask}
 Flask is a web framework that provides tools to allow you to build a web application.
 Flask is a micro-framework, so it requires no outside dependencies or external libraries.
-This means that the Flask is lightweight. Flask is designed for creating web applications,
+This means that Flask is lightweight. Flask is designed for creating web applications,
 with a databse backend that operates through the browser. We will be using it to open
 a port on the local wifi network that will act as a REST server. We will use this server to send
 commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
@@ -373,7 +379,7 @@ android application and the components inside the coffee machine.
 
 \section{Project Tasks}
 
-\subsection{Physical Machine Tasks}
+\subsection{Physical Machine}
 
 \begin{itemize}
 \item Design frothing mechanism
@@ -386,6 +392,9 @@ android application and the components inside the coffee machine.
 \item Fabricate ceramic burr plates
 \item Construct boilers
 \item Construct refridgeration system
+\item Assemble grinder
+\item Assemble brewing system
+\item Assemble frother
 \end{itemize}
 
 \subsection{Mobile User Interface}
@@ -393,7 +402,7 @@ android application and the components inside the coffee machine.
   \item Device pairing main screen % What main screen?
   \item Login screen which allows optional user login/registration or not.
   \item Main menu screen, allowing decision of brew creation, recommendations, recents, favorites, and a search menu.
-  \item Brew creation screen, with an advanced/basic toggle button and sliders, value inputs, and other selections based on mechanical aspect
+  \item Beverage creation screen has an advanced/basic toggle button and sliders, value inputs, and other selections
   \item Recommendations, scheduling, recents, favorites, and search sharing same UI layout (minor difference in scheduling), will query different data structures.
   \item Database integration with Firebase
   \item Communication with Flask
@@ -413,17 +422,21 @@ android application and the components inside the coffee machine.
 % Flask talking to Android Device
 % DB Pushing valuable data downstream
 %Machine talking to Android Device
-\subsection{Low Level Code}
+\subsection{Machine Side Software}
 \begin{itemize}
-\item Individual Components
-\item All Components Controlled By I2C or SPI
-\item Commands Send via Python
-\item Flask archetecture setup
-\item Flask CMD Buffer
-\item DataBase setup
-\item Android talking to Flask
-\item DataBase talking to Android and Flask
-\item DataBase Recommendations and Statistics
+  \item Flask application setup
+  \item Flask can receive commands from Android application
+  \item Mainboard communicating with regulators and monitors
+  \item Mainboard controls motors, servos, and steppers
+  \item Mainboard can adjust grinder fineness and start/stop grinding mechanism
+  \item Mainboard can initiate tamping process
+  \item Mainboard can initiate brewing process
+  \item Mainboard can initiate frothing process
+  \item Mainboard can initiate cleaning process
+\end{itemize}
+
+\subsection{Database/Web Server}
+\begin{itemize}
 \end{itemize}
 
 % Leave this to me - Aaron
@@ -433,7 +446,7 @@ android application and the components inside the coffee machine.
 \item Stainless steel stock
 \item Cartridge heaters
 \item Custom PCBs
-\item Various IC's and Discretes % TODO Add more specificity
+\item Various IC's and discretes % TODO Add more specificity
 \item Copper pipe
 \item Silicone Tubing
 \item Custom machined parts
@@ -446,7 +459,7 @@ android application and the components inside the coffee machine.
 \item Stepper motors
 \item Peristaltic pumps
 \item Thermocouples
-\item Liquid prressure sensors
+\item Liquid pressure sensors
 \item DC motors
 \end {itemize}
 
@@ -460,12 +473,17 @@ android application and the components inside the coffee machine.
 % Custom machined pieces from proto labs
 
 \section{Testing Approach}
+
+\subsection{Machine Side Software Testing}
 % Flask
 Testing against the Flask microframework part of our project will be heavily reliant on 'mocking'
 outputs and inputs of recieved calls. Flask as a microframework does not need to be tested, however
 our devices reaction to GPIO eventst needs to be tested. This can be occumplished using the python
 unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
-be able to flush out multiple tests without relying on any network or GPIO setup. 
+be able to flush out multiple tests without relying on any network or GPIO setup.
+
+\subsection{Physical Machine Testing}
+
 \subsection{Mobile User Interface Testing}
 Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first
  goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time,
@@ -483,6 +501,7 @@ At the project demonstation, the machine will be setup with an Android tablet an
 Visitors will be invited to use the tablet to design a drink watch the machine in action. Various spare internal components
 will be set out to aide in explaining how the machine works.
 
+% Don't think this section is necessary - Aaron
 \subsection{Mobile Demonstration}
 We will first demonstrate functionality with non registered user implementation (the basics on mobile)
  and how the mobile device can communicate with the machine properly to make a cup of coffee that is
