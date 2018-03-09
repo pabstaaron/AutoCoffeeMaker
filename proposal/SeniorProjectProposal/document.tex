@@ -362,7 +362,7 @@ registered, a user may have the decision to leave information on the drink creat
 searchable database and/or their recents/favorites. Information may be a title, description, etc. If the user is not registered, it will not prompt them for anything and brew their drink.
 
 \subsection{Data Aggregation and Processing Overview}
-The application will store user registrations, favorites, and other data in a standard SQL database. This database will be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in a Wildfly(JBoss) application server implementing the Java Enterprise Edition Standard. Wildfly provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the Wildfly server. Java code running inside the Wildfly server will translate JSON objects sent by the user into Java objects. MyBatis mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, MyBatis can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
+The application will store user registrations, favorites, and other data in a standard SQL database. This database may be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in an application server. The application server provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the application server. Code running inside the application server will translate JSON or XML objects sent by the user into Java objects. Mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, the mapper can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
 
 %TODO This is written as if there will be microcontroller in conjunction with
 % the RPI. I don't think that will wind up being the case - Aaron
@@ -370,7 +370,7 @@ The application will store user registrations, favorites, and other data in a st
 Flask is a web framework that provides tools to allow you to build a web application.
 Flask is a micro-framework, so it requires no outside dependencies or external libraries.
 This means that Flask is lightweight. Flask is designed for creating web applications,
-with a databse backend that operates through the browser. We will be using it to open
+with a database backend that operates through the browser. We will be using it to open
 a port on the local wifi network that will act as a REST server. We will use this server to send
 commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
 android application and the components inside the coffee machine.
@@ -435,10 +435,11 @@ android application and the components inside the coffee machine.
 
 \subsection{Database/Web Server}
 \begin{itemize}
-\item Setup a WildFly(JBoss) web server that is capable of receiving and sending REST requests.
+\item decide which application server, database mapper, and programming language to use for web server.
+\item Setup application server that is capable of receiving and sending REST requests.
 \item Establish API for communicating with android application (decide on communication format, i.e. xml or json)
-\item Convert REST data into java objects. 
-\item Develop a set of MyBatis mappers that can convert Java objects to SQL inserts and vice versa.
+\item Convert REST data into language specific objects. 
+\item Develop a set of mappers that can convert language specific objects to SQL inserts and vice versa.
 \item Set up SQL Database and populate schema. 
 \end{itemize}
 
