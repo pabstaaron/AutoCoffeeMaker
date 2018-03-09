@@ -402,9 +402,9 @@ android application and the components inside the coffee machine.
   \item Main menu screen, allowing decision of brew creation, recommendations, recents, favorites, and a search menu.
   \item Beverage creation screen has an advanced/basic toggle button and sliders, value inputs, and other selections
   \item Recommendations, scheduling, recents, favorites, and search sharing same UI layout (minor difference in scheduling), will query different data structures.
-  \item Database integration with Firebase
-  \item Communication with Flask
-  \item Communication between application, Flask, Firebase, and coffee machine.
+  \item Database integration with mobile and coffee machine
+  \item Communication with web server
+  \item Communication between application, webserver, database and coffee machine.
 \end{itemize}
 
 % Just guessing here, but in an ideal world this would be the waterfall outward
@@ -494,8 +494,8 @@ of the same requests are discarded.
 Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first
  goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time,
 moving in the flow as a user would. Afterward another pass will be taken, adding data. Starting with the
- login screen, communication between Firebase, Flask, and the device will be established and pairing/
- login data will be tested and verified on every side. We then move to the basic function of non
+ login screen, communication between database, webserver, and the device will be established and
+  pairing/login data will be tested and verified on every side. We then move to the basic function of non
   registered user: creating a drink. If the mechanical portions are not ready yet, then data collection will
    be done next on all of the other menus: scheduling, favorites, recommendations, recents, and online
     searching. During all of these integrations, testing with the actual coffee machine will take place, 
