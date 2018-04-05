@@ -330,12 +330,27 @@ one used for producing brew water and will need to be capable of withstanding a
 large amount pressure. For this reason, a safety blow valve will be incorporated
 into the steam boiler.
 
+\subsection{Data Aggregation and Processing Overview}
+The application will store user registrations, favorites, and other data in a standard SQL database. This database will be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in a Wildfly(JBoss) application server implementing the Java Enterprise Edition Standard. Wildfly provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the Wildfly server. Java code running inside the Wildfly server will translate JSON objects sent by the user into Java objects. MyBatis mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, MyBatis can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
+
+%TODO This is written as if there will be microcontroller in conjunction with
+% the RPI. I don't think that will wind up being the case - Aaron
+\subsection{Flask}
+Flask is a web framework that provides tools to allow you to build a web application.
+Flask is a micro-framework, so it requires no outside dependencies or external libraries.
+This means that Flask is lightweight. Flask is designed for creating web applications,
+with a databse backend that operates through the browser. We will be using it to open
+a port on the local wifi network that will act as a REST server. We will use this server to send
+commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
+android application and the components inside the coffee machine.
+
 % We can do better than forcing the user to puch in a serial number - Aaron
 % We don't need an account system for our prototype. In fact, that doesn't make
 % a lot of sense - Aaron 
 % Not sure a scheduling system makes sense in the scope
 % of our demo - Aaron
-\subsection{Mobile User Interface Overview}
+\section{Mobile User Interface}
+\subsection{Overview}
 The UI will be implemented as an Android application written in Java. Upon
 opening the application, it will ask the user to pair their Android device to the coffee machine given it's serial number. Afterwards It will 
 take the user to a login screen which will allow the user to register or not. Registering will allow the user 
@@ -361,8 +376,22 @@ options, allowing the user to be very precise, or general in their brew. Once al
 registered, a user may have the decision to leave information on the drink created and post it in a 
 searchable database and/or their recents/favorites. Information may be a title, description, etc. If the user is not registered, it will not prompt them for anything and brew their drink.
 
+\subsection{Communication between FLASK and App}
+The Raspberry Pi itself will be hosting it's own web server that we will be communicating with. It will have a REST API that will allow us to control the board, and in turn the machine as well. Within the android application itself, we can use a Class called Java.net. Within that class we will be able to use things such as HttpURLConnection to send HTTP requests such as GET and POST requests. For Java HTTP GET requests we can get all the info we need in a browser URL. We can use static functions or functions with parameters within that URL. An example of a GET request would be something like: \\ \\ \textbf{http://localhost:8080/CoffeeMaker/login?userName=Jim}\\ \\which could be a request for the user information on a user named "Jim". We could also send out information in a POST request that would be received on the local server and then interpret the information and perform an action. There are also other actions that are useful in REST API's such as PUT, PATCH, and DELETE. Steps below are ones that would be used to send HTTP requests to the server using the HttpURLConnection class:
+\begin{itemize}
+\item Create a URL object with a GET/POST URL string like one mentioned above
+\item Open a connection with that URL that creates an instance of an HttpURLConnection
+\item Set the request method in the HttpURLConnection
+\item Call setRequestProperty() on HttpURLConnection
+\item Call getResponseCode() to see if the request was processed successfully or any errors
+\item For GET, use a Reader and InputStream and process the response
+\item For POST, before reading the response, get an OutputStream from HttpURLConnection and write POST parameters into it.
+\end{itemize}
+
+\subsection{Skeleton}
+
 \subsection{Data Aggregation and Processing Overview}
-The application will store user registrations, favorites, and other data in a standard SQL database. This database will be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in a Wildfly(JBoss) application server implementing the Java Enterprise Edition Standard. Wildfly provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the Wildfly server. Java code running inside the Wildfly server will translate JSON objects sent by the user into Java objects. MyBatis mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, MyBatis can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
+The application will store user registrations, favorites, and other data in a standard SQL database. This database may be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in an application server. The application server provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the application server. Code running inside the application server will translate JSON or XML objects sent by the user into Java objects. Mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, the mapper can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
 
 %TODO This is written as if there will be microcontroller in conjunction with
 % the RPI. I don't think that will wind up being the case - Aaron
@@ -370,7 +399,7 @@ The application will store user registrations, favorites, and other data in a st
 Flask is a web framework that provides tools to allow you to build a web application.
 Flask is a micro-framework, so it requires no outside dependencies or external libraries.
 This means that Flask is lightweight. Flask is designed for creating web applications,
-with a databse backend that operates through the browser. We will be using it to open
+with a database backend that operates through the browser. We will be using it to open
 a port on the local wifi network that will act as a REST server. We will use this server to send
 commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
 android application and the components inside the coffee machine.
@@ -397,14 +426,11 @@ android application and the components inside the coffee machine.
 
 \subsection{Mobile User Interface}
 \begin{itemize}
-  \item Device pairing main screen % What main screen?
   \item Login screen which allows optional user login/registration or not.
-  \item Main menu screen, allowing decision of brew creation, recommendations, recents, favorites, and a search menu.
+  \item Device pairing screen
   \item Beverage creation screen has an advanced/basic toggle button and sliders, value inputs, and other selections
-  \item Recommendations, scheduling, recents, favorites, and search sharing same UI layout (minor difference in scheduling), will query different data structures.
-  \item Database integration with Firebase
-  \item Communication with Flask
-  \item Communication between application, Flask, Firebase, and coffee machine.
+  \item Communication between application and FLASK server.
+  \item Recommendations, scheduling, recents, favorites, and search sharing same UI layout, some using database(stretch goal).
 \end{itemize}
 
 % Just guessing here, but in an ideal world this would be the waterfall outward
@@ -435,10 +461,11 @@ android application and the components inside the coffee machine.
 
 \subsection{Database/Web Server}
 \begin{itemize}
-\item Setup a WildFly(JBoss) web server that is capable of receiving and sending REST requests.
+\item decide which application server, database mapper, and programming language to use for web server.
+\item Setup application server that is capable of receiving and sending REST requests.
 \item Establish API for communicating with android application (decide on communication format, i.e. xml or json)
-\item Convert REST data into java objects. 
-\item Develop a set of MyBatis mappers that can convert Java objects to SQL inserts and vice versa.
+\item Convert REST data into language specific objects. 
+\item Develop a set of mappers that can convert language specific objects to SQL inserts and vice versa.
 \item Set up SQL Database and populate schema. 
 \end{itemize}
 
@@ -493,8 +520,8 @@ of the same requests are discarded.
 Mobile Interface testing will be done one task at a time. Creating the layout and listeners will be the first
  goal. By doing this it will ensure a skeleton to work with. Each screen will be done one at a time,
 moving in the flow as a user would. Afterward another pass will be taken, adding data. Starting with the
- login screen, communication between Firebase, Flask, and the device will be established and pairing/
- login data will be tested and verified on every side. We then move to the basic function of non
+ login screen, communication between database, webserver, and the device will be established and
+  pairing/login data will be tested and verified on every side. We then move to the basic function of non
   registered user: creating a drink. If the mechanical portions are not ready yet, then data collection will
    be done next on all of the other menus: scheduling, favorites, recommendations, recents, and online
     searching. During all of these integrations, testing with the actual coffee machine will take place, 
