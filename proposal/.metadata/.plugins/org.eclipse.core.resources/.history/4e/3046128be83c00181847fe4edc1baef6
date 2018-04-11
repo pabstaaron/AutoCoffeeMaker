@@ -281,35 +281,13 @@ and recommend beverages and settings to the user.
 The machine will be primarily operated by some remote user interface running on an Android
 device to allow for a more streamlined user experience.
 
-% TODO Not sure if this is the right place for this
-The user application will collect various settings related to the operation of the
-machine from the user. These settings will contain information about grind fineness, brewing
-temperature, and frothing pressure. A definitive list of information that may be sent follows.
-All values are to be shipped as integers.
-
-\begin{itemize}
-\item Brew water temperature; as a value in degress Farenheit
-\item Frothing pressure; as a value in PSI
-\item Brew water pressure, as a value in PSI
-\item Amount of water to dispense through the brewer, as a value in ounces
-\item Amount of milk dispensed through the frother, in ounces
-\item Temprature for milk to reach in frothing cycle, as a value in degrees Fahrenheit
-\item Amount of froth to produce; as a value from zero to 100. A value of zero will cause the milk
-  to simply be warmed up (steamed), while a higher value will produce more foam.
-\item What kind of syrup, along with how much; as two integer values. The first number will be a
-  value between zero and four. The second number will be the amount of syrup to dispense; in ounces.
-\item The amount of coffee to dispense; in kilograms.
-\item The fineness of the coffee grind, as number from zero to 100 where 0 is the coarsest possible
-  grind and 100 is the finest possible grind.
-\end{itemize}
-
 \subsection{Physical Machine Overview}
 
 The physical espresso machine will consist of a brewing mechanism, a
 burr grinder, a tamping mechanism, a frother, several syrup dispensers, and
 storage tanks for water, milk and a non-dairy equivalent, and detergent.
 
-\subsubsection{Burr Grinder and Automatic Tamper}
+\subsubsection{Burr Grinder}
 The grinder will be based around flat (rather than conical) burr plates. We will first
 attempt to scratch build the grinder as follows.
 
@@ -333,7 +311,7 @@ Should this prove too daunting, an existing burr grinder will be modified
 and integrated into the machine. This approach will still require that an additional
 motor be added to adjust the grind.
 
-\subsubsection{Brewing Mechanism}
+\subsubsection{Tamping and Brewing Mechanism}
 The brewing mechanism will consist of the following major pieces: a boiler for
 heating brew water, a pump for pushing the water through the
 grounds, and a solenoid valve for allowing water into the boiler from the storage tank.
@@ -341,7 +319,6 @@ Existing pressure vessels will be used as boilers.
 
 % TODO Where will these pressure vessels come from?
 % TODO Will they need to be modified in any way?
-% TODO Need to go into a lot more detail about the brewing proces
 
 \subsubsection{Automatic Frother}
 The frother will be implemented as a chamber sitting directly above the
@@ -360,17 +337,6 @@ The boiler will need to be capable of reaching much higher temperatures than the
 one used for producing brew water and will need to be capable of withstanding a
 large amount pressure. For this reason, a safety blow valve will be incorporated
 into the steam boiler to keep the pressure at safe levels.
-
-% TODO Different degrees of froth. Steamed vs. cappucino
-% How are these different degrees of froth produced?
-
-\subsubsection{Milk Chiller}
-The frother will be fed from an insulated chamber equipped with a peliter element
-to keep the chamber cool and its contents unspoiled. The chamber will be constructed from
-an existing aluminum container. During a brewing cyce, milk from this chamber will be
-pumped into the frothing chamber using a peristaltic pump.
-
-\subsubsection{Flavoring Dispenser}
 
 % TODO Brunvand was concerned about this system needing some kind of feedback. It really
 %      doesn't... should address that here.
@@ -544,11 +510,10 @@ with a single button. As usual with all widgets, we we have listeners that will
 react to an action on them. This button will most likely say "connect", which
 will then open a new activity, or if already connected to a device that is
 recognized as one of our machines, the application will skip the second
-activity and go straight to the brewing portion of our application. 
+activity and go straight to the brewing portion of our application.
+ 
 
-% Not sure this is something we want to do..
-% I don't want to be in the business of trying to set up a PI as an AP
-If the mobile device had never been connected to the machine, the first
+If the mobile device had never been connected to the machine, that first
 activity would take you to the next activity on a "connect" button push that
 would let you connect to wireless access points around you (just as you
 normally would connect to wifi). The list of wireless access points will most

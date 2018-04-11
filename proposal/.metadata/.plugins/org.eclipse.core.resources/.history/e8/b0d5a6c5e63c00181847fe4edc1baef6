@@ -281,35 +281,13 @@ and recommend beverages and settings to the user.
 The machine will be primarily operated by some remote user interface running on an Android
 device to allow for a more streamlined user experience.
 
-% TODO Not sure if this is the right place for this
-The user application will collect various settings related to the operation of the
-machine from the user. These settings will contain information about grind fineness, brewing
-temperature, and frothing pressure. A definitive list of information that may be sent follows.
-All values are to be shipped as integers.
-
-\begin{itemize}
-\item Brew water temperature; as a value in degress Farenheit
-\item Frothing pressure; as a value in PSI
-\item Brew water pressure, as a value in PSI
-\item Amount of water to dispense through the brewer, as a value in ounces
-\item Amount of milk dispensed through the frother, in ounces
-\item Temprature for milk to reach in frothing cycle, as a value in degrees Fahrenheit
-\item Amount of froth to produce; as a value from zero to 100. A value of zero will cause the milk
-  to simply be warmed up (steamed), while a higher value will produce more foam.
-\item What kind of syrup, along with how much; as two integer values. The first number will be a
-  value between zero and four. The second number will be the amount of syrup to dispense; in ounces.
-\item The amount of coffee to dispense; in kilograms.
-\item The fineness of the coffee grind, as number from zero to 100 where 0 is the coarsest possible
-  grind and 100 is the finest possible grind.
-\end{itemize}
-
 \subsection{Physical Machine Overview}
 
 The physical espresso machine will consist of a brewing mechanism, a
 burr grinder, a tamping mechanism, a frother, several syrup dispensers, and
 storage tanks for water, milk and a non-dairy equivalent, and detergent.
 
-\subsubsection{Burr Grinder and Automatic Tamper}
+\subsubsection{Burr Grinder}
 The grinder will be based around flat (rather than conical) burr plates. We will first
 attempt to scratch build the grinder as follows.
 
@@ -333,7 +311,7 @@ Should this prove too daunting, an existing burr grinder will be modified
 and integrated into the machine. This approach will still require that an additional
 motor be added to adjust the grind.
 
-\subsubsection{Brewing Mechanism}
+\subsubsection{Tamping and Brewing Mechanism}
 The brewing mechanism will consist of the following major pieces: a boiler for
 heating brew water, a pump for pushing the water through the
 grounds, and a solenoid valve for allowing water into the boiler from the storage tank.
@@ -341,7 +319,6 @@ Existing pressure vessels will be used as boilers.
 
 % TODO Where will these pressure vessels come from?
 % TODO Will they need to be modified in any way?
-% TODO Need to go into a lot more detail about the brewing proces
 
 \subsubsection{Automatic Frother}
 The frother will be implemented as a chamber sitting directly above the
@@ -360,17 +337,6 @@ The boiler will need to be capable of reaching much higher temperatures than the
 one used for producing brew water and will need to be capable of withstanding a
 large amount pressure. For this reason, a safety blow valve will be incorporated
 into the steam boiler to keep the pressure at safe levels.
-
-% TODO Different degrees of froth. Steamed vs. cappucino
-% How are these different degrees of froth produced?
-
-\subsubsection{Milk Chiller}
-The frother will be fed from an insulated chamber equipped with a peliter element
-to keep the chamber cool and its contents unspoiled. The chamber will be constructed from
-an existing aluminum container. During a brewing cyce, milk from this chamber will be
-pumped into the frothing chamber using a peristaltic pump.
-
-\subsubsection{Flavoring Dispenser}
 
 % TODO Brunvand was concerned about this system needing some kind of feedback. It really
 %      doesn't... should address that here.
@@ -427,9 +393,9 @@ android application and the components inside the coffee machine.
 \subsection{Overview}
 The UI will be implemented as an Android application written in Java. Upon
 opening the application, it will ask the user to pair their Android device to
-the coffee machine given it's serial number. Afterwards, it will take the user
-to a login screen which will allow give the user the option of registering.
-Registering will allow the user to have a few extra options given from a database
+the coffee machine given it's serial number. Afterwards It will take the user
+to a login screen which will allow the user to register or not. Registering
+will allow the user to have a few extra options given from a database
 integration. These options will allow the user to search recent beverage
 choices, favorites, recommendations, schedules, and an online database. Each
 menu will include a similar list layout with searchable drinks. Upon clicking
@@ -441,7 +407,7 @@ canceled or changed. The benefit of registering will allow a user to login on
 any application and have all of the features described above.
 Given the choice of not creating a login, a user will still have to pair their
 phone to the device through the database, but won't have to deal with any extra
-UI that comes with a registered user. A non-registered user will be allowed to
+UI that comes with a registered user. A non- registered user will be allowed to
 brew coffee the way they want at that instant, and that will be the most basic
 functionality. Registering will be as simple as creating a login name and
 password with an email verification to prevent non-human users from
@@ -460,12 +426,11 @@ created and post it in a searchable database and/or their recents/favorites.
 Information may be a title, description, etc. If the user is not registered, it
 will not prompt them for anything and brew their drink.
 
-% TODO Not sure a java.net callout is necessary
 \subsection{Communication between FLASK and App}
-The machine will be hosting it's own web server that the user application will
-be communicating with. It will have a REST API that will allow us to control the
+The Raspberry Pi itself will be hosting it's own web server that we will be
+communicating with. It will have a REST API that will allow us to control the
 board, and in turn the machine as well. Within the android application itself,
-we can use a class called Java.net. Within that class we will be able to use
+we can use a Class called Java.net. Within that class we will be able to use
 things such as HttpURLConnection to send HTTP requests such as GET and POST
 requests. For Java HTTP GET requests we can get all the info we need in a
 browser URL. We can use static functions or functions with parameters within
@@ -482,21 +447,20 @@ HttpURLConnection class:
 \item Open a connection with that URL that creates an instance of an HttpURLConnection
 \item Set the request method in the HttpURLConnection
 \item Call setRequestProperty() on HttpURLConnection
-\item Call getResponseCode() to see if the request was processed successfully or
-if there were errors
+\item Call getResponseCode() to see if the request was processed successfully or any errors
 \item For GET, use a Reader and InputStream and process the response
 \item For POST, before reading the response, get an OutputStream from
 HttpURLConnection and write POST parameters into it.
 \end{itemize} 
 \ \\
-\textbf{The flask API will expose 3 API calls to the localhost:} \\ 
+\textbf{The flask API will expose 3 api calls to the localhost:} \\ 
 \begin{itemize}
 \item The first API call will be to verify that it is connected, this call will
 be a GET call to verify connectivity. If the call succeeds a 200 response will
-be posted as well as the session number, UTC timestamp, and model of the
+be posted as well as the session number, utc timestamp, and model of the
 machine in a json formatted payload.
-\item The second API call will be to initiate a brewing cycle. This will be a
-POST call with machine settings embedded in the url or in a payload sent. If the
+\item The second API call will be to make a cup of coffee. This will be a POST
+call with coffee preferences embedded in the url or in a payload sent. If the
 call succeeds a 201 response will be posted as well as session number, utc
 timestamp, model and the data that was interpreted. If the machine is currently
 making a cup of coffee, it will respond with a 200 response that indicates that
@@ -504,14 +468,12 @@ the machine is busy and the order will either be queued or discarded.
 \item The third API call will be to send the most recent 10-20 requests back in
 a json format. This will be a GET call that will tell the Flask server to pull
 the latest user data for that machine down, and send it back to the client. If
-this succeeds, a 200 Response will be posted as well as a session number, UTC
+succeeds a 200 Response will be posted as well as a session number, utc
 timestamp, model, and json formatted rows of data about previously made drinks.
 \end{itemize}
 \ \\
 
-% TODO - Need to improve clarity on these first couple sentences. They're kind
-% of hard to understand
-The REST API will be exposed to anyone on the network as it will run on host
+The REST api will be exposed to anyone on the network as it will run on host
 '0.0.0.0'. '0.0.0.0' is a non-routable address that allows all IPV4 addresses
 on the network to be listened to on the Raspberry Pi operating system.
 However, each request will not be accepted by the machine unless it has a
@@ -525,30 +487,25 @@ pushing up to the database.
 
 % TODO Can we add some figures with the UI?
 \subsection{UI Skeleton}
-For the user interface, we aim to setup something simple for a user, then if we
-have more time, we will try to integrate a database into the machine that would
-effect the mobile app as well. For the first part of this section, the focus will be
+For the user interface, we aim to setup something simple to a user, then if we
+have more time, we will try to integrate a database in the PI that would effect
+the mobile app as well. For the first part of this section, the focus will be
 on what we aim to accomplish. The rest of the section will be on the database
 stretch goal skeleton. The mobile application will not be too complex and will
 probably consist of only a few activities in an Android Application. As usual
-for many UI applications, we will be using a Model View Controller (MVC)      %
-% A what now? 
+for many UI applications, we will be using a Model View Controller (MVC)
 concept.  Android studio can be nice, because it is completely possible to have
-the model and controller in one section and the view in XML or another class
-file that would most likely implement a canvas. Functionality is the first
+the Model and Controller in one section and the View in XML or another class
+file that would most likely implement a Canvas. Functionality is the first
 objective, so an XML View, and Model/Controller activity class would probably
 be the simplest form for a few activities.
-
-For the main activity, the idea is to have a very simple main title screen
+\par For the main activity, the idea is to have a very simple main title screen
 with a single button. As usual with all widgets, we we have listeners that will
 react to an action on them. This button will most likely say "connect", which
 will then open a new activity, or if already connected to a device that is
 recognized as one of our machines, the application will skip the second
-activity and go straight to the brewing portion of our application. 
-
-% Not sure this is something we want to do..
-% I don't want to be in the business of trying to set up a PI as an AP
-If the mobile device had never been connected to the machine, the first
+activity and go straight to the brewing portion of our application.
+\par If the mobile device had never been connected to the machine, that first
 activity would take you to the next activity on a "connect" button push that
 would let you connect to wireless access points around you (just as you
 normally would connect to wifi). The list of wireless access points will most
