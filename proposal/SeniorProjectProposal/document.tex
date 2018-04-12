@@ -595,8 +595,35 @@ mobile app know that it is the correct device and open the brewing activity.
 %ease in sorting through machine by machine usage.
 
 \section{Database Integration}
+(Stretch Goal) Our goal for the DB integration is to used a free DB hosting service such as AWS or Firebase
+to accumulate data about recent machine requests and generic machine usage statistics. Machine requests will
+be sent in as a json object, and will likely be represented in the DB as a json object. The goal for collecting request
+data is to for the user to have a history definition for tweaking and repeating, and for us to aggregate what common 
+settings are for future optimization. Each request will be held in a global database, with a unique machine specific
+key for querying a specific machine only. The machine statistics are meant for durability data, and to analyze data in hopes for future optimization.
+Machine statistics will not be kept in a global table, and are only meant for local use.
 
 \section{Project Tasks}
+\subsection{Flask}
+\begin{itemize}
+\item Flask running on Raspberry Pi
+\item Flask running on startup and reboot
+\item Flask connected call
+\item Flask control of inner components
+\item Flask Coffee Call
+\item Flask DB Connection (Stretch)
+\item Flask DB Push (Stretch)
+\item Flask DB Pull and Return on Call (Stretch)
+\end{itemize}
+\subsection{Database Integration (Stretch Goal)}
+\begin{itemize}
+\item AWS or Firebase Setup
+\item Setup Request Global table
+\item Setup / Test push & pull to request table
+\item Setup Local table
+\item Return only machine specific data
+\end{itemize}
+
 
 \subsection{Physical Machine}
 
@@ -733,6 +760,16 @@ We will first demonstrate functionality with non registered user implementation 
   information from the database and laying it out in multiple menu's will give users the ease of quickly 
   making what they need or searching for something new. Using these different menu's, we will show 
   that the data integrity holds and creates the drink as it should. 
+
+\section{Contigency Plans}
+\subsection{Flask and Database}
+In the case that we cannot complete the project the database element will be scratched. This would affect
+Flask part of the project such that the expectation of data pushing and pulling will not be implemented.
+If time does not permit us to complete the database section in whole, then the database loses all 
+of its importance to this project and thus should not be attempted.
+
+In the case that we cannot demonstrate our project at the University of Utah due to network protections,
+we would buy / bring a popup wifi-network that we could connect to.
  
 
 % \begin{thebibliography}{1}
