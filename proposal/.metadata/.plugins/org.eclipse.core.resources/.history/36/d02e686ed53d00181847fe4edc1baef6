@@ -333,12 +333,6 @@ Should this prove too daunting, an existing burr grinder will be modified
 and integrated into the machine. This approach will still require that an additional
 motor be added to adjust the grind.
 
-As the coffee is ground and exits the grinding plates, it will fall into a chute
-that directs the coffee into a portafilter (housing/filter for the puck). The
-portafilter will be equipped with a force sensor in order to determine when
-enough coffee is present. Once an adequete amount of coffee has fallen into the
-chute, a linear actuator will press down into the grounds to pack them into a dense puck.
-
 \subsubsection{Brewing Mechanism}
 The brewing mechanism will consist of the following major pieces: a boiler for
 heating brew water, a pump for pushing the water through the
@@ -349,7 +343,7 @@ Existing pressure vessels will be used as boilers.
 % TODO Will they need to be modified in any way?
 % TODO Need to go into a lot more detail about the brewing proces
 
-\subsubsection{Automatic Frother and Milk Chiller}
+\subsubsection{Automatic Frother}
 The frother will be implemented as a chamber sitting directly above the
 dispensing end of the device. Milk will be pumped into this chamber from the
 refrigeration tank. Inside this chamber there will be a telescoping pipe
@@ -364,39 +358,22 @@ machining service to be fabricated in stainless steel or aluminum.
 
 The boiler will need to be capable of reaching much higher temperatures than the
 one used for producing brew water and will need to be capable of withstanding a
-large amount of pressure. For this reason, a safety blow valve will be incorporated
+large amount pressure. For this reason, a safety blow valve will be incorporated
 into the steam boiler to keep the pressure at safe levels.
 
 % TODO Different degrees of froth. Steamed vs. cappucino
 % How are these different degrees of froth produced?
 
-The frother needs to be capable of moving into and out of the milk to produce a host
-of different results needed to for different beverages. Some beverages require the milk
-to simply be heated up, in which case the end of the wand must be fully immersed, while
-some beverages require a large amount of foam, meaning the end of the wand must be positioned
-close to the surface of the liquid in order to incorporate large amounts of air.
-
+\subsubsection{Milk Chiller}
 The frother will be fed from an insulated chamber equipped with a peliter element
 to keep the chamber cool and its contents unspoiled. The chamber will be constructed from
 an existing aluminum container. During a brewing cyce, milk from this chamber will be
 pumped into the frothing chamber using a peristaltic pump.
 
+\subsubsection{Flavoring Dispenser}
+
 % TODO Brunvand was concerned about this system needing some kind of feedback. It really
 %      doesn't... should address that here.
-
-\subsubsection{Flavoring Dispenser}
-Many espresso drinks call for some type of flavoring syrup. The machine will be equipped
-with several mechanism for adding syrup to a beverage (the actual number of channels will
-depend on cost and space restrictions).
-
-The mechanism will accept a standard coffee flavoring bottle, which will have one end
-of a peristaltic pump placed inside of it (peristaltic pumps do well with viscous
-fluids). The syrup will be pumped directly into the functional end of the device and
-into the user's cup. The syrup will be pumped first in the brewing process and will rely
-on the pouring of the other fluids for mixing.
-
-The amount of syrup pumped will be approximated by tracking the number of rotations
-made by the pump's rollers.
 
 % TODO Consider revising first sentence to simply ``user data''
 % I'm a little confused about whether this is server side to client side -Aaron
