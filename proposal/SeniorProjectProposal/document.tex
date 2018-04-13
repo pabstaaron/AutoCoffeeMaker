@@ -441,18 +441,14 @@ a port on the local wifi network that will act as a REST server. We will use thi
 commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
 android application and the components inside the coffee machine.
 
-% We can do better than forcing the user to puch in a serial number - Aaron
-% We don't need an account system for our prototype. In fact, that doesn't make
-% a lot of sense - Aaron 
-% Not sure a scheduling system makes sense in the scope
-% of our demo - Aaron
-\section{Mobile User Interface}
-\subsection{Overview}
+\subsection{Mobile Application}
 The UI will be implemented as an Android application written in Java. Upon
 opening the application, it will ask the user to pair their Android device to
 the coffee machine given it's serial number. Afterwards, it will take the user
 to a login screen which will allow give the user the option of registering.
-Registering will allow the user to have a few extra options given from a database
+Registering and implementing a database is a stretch goal for us, our first priority is a simple UI that functions well with the coffee machine. 
+
+\par For registration, the idea is that we will allow the user to have a few extra options given from a database
 integration. These options will allow the user to search recent beverage
 choices, favorites, recommendations, schedules, and an online database. Each
 menu will include a similar list layout with searchable drinks. Upon clicking
@@ -462,28 +458,34 @@ will then have the option of favoriting, brewing, and scheduling the drink
 right in that given screen. In the scheduling menu, drink schedules may be
 canceled or changed. The benefit of registering will allow a user to login on
 any application and have all of the features described above.
-Given the choice of not creating a login, a user will still have to pair their
+
+\par Given the choice of not creating a login, which is our base goal, a user will still have to pair their
 phone to the device through the database, but won't have to deal with any extra
 UI that comes with a registered user. A non-registered user will be allowed to
-brew coffee the way they want at that instant, and that will be the most basic
-functionality. Registering will be as simple as creating a login name and
-password with an email verification to prevent non-human users from
-registering. After authentication, you will be sent to a screen with multiple
-options, buttons that will take you to menus such as: scheduling, beverage
-creation, recent beverages, recommended beverages, favorited beverages, or a
-searchable database.
-If the user is not registered, and the device is paired, it will take them to
-the beverage creation menu.
-For registered users, the schedule, recent, recommended, and favorited menus
-will be available and of the same list format. For the beverage creation menu,
-there will be advanced and basic settings options, allowing the user to be very
+brew coffee the way they want at that instant. 
+
+\par For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very
 precise, or general in their brew. Once all settings are selected, if
 registered, a user may have the decision to leave information on the drink
 created and post it in a searchable database and/or their recents/favorites.
 Information may be a title, description, etc. If the user is not registered, it
-will not prompt them for anything and brew their drink.
+will not prompt them for anything and brew their drink. 
 
-% TODO Not sure a java.net callout is necessary
+\par The mobile application
+will have the job of communicating between the FLASK server hosted on the 
+Rasperry PI, which in turn controls the coffee machine via GPIO pins. To be
+precise, the goal is to create a simple UI that controls the coffee machine the way it should.
+If time is generous, we will then try to implement communication with a database and
+maybe some more features on the mobile app.
+
+
+\section{Mobile Application}
+In this section the communication between the mobile application and the FLASK
+server hosted on the Raspberry PI. The skeleton for the the application itself will
+also be discussed, specifying the general layout/functionality of the application, as
+well as the stretch goals that we will be implemented if time is generous and things
+go smoothly.
+
 \subsection{Communication between FLASK and App}
 The machine will be hosting it's own web server that the user application will
 be communicating with. It will have a REST API that will allow us to control the
@@ -554,23 +556,19 @@ effect the mobile app as well. For the first part of this section, the focus wil
 on what we aim to accomplish. The rest of the section will be on the database
 stretch goal skeleton. The mobile application will not be too complex and will
 probably consist of only a few activities in an Android Application. As usual
-for many UI applications, we will be using a Model View Controller (MVC)      %
-% A what now? 
+for many UI applications, we will be using a Model View Controller (MVC)     
 concept.  Android studio can be nice, because it is completely possible to have
 the model and controller in one section and the view in XML or another class
 file that would most likely implement a canvas. Functionality is the first
 objective, so an XML View, and Model/Controller activity class would probably
 be the simplest form for a few activities.
 
-For the main activity, the idea is to have a very simple main title screen
+\par For the main activity, the idea is to have a very simple main title screen
 with a single button. As usual with all widgets, we we have listeners that will
 react to an action on them. This button will most likely say "connect", which
 will then open a new activity, or if already connected to a device that is
 recognized as one of our machines, the application will skip the second
 activity and go straight to the brewing portion of our application. 
-
-% Not sure this is something we want to do..
-% I don't want to be in the business of trying to set up a PI as an AP
 If the mobile device had never been connected to the machine, the first
 activity would take you to the next activity on a "connect" button push that
 would let you connect to wireless access points around you (just as you
@@ -584,7 +582,9 @@ usable once a card is selected. Once the "connect" button is selected, the
 application will send out a request to that access point. If that device is one
 of our coffee machines, it will send a specific message that will let the
 mobile app know that it is the correct device and open the brewing activity.
-\par %this section is for the brewing activity of the application
+
+\par  In the brewing activity there will be many different widgets that control options
+on the coffee machine. 
 
 
 %\subsection{Data Aggregation and Processing Overview}
@@ -619,7 +619,7 @@ Machine statistics will not be kept in a global table, and are only meant for lo
 \begin{itemize}
 \item AWS or Firebase Setup
 \item Setup Request Global table
-\item Setup / Test push & pull to request table
+\item Setup / Test push \& pull to request table
 \item Setup Local table
 \item Return only machine specific data
 \end{itemize}
