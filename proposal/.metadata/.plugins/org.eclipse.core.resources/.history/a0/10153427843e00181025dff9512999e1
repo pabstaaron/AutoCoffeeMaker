@@ -427,15 +427,10 @@ ethernet ports, WIFI controllers, audio jack, or power connector (it does have
 a microSD slot for loading an operating system).
 Instead, the RPi compute module plugs into a standard SODIMM connector and provides access to all
 IO ports and periperals through that interface, making it easily integrated into
-a user built PCB. The RPi lacks many peripherals needed in embedded systems
-applications and the heavy operating systems they run makes accessing low level
-reasources such as timers difficult. Since access to low level hardware
-reasources and peripherals such as analog to digital converters will be needed,
-a seperate STM32 chip will be interfaced via UART or I2C with the RPI to handle
-all low level control and monitoring tasks. 
+a user built PCB. 
 
-The compute module and STM32 chip will interface with a PCB(s) of our own
-design, which will contain circuitry for a WiFi adapter, actuator controllers, thermal
+The compute module will interface with a PCB(s) of our own design, which will
+contain circuitry for a WiFi adapter, actuator controllers, thermal
 monitors/regulators, flow monitors, pump controllers, motor controllers, and
 weight sensors.
 
@@ -443,25 +438,18 @@ The WiFi adapter will be implemented in the same manner as on a traditional RPi.
 As an on-board USB to WiFi adapter.
 
 All linear actuators in the machine will be digital linear servos and controlled
-via PWM using the STM32 timers.
+via PWM. The RPi does not have any PWM controllers built in, so we will add an
+external helper chip for PWM control.
 
-Thermal monitoring for all heaters, chillers, and the frother will be utilize a
+Thermal monitoring for all heater, chillers, and the frother will be utilize a
 thermocouple. A thermocouple is a device that produces a small voltage
 differential based on the amount of heat applied to it. This small voltage will
 need to be amplified in order to obtain a measurable voltage. For this task,
-specialty thermocouple amplifier chips are available. The analog to digital
-converters on the STM32 will be used to make final measurements.
+specialty thermocouple amplifier chips are available. The RPi has no analog to
+digital converters, so an additional chip will be needed for this task.
 
 Thermal reglation for all heating elements will be handled by toggling a relay
-that connects the heating element to the mains. Chilling elements will be
-controlled in the same manner, except that the peltier element will be connected
-to a 12 volt regulated power supply. This task will be handled by the STM32.
-
-All flow monitors will be hall effect based pinweel sensors. These sensors
-deliver a series of electrical pulses. The amount of fluid that has passed
-through the sensor can be determined by counting the number of pulses that occur
-in a given period of time. Timers and interrupts on the STM32 will be used to
-make these measurments.
+that connects the heating element to the mains.
 
 % TODO Consider revising first sentence to simply ``user data''
 % I'm a little confused about whether this is server side to client side -Aaron

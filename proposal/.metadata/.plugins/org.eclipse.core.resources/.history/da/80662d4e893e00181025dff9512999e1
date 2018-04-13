@@ -460,8 +460,7 @@ to a 12 volt regulated power supply. This task will be handled by the STM32.
 All flow monitors will be hall effect based pinweel sensors. These sensors
 deliver a series of electrical pulses. The amount of fluid that has passed
 through the sensor can be determined by counting the number of pulses that occur
-in a given period of time. Timers and interrupts on the STM32 will be used to
-make these measurments.
+in a given period of time.
 
 % TODO Consider revising first sentence to simply ``user data''
 % I'm a little confused about whether this is server side to client side -Aaron

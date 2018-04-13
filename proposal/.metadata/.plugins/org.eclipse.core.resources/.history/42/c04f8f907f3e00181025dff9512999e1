@@ -370,8 +370,8 @@ temperature monitoring and will have a hall effect based flow meter on the inlet
 \subsubsection{Automatic Frother and Milk Chiller}
 The frother will be implemented as a chamber sitting directly above the
 dispensing end of the device. Inside this chamber there will be a telescoping pipe
-attached to a linear actuator acting as the frothing wand. This pipe will be
-able to autonomously move into and out of the milk and will be connected to a boiler
+attached to a servo acting as the frothing wand. This pipe will be able to
+autonomously move into and out of the milk and will be connected to a boiler
 producing high pressure steam. In this manner, the machine will be able to froth
 exactly as a human barista would.
 
@@ -388,7 +388,7 @@ into the steam boiler to keep the pressure at safe levels.
 % How are these different degrees of froth produced?
 
 The frother needs to be capable of moving into and out of the milk to produce a host
-of different results needed for different beverages. Some beverages require the milk
+of different results needed to for different beverages. Some beverages require the milk
 to simply be heated up, in which case the end of the wand must be fully immersed, while
 some beverages require a large amount of foam, meaning the end of the wand must be positioned
 close to the surface of the liquid in order to incorporate large amounts of air.
@@ -396,19 +396,15 @@ close to the surface of the liquid in order to incorporate large amounts of air.
 The frother will be fed from an insulated chamber equipped with a peliter element
 to keep the chamber cool and its contents unspoiled. The chamber will be constructed from
 an existing aluminum container. During a brewing cyce, milk from this chamber will be
-pumped into the frothing chamber using a peristaltic pump. A hall effect based
-flow meter will determine how much milk has been dispensed. The frothing chamber
-will be equipped with a liquid level sensor as a part of the control system for
-the wand.
+pumped into the frothing chamber using a peristaltic pump.
 
 % TODO Brunvand was concerned about this system needing some kind of feedback. It really
 %      doesn't... should address that here.
 
-
 \subsubsection{Flavoring Dispenser}
 Many espresso drinks call for some type of flavoring syrup. The machine will be equipped
-with several mechanisms for adding syrup to a beverage (the actual number of
-channels will depend on cost and space restrictions).
+with several mechanism for adding syrup to a beverage (the actual number of channels will
+depend on cost and space restrictions).
 
 The mechanism will accept a standard coffee flavoring bottle, which will have one end
 of a peristaltic pump placed inside of it (peristaltic pumps do well with viscous
@@ -418,50 +414,6 @@ on the pouring of the other fluids for mixing.
 
 The amount of syrup pumped will be approximated by tracking the number of rotations
 made by the pump's rollers.
-
-\subsubsection{Electronics and Control}
-The primary control system will be based around the Raspberry Pi. Specifically,
-the Raspberry Pi Compute Module. The RPi compute module has all of the basic
-electronics found on a regular RPi, but without GPIO headers, USB ports,
-ethernet ports, WIFI controllers, audio jack, or power connector (it does have
-a microSD slot for loading an operating system).
-Instead, the RPi compute module plugs into a standard SODIMM connector and provides access to all
-IO ports and periperals through that interface, making it easily integrated into
-a user built PCB. The RPi lacks many peripherals needed in embedded systems
-applications and the heavy operating systems they run makes accessing low level
-reasources such as timers difficult. Since access to low level hardware
-reasources and peripherals such as analog to digital converters will be needed,
-a seperate STM32 chip will be interfaced via UART or I2C with the RPI to handle
-all low level control and monitoring tasks. 
-
-The compute module and STM32 chip will interface with a PCB(s) of our own
-design, which will contain circuitry for a WiFi adapter, actuator controllers, thermal
-monitors/regulators, flow monitors, pump controllers, motor controllers, and
-weight sensors.
-
-The WiFi adapter will be implemented in the same manner as on a traditional RPi.
-As an on-board USB to WiFi adapter.
-
-All linear actuators in the machine will be digital linear servos and controlled
-via PWM using the STM32 timers.
-
-Thermal monitoring for all heaters, chillers, and the frother will be utilize a
-thermocouple. A thermocouple is a device that produces a small voltage
-differential based on the amount of heat applied to it. This small voltage will
-need to be amplified in order to obtain a measurable voltage. For this task,
-specialty thermocouple amplifier chips are available. The analog to digital
-converters on the STM32 will be used to make final measurements.
-
-Thermal reglation for all heating elements will be handled by toggling a relay
-that connects the heating element to the mains. Chilling elements will be
-controlled in the same manner, except that the peltier element will be connected
-to a 12 volt regulated power supply. This task will be handled by the STM32.
-
-All flow monitors will be hall effect based pinweel sensors. These sensors
-deliver a series of electrical pulses. The amount of fluid that has passed
-through the sensor can be determined by counting the number of pulses that occur
-in a given period of time. Timers and interrupts on the STM32 will be used to
-make these measurments.
 
 % TODO Consider revising first sentence to simply ``user data''
 % I'm a little confused about whether this is server side to client side -Aaron
