@@ -52,7 +52,6 @@
 
 \documentclass[conference]{IEEEtran}
 \usepackage{url}
-\usepackage{graphicx}
 
 %
 \ifCLASSINFOpdf
@@ -463,12 +462,6 @@ specialty thermocouple amplifier chips are available such as the AD8495
 \cite{thermo}.
 The analog to digital converters on the STM32 will be used to make final measurements.
 
-\begin{figure}
-  \centering
-    \includegraphics[width=0.5\textwidth]{ThermoAmp}
-    \caption{Thermocouple amplifier with 100Hz low-pass filter.}
-\end{figure}
-
 Thermal reglation for all heating elements will be handled by toggling a relay
 that connects the heating element to the mains. Chilling elements will be
 controlled in the same manner, except that the peltier element will be connected
@@ -529,7 +522,7 @@ the coffee machine given it's serial number. Afterwards, it will take the user
 to a login screen which will allow give the user the option of registering.
 Registering and implementing a database is a stretch goal for us, our first priority is a simple UI that functions well with the coffee machine. 
 
-For registration, the idea is that we will allow the user to have a few extra options given from a database
+\par For registration, the idea is that we will allow the user to have a few extra options given from a database
 integration. These options will allow the user to search recent beverage
 choices, favorites, recommendations, schedules, and an online database. Each
 menu will include a similar list layout with searchable drinks. Upon clicking
@@ -540,19 +533,19 @@ right in that given screen. In the scheduling menu, drink schedules may be
 canceled or changed. The benefit of registering will allow a user to login on
 any application and have all of the features described above.
 
-Given the choice of not creating a login, which is our base goal, a user will still have to pair their
+\par Given the choice of not creating a login, which is our base goal, a user will still have to pair their
 phone to the device through the database, but won't have to deal with any extra
 UI that comes with a registered user. A non-registered user will be allowed to
 brew coffee the way they want at that instant. 
 
-For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very
+\par For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very
 precise, or general in their brew. Once all settings are selected, if
 registered, a user may have the decision to leave information on the drink
 created and post it in a searchable database and/or their recents/favorites.
 Information may be a title, description, etc. If the user is not registered, it
 will not prompt them for anything and brew their drink. 
 
-The mobile application
+\par The mobile application
 will have the job of communicating between the FLASK server hosted on the 
 Rasperry PI, which in turn controls the coffee machine via GPIO pins. To be
 precise, the goal is to create a simple UI that controls the coffee machine the way it should.

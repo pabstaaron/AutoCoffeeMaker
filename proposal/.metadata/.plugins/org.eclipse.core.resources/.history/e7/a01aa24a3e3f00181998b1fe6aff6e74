@@ -52,7 +52,6 @@
 
 \documentclass[conference]{IEEEtran}
 \usepackage{url}
-\usepackage{graphicx}
 
 %
 \ifCLASSINFOpdf
@@ -399,8 +398,8 @@ The frother will be fed from an insulated chamber equipped with a peliter elemen
 to keep the chamber cool and its contents unspoiled. The chamber will be constructed from
 an existing aluminum container and insulating material readily available at big
 box hardware stores.
-During a brewing cycle, milk from this chamber will be pumped into the frothing
-chamber using a peristaltic pump. A hall effect based flow meter will determine how much milk has been dispensed. The frothing chamber
+During a brewing cyce, milk from this chamber will be pumped into the frothing chamber using a peristaltic pump. A hall effect based
+flow meter will determine how much milk has been dispensed. The frothing chamber
 will be equipped with a liquid level sensor as a part of the control system for
 the wand.
 
@@ -430,7 +429,7 @@ such as listening for commands on the network and exchanging operating data whil
 STM32 chip will be responsible for all embedded control. 
 The RPi compute module has all of the basic electronics found on a regular RPi, but without GPIO headers, USB ports,
 ethernet ports, WIFI controllers, audio jack, or power connector (it does have
-a microSD slot for loading an operating system) \cite{RPi}.
+a microSD slot for loading an operating system).
 Instead, the RPi compute module plugs into a standard SODIMM connector and provides access to all
 IO ports and periperals through that interface, making it easily integrated into
 a user built PCB. The RPi lacks many peripherals needed in embedded systems
@@ -451,23 +450,14 @@ As an on-board USB to WiFi adapter.
 
 All linear actuators in the machine will be digital linear servos and controlled
 via PWM using the STM32 timers. Should more PWM outputs be needed than are
-available on the STM32, the PCA9685 PWM expansion chip will be used (the
-PCA9685 was designed for driving LEDs, but it works just fine for controlling
-servos as well) \cite{PWM}.
+available on the STM32, the PCA9685 PWM expansion chip will be used.
 
 Thermal monitoring for all heaters, chillers, and the frother will utilize a
 thermocouple. A thermocouple is a device that produces a small voltage
 differential based on the amount of heat applied to it. This small voltage will
 need to be amplified in order to obtain a measurable voltage. For this task,
-specialty thermocouple amplifier chips are available such as the AD8495
-\cite{thermo}.
-The analog to digital converters on the STM32 will be used to make final measurements.
-
-\begin{figure}
-  \centering
-    \includegraphics[width=0.5\textwidth]{ThermoAmp}
-    \caption{Thermocouple amplifier with 100Hz low-pass filter.}
-\end{figure}
+specialty thermocouple amplifier chips are available such as the AD8495. The
+analog to digital converters on the STM32 will be used to make final measurements.
 
 Thermal reglation for all heating elements will be handled by toggling a relay
 that connects the heating element to the mains. Chilling elements will be
@@ -529,7 +519,7 @@ the coffee machine given it's serial number. Afterwards, it will take the user
 to a login screen which will allow give the user the option of registering.
 Registering and implementing a database is a stretch goal for us, our first priority is a simple UI that functions well with the coffee machine. 
 
-For registration, the idea is that we will allow the user to have a few extra options given from a database
+\par For registration, the idea is that we will allow the user to have a few extra options given from a database
 integration. These options will allow the user to search recent beverage
 choices, favorites, recommendations, schedules, and an online database. Each
 menu will include a similar list layout with searchable drinks. Upon clicking
@@ -540,19 +530,19 @@ right in that given screen. In the scheduling menu, drink schedules may be
 canceled or changed. The benefit of registering will allow a user to login on
 any application and have all of the features described above.
 
-Given the choice of not creating a login, which is our base goal, a user will still have to pair their
+\par Given the choice of not creating a login, which is our base goal, a user will still have to pair their
 phone to the device through the database, but won't have to deal with any extra
 UI that comes with a registered user. A non-registered user will be allowed to
 brew coffee the way they want at that instant. 
 
-For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very
+\par For the beverage creation menu, there will be advanced and basic settings options, allowing the user to be very
 precise, or general in their brew. Once all settings are selected, if
 registered, a user may have the decision to leave information on the drink
 created and post it in a searchable database and/or their recents/favorites.
 Information may be a title, description, etc. If the user is not registered, it
 will not prompt them for anything and brew their drink. 
 
-The mobile application
+\par The mobile application
 will have the job of communicating between the FLASK server hosted on the 
 Rasperry PI, which in turn controls the coffee machine via GPIO pins. To be
 precise, the goal is to create a simple UI that controls the coffee machine the way it should.

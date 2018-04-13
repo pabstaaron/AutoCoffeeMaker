@@ -464,9 +464,9 @@ specialty thermocouple amplifier chips are available such as the AD8495
 The analog to digital converters on the STM32 will be used to make final measurements.
 
 \begin{figure}
+  \caption{Thermocouple amplifier with 100Hz low-pass filter.}
   \centering
     \includegraphics[width=0.5\textwidth]{ThermoAmp}
-    \caption{Thermocouple amplifier with 100Hz low-pass filter.}
 \end{figure}
 
 Thermal reglation for all heating elements will be handled by toggling a relay

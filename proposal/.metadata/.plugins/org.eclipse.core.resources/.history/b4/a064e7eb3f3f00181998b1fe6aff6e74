@@ -104,17 +104,8 @@ url = "https://www.thespruce.com/how-to-slipcast-ceramics-4154220"
 @manual{thermo,
     organization  = "Analog Devices",
     title         = "Precision Thermocouple Amplifiers with Cold Junction Compensation",
-    number        = "AD8494",
-    year          =  2018,
+    number        = "PCA9685",
+    year          =  2015,
     month         =  4,    
-    note          = "Rev. D"
-}
-
-@manual{RPi,
-    organization  = "Raspberry Pi Foundation",
-    title         = "Raspberry Pi Compute Module",
-    number        = "CM3",
-    year          =  2016,
-    month         =  10,    
-    note          = "Rev. 1"
+    note          = "Rev. 4"
 }

@@ -52,7 +52,6 @@
 
 \documentclass[conference]{IEEEtran}
 \usepackage{url}
-\usepackage{graphicx}
 
 %
 \ifCLASSINFOpdf
@@ -462,12 +461,6 @@ need to be amplified in order to obtain a measurable voltage. For this task,
 specialty thermocouple amplifier chips are available such as the AD8495
 \cite{thermo}.
 The analog to digital converters on the STM32 will be used to make final measurements.
-
-\begin{figure}
-  \centering
-    \includegraphics[width=0.5\textwidth]{ThermoAmp}
-    \caption{Thermocouple amplifier with 100Hz low-pass filter.}
-\end{figure}
 
 Thermal reglation for all heating elements will be handled by toggling a relay
 that connects the heating element to the mains. Chilling elements will be
