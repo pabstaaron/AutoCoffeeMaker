@@ -668,7 +668,7 @@ mobile app know that it is the correct device and open the brewing activity.
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.5\columnwidth]{connect.png}
-\caption{Mockup of the homescreen [2]}
+\caption{Basic mockup of the homescreen [2]}
 \end{figure} 
 
 \par  In the brewing activity there will be many different widgets that control options
@@ -682,12 +682,54 @@ have a specification on the amount of beans we want to grind (generally speaking
 we would like our coffee to be). If constructing our own we will most likely just use a stepper motor, some
 burr grinders use belts along with motors but we most likely wont go that route. The signal of coffee "strength"
 will be sent to the Raspberry Pi, and it will communicate with the motor, stopping after a certain threshold is reached.
+%still need more info on what will be controlled with the mobile app, what requests i would need to send and what data
+\par
 
-\par 
+\subsection{Mobile Stretch Goals}
+The idea of having a database attached to this whole system is something that we would like to do, but we may not find time.
+Depending how much data we would want to keep track of would cost more and more in time.
+Ideally we would like to create a system that keeps track of previous drinks, favorited drinks, and create scheduled times for drinks.
+The other idea would be to allow a cross integrated system between all users and allow them to share beverage ideas and also
+have a feature of recommended drinks.
 
+\par If we were to implement this, when opening the application, instead of directly going into connecting with a device, we would
+have the option for the user to login or continue without logging in. If the user didn't have an account they could create one by
+giving an email, login name, etc. They would then have to verify their email before continuing. The way we could go about doing this 
+is by using Firebase. Firebase is a google database, we would implement the Raspberry PI to communicate with Firebase and then
+relay the data back to the mobile devices attached. On the mobile side we would send http requests to the Raspberry PI to see
+if the user existed or not and login using that information. It is also very possible to do Bluetooth communication with the Raspberry Pi
+and mobile application and have the mobile application just use cellular or wifi to communicate with the Firebase server. For right
+now we are aiming at using the Raspberry Pi as the center control for everything.
 
+\par If the user had not logged in, the the previous ideas mentioned before would be presented. If they did login, they would be 
+presented with a menu with multiple options. Those options would be the ones that were listed before: Recent Drinks, Favorited Drinks,
+Scheduled drinks, Recommended drinks, and searchable drinks. If anything the first stretch goal would be to get Recent, Favorited, and Scheduled
+drinks implemented, because that does not require cross data integration between other users. Integrating the database would allow users to login
+with different devices on different coffee machines and have their own data readily available to them.
 
+\par Drink brewing would be a little bit different for users. Upon creating a drink, it would allow you to upload it to the database or add it to your favorites; also allowing the user to  add a description of it,
+allowing other users to search for it in the other "search" menu. This option would be available when pushing the button to "brew" your drink, a popup would display, having a textbox for description, spinners
+for times, check marks to enable things like setting schedules or uploading to the database or adding to your favorites list. Same concept of brewing, but with added features to save data for the user.
 
+\par Opening the recent menu would display a view that had the last few drinks you had brewed. The drinks would probably be listed as as some sort of card (object that holds info) and
+upon clicking the card, it would bring up the brewing menu but, but the one like the one listed in the above paragraph; performing the exact same way.
+
+\par Opening the favorited menu would be a little like the recent menu, but most likely be in a recycler view (a view that holds cards and is scrollable). The cards would act the exact same way
+as the other cards in the previous sections, opening the brewing action. The difference with this menu is that the user would be allowed to remove favorited items. There would most likely be
+a check mark next to all of the cards and once selected, a button would highlight that would allow you to delete it; perhaps even editing could be implemented as well.
+
+\par The scheduled menu would be the exact same layout as the favorited menu, but it would allow you to edit as well, setting times to how you want them. There would probably be
+a new type of action that would be made specifically for this. Opening a popup specific to changing times on a specific drink. There would be spinners and and check marks, allowing
+users to make recurring drink schedules or a one time schedule.
+
+\par Recommended and Searchable features are ones that would require data aggregation. The recommendation menu would be laid out the same as the others menus. It could either 
+have a set limit of recommended brews (preferably easier) or a scrollable list that updates as it goes (probably not ideal for this project). The functionality would be the same, by clicking on
+a card, it would take the user to the brewing screen where they could make it a favorite, brew it, etc. Some sort of user cross referencing algorithm would have to be used to select data
+from the database for recommended brews. A simple query could probably be used for that, but it is possible to create something more thorough. The searchable feature would require
+some sort of search box, and implement a query based on that search box. These queries would be executed by the Raspberry Pi and sent back to the mobile application, the app would
+just need to send queries through http calls.
+Since there probably would not be very many tables, the searching would not be too hard to implement. These
+two would be the most difficult to implement out of the features in this stretch goal.
 
 %\subsection{Data Aggregation and Processing Overview}
 % The application will store user registrations, favorites, and other data in a standard SQL database. This database may be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in an application server. The application server provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the application server. Code running inside the application server will translate JSON or XML objects sent by the user into Java objects. Mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, the mapper can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
