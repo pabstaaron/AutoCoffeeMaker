@@ -473,7 +473,7 @@ Thermal reglation for all heating elements will be handled by toggling a relay
 that connects the heating element to the mains. Chilling elements will be
 controlled in the same manner, except that the peltier element will be connected
 to a 12 volt regulated power supply. This task will be handled by the STM32.
-	
+
 All flow monitors will be hall effect based pinweel sensors. These sensors
 deliver a series of electrical pulses proportional to the amount of fluid
 flowing through them. Timers and interrupts on the STM32 will be used to make
