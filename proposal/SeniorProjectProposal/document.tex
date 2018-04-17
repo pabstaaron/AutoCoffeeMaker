@@ -667,23 +667,23 @@ mobile app know that it is the correct device and open the brewing activity.
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.5\columnwidth]{connect.png}
-\caption{Basic mockup of the homescreen [2]}
+\includegraphics[width=0.4\columnwidth]{connect.png}
+\frame{\includegraphics[width=0.4\columnwidth]{wifi.png}}
+\caption{Basic mockup of the homescreen, and wifi connection}
 \end{figure} 
 
 \par  In the brewing activity there will be many different widgets that control options
 on the coffee machine. There are Spinners, Buttons, Sliders, Seekbars, etc. to control
 the different mechanisms within the coffee machine. The different
-mechanisms that will need control are the burr grinder (motor), liquid pumps(on/off).
+mechanisms that will need control are temperatures of water/milk, PSI values for water/frothing,
+amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
+of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-\par The Burr Grinder will need most likely
-just need to have a motor and will be used when the coffee is actually being brewed and will
-have a specification on the amount of beans we want to grind (generally speaking how strong
-we would like our coffee to be). If constructing our own we will most likely just use a stepper motor, some
-burr grinders use belts along with motors but we most likely wont go that route. The signal of coffee "strength"
-will be sent to the Raspberry Pi, and it will communicate with the motor, stopping after a certain threshold is reached.
-%still need more info on what will be controlled with the mobile app, what requests i would need to send and what data
-\par
+\begin{figure}[!ht]
+\centering
+\frame{\includegraphics[width=0.5\columnwidth]{brewNoUser.png}}
+\caption{Basic mockup of brew activity}
+\end{figure} 
 
 \subsection{Mobile Stretch Goals}
 The idea of having a database attached to this whole system is something that we would like to do, but we may not find time.
@@ -729,7 +729,28 @@ from the database for recommended brews. A simple query could probably be used f
 some sort of search box, and implement a query based on that search box. These queries would be executed by the Raspberry Pi and sent back to the mobile application, the app would
 just need to send queries through http calls.
 Since there probably would not be very many tables, the searching would not be too hard to implement. These
-two would be the most difficult to implement out of the features in this stretch goal.
+two would be the most difficult to implement out of the features in this stretch goal. \\ Figure 4 shows some mockups of user
+features; Figure 5 shows some other user activities that would be used.
+
+\begin{figure}[!ht]
+\centering
+\frame{\includegraphics[width=0.4\columnwidth]{loginStretch.png}}
+\frame{\includegraphics[width=0.4\columnwidth]{brewStretch.png}}
+\frame{\includegraphics[width=0.4\columnwidth]{menu.png}}
+
+\caption{Basic mockup of user login, brew, and menu screens}
+\end{figure} 
+
+\par
+\begin{figure}[!ht]
+\centering
+\frame{\includegraphics[width=0.3\columnwidth]{Schedule.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Scheduled.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Search.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Register.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Load.png}}
+\caption{Basic mockup of other screens such as: Creating schedules, searching, Registering, and a schedule screen, and waiting for email confirmation}
+\end{figure} 
 
 %\subsection{Data Aggregation and Processing Overview}
 % The application will store user registrations, favorites, and other data in a standard SQL database. This database may be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in an application server. The application server provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the application server. Code running inside the application server will translate JSON or XML objects sent by the user into Java objects. Mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, the mapper can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
