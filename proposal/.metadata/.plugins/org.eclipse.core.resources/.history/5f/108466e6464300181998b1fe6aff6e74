@@ -699,10 +699,9 @@ mechanisms that will need control are temperatures of water/milk, PSI values for
 amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
 of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-% TODO There is no strength parameter for the grind, only fineness
 \begin{figure*}[!ht]
 \centering
-\frame{\includegraphics[width=0.8\columnwidth]{BrewNoUser.png}}
+\frame{\includegraphics[width=0.8\columnwidth]{brewNoUser.png}}
 \caption{Basic mockup of brew activity}
 \end{figure*} 
 
@@ -947,13 +946,10 @@ We will first demonstrate functionality with non registered user implementation 
   making what they need or searching for something new. Using these different menu's, we will show 
   that the data integrity holds and creates the drink as it should. 
 
-% TODO - I think these should just be rolled into the sections they relate to
-% -Aaron
 \section{Contigency Plans}
 \subsection{Flask and Database}
-In the case that we cannot complete the project the database element will be
-scratched. This would affect the Flask part of the project such that the
-expectation of data pushing and pulling will not be implemented.
+In the case that we cannot complete the project the database element will be scratched. This would affect
+Flask part of the project such that the expectation of data pushing and pulling will not be implemented.
 If time does not permit us to complete the database section in whole, then the database loses all 
 of its importance to this project and thus should not be attempted.
 

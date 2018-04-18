@@ -699,10 +699,9 @@ mechanisms that will need control are temperatures of water/milk, PSI values for
 amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
 of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-% TODO There is no strength parameter for the grind, only fineness
 \begin{figure*}[!ht]
 \centering
-\frame{\includegraphics[width=0.8\columnwidth]{BrewNoUser.png}}
+\frame{\includegraphics[width=0.8\columnwidth]{brewNoUser.png}}
 \caption{Basic mockup of brew activity}
 \end{figure*} 
 
@@ -722,28 +721,28 @@ if the user existed or not and login using that information. It is also very pos
 and mobile application and have the mobile application just use cellular or wifi to communicate with the Firebase server. For right
 now we are aiming at using the Raspberry Pi as the center control for everything.
 
-If the user had not logged in, the the previous ideas mentioned before would be presented. If they did login, they would be 
+\par If the user had not logged in, the the previous ideas mentioned before would be presented. If they did login, they would be 
 presented with a menu with multiple options. Those options would be the ones that were listed before: Recent Drinks, Favorited Drinks,
 Scheduled drinks, Recommended drinks, and searchable drinks. If anything the first stretch goal would be to get Recent, Favorited, and Scheduled
 drinks implemented, because that does not require cross data integration between other users. Integrating the database would allow users to login
 with different devices on different coffee machines and have their own data readily available to them.
 
-Drink brewing would be a little bit different for users. Upon creating a drink, it would allow you to upload it to the database or add it to your favorites; also allowing the user to  add a description of it,
+\par Drink brewing would be a little bit different for users. Upon creating a drink, it would allow you to upload it to the database or add it to your favorites; also allowing the user to  add a description of it,
 allowing other users to search for it in the other "search" menu. This option would be available when pushing the button to "brew" your drink, a popup would display, having a textbox for description, spinners
 for times, check marks to enable things like setting schedules or uploading to the database or adding to your favorites list. Same concept of brewing, but with added features to save data for the user.
 
-Opening the recent menu would display a view that had the last few drinks you had brewed. The drinks would probably be listed as as some sort of card (object that holds info) and
+\par Opening the recent menu would display a view that had the last few drinks you had brewed. The drinks would probably be listed as as some sort of card (object that holds info) and
 upon clicking the card, it would bring up the brewing menu but, but the one like the one listed in the above paragraph; performing the exact same way.
 
-Opening the favorited menu would be a little like the recent menu, but most likely be in a recycler view (a view that holds cards and is scrollable). The cards would act the exact same way
+\par Opening the favorited menu would be a little like the recent menu, but most likely be in a recycler view (a view that holds cards and is scrollable). The cards would act the exact same way
 as the other cards in the previous sections, opening the brewing action. The difference with this menu is that the user would be allowed to remove favorited items. There would most likely be
 a check mark next to all of the cards and once selected, a button would highlight that would allow you to delete it; perhaps even editing could be implemented as well.
 
-The scheduled menu would be the exact same layout as the favorited menu, but it would allow you to edit as well, setting times to how you want them. There would probably be
+\par The scheduled menu would be the exact same layout as the favorited menu, but it would allow you to edit as well, setting times to how you want them. There would probably be
 a new type of action that would be made specifically for this. Opening a popup specific to changing times on a specific drink. There would be spinners and and check marks, allowing
 users to make recurring drink schedules or a one time schedule.
 
-Recommended and Searchable features are ones that would require data aggregation. The recommendation menu would be laid out the same as the others menus. It could either 
+\par Recommended and Searchable features are ones that would require data aggregation. The recommendation menu would be laid out the same as the others menus. It could either 
 have a set limit of recommended brews (preferably easier) or a scrollable list that updates as it goes (probably not ideal for this project). The functionality would be the same, by clicking on
 a card, it would take the user to the brewing screen where they could make it a favorite, brew it, etc. Some sort of user cross referencing algorithm would have to be used to select data
 from the database for recommended brews. A simple query could probably be used for that, but it is possible to create something more thorough. The searchable feature would require
@@ -779,8 +778,6 @@ features; Figure 5 shows some other user activities that would be used.
 %Coffee customizations will be in a global database table where it will store information about the individual customizations of the cup of coffee as well as the serialized number for the coffee machine, for
 %ease in sorting through machine by machine usage.
 
-% TODO If this is a stretch goal, it should probably go with the preceding
-% stretch goal section instead of stating stretch goal in paranthesis
 \section{Database Integration}
 (Stretch Goal) Our goal for the DB integration is to used a free DB hosting service such as AWS or Firebase
 to accumulate data about recent machine requests and generic machine usage statistics. Machine requests will
@@ -875,6 +872,7 @@ Machine statistics will not be kept in a global table, and are only meant for lo
 \item Set up SQL Database and populate schema. 
 \end{itemize}
 
+% Leave this to me - Aaron
 \section{Project Materials}
 \begin{itemize}
 \item Raspberry Pi compute module
@@ -913,8 +911,8 @@ Machine statistics will not be kept in a global table, and are only meant for lo
 % Flask
 Testing against the Flask microframework part of our project will be heavily reliant on 'mocking'
 outputs and inputs of recieved calls. Flask as a microframework does not need to be tested, however
-our devices reaction to GPIO events needs to be tested. This can be accomplished
-using the python unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
+our devices reaction to GPIO eventst needs to be tested. This can be occumplished using the python
+unittest.mock framework  \cite{mock} where we can create tests that will 'mock' returned data to
 be able to flush out multiple tests without relying on any network or GPIO setup. We will also have to 
 test a buffer system to make sure 'real' requests are getting recieved and queued and multiple requests
 of the same requests are discarded.
@@ -947,13 +945,10 @@ We will first demonstrate functionality with non registered user implementation 
   making what they need or searching for something new. Using these different menu's, we will show 
   that the data integrity holds and creates the drink as it should. 
 
-% TODO - I think these should just be rolled into the sections they relate to
-% -Aaron
 \section{Contigency Plans}
 \subsection{Flask and Database}
-In the case that we cannot complete the project the database element will be
-scratched. This would affect the Flask part of the project such that the
-expectation of data pushing and pulling will not be implemented.
+In the case that we cannot complete the project the database element will be scratched. This would affect
+Flask part of the project such that the expectation of data pushing and pulling will not be implemented.
 If time does not permit us to complete the database section in whole, then the database loses all 
 of its importance to this project and thus should not be attempted.
 

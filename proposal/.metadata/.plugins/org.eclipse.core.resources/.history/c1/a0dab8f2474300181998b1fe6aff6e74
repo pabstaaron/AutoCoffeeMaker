@@ -699,7 +699,6 @@ mechanisms that will need control are temperatures of water/milk, PSI values for
 amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
 of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-% TODO There is no strength parameter for the grind, only fineness
 \begin{figure*}[!ht]
 \centering
 \frame{\includegraphics[width=0.8\columnwidth]{BrewNoUser.png}}
