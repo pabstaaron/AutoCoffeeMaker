@@ -555,8 +555,6 @@ right in that given screen. In the scheduling menu, drink schedules may be
 canceled or changed. Registering will allow a user to login on
 any application and have all of the features described above.
 
-% Last sentence in this paragraph could use some work. It's a bit confusing
-% -Aaron
 Given the choice of not creating a login, which is our base goal, a user will still have to pair their
 phone to the device through the database, but won't have to deal with any extra
 UI that comes with a registered user. A non-registered user will be allowed to
@@ -566,10 +564,8 @@ For the beverage creation menu, there will be advanced and basic settings option
 precise in their beverage creation. Once all settings are selected, if
 registered, a user may have the decision to leave information on the drink
 created and post it in a searchable database and/or their recents/favorites.
-Information may be a title, description, etc. If the user is not registered, it
-will not prompt them for anything and brew their drink. 
+If the user is not registered, it will not prompt them for anything and brew their drink. 
 
-% I think this paragraph can go away -Aaron
 The mobile application
 will have the job of communicating between the FLASK server hosted on the 
 Rasperry PI, which in turn controls the coffee machine via GPIO pins. To be
@@ -580,14 +576,12 @@ maybe some more features on the mobile app.
 
 \section{Mobile Application}
 
-% This one too -Aaron
 In this section the communication between the mobile application and the FLASK
-server hosted on the Raspberry PI. The skeleton for the the application itself will
+server hosted on the Raspberry PI will be discussed. The skeleton for the the application itself will
 also be discussed, specifying the general layout/functionality of the application, as
 well as the stretch goals that we will be implemented if time is generous and things
 go smoothly.
 
-% Suggest removing subsection heading here -Aaron
 \subsection{Communication between FLASK and App}
 The machine will be hosting it's own web server that the user application will
 be communicating with. It will have a REST API that will allow us to control the
@@ -616,9 +610,8 @@ if there were errors
 HttpURLConnection and write POST parameters into it.
 \end{itemize} 
 \ \\
-% Not sure boldface is necessary here. Just make it the first sentence of the
-% following paragraph. -Aaron
-\textbf{The flask API will expose 3 API calls to the localhost:} \\ 
+
+\indent\textbf{The flask API will expose 3 API calls to the localhost:} \\ 
 \begin{itemize}
 \item The first API call will be to verify that it is connected, this call will
 be a GET call to verify connectivity. If the call succeeds a 200 response will
@@ -687,8 +680,8 @@ mobile app know that it is the correct device and open the brewing activity.
 
 \begin{figure*}[!ht]
 \centering
-\includegraphics[width=0.4\columnwidth]{connect.png}
-\frame{\includegraphics[width=0.8\columnwidth]{wifi.png}}
+\includegraphics[width=0.5\columnwidth]{connect.png}
+\frame{\includegraphics[width=0.5\columnwidth]{wifi.png}}
 \caption{Basic mockup of the homescreen, and wifi connection}
 \end{figure*} 
 
@@ -699,10 +692,9 @@ mechanisms that will need control are temperatures of water/milk, PSI values for
 amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
 of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-% TODO There is no strength parameter for the grind, only fineness
 \begin{figure*}[!ht]
 \centering
-\frame{\includegraphics[width=0.8\columnwidth]{BrewNoUser.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{BrewNoUser.png}}
 \caption{Basic mockup of brew activity}
 \end{figure*} 
 
@@ -755,20 +747,20 @@ features; Figure 5 shows some other user activities that would be used.
 
 \begin{figure*}[!ht]
 \centering
-\frame{\includegraphics[width=0.8\columnwidth]{loginStretch.png}}
-\frame{\includegraphics[width=0.8\columnwidth]{brewStretch.png}}
-\frame{\includegraphics[width=0.8\columnwidth]{menu.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{loginStretch.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{brewStretch.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{menu.png}}
 
 \caption{Basic mockup of user login, brew, and menu screens}
 \end{figure*} 
 
 \begin{figure*}[!ht]
 \centering
-\frame{\includegraphics[width=0.5\columnwidth]{Schedule.png}}
-\frame{\includegraphics[width=0.5\columnwidth]{Scheduled.png}}
-\frame{\includegraphics[width=0.5\columnwidth]{Search.png}}
-\frame{\includegraphics[width=0.5\columnwidth]{Register.png}}
-\frame{\includegraphics[width=0.5\columnwidth]{Load.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Schedule.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Scheduled.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Search.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Register.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Load.png}}
 \caption{Basic mockup of other screens such as: Creating schedules, searching, Registering, and a schedule screen, and waiting for email confirmation}
 \end{figure*} 
 
@@ -938,14 +930,6 @@ At the project demonstration, the machine will be setup with an Android tablet a
 Visitors will be invited to use the tablet to design a drink watch the machine
 in action. Various spare internal components will be set out to aide in explaining how the machine works.
 
-% Don't think this section is necessary - Aaron
-\subsection{Mobile Demonstration}
-We will first demonstrate functionality with non registered user implementation (the basics on mobile)
- and how the mobile device can communicate with the machine properly to make a cup of coffee that is
-  asked for. Then we will demonstrate how data collection offers different options to users. Grabbing 
-  information from the database and laying it out in multiple menu's will give users the ease of quickly 
-  making what they need or searching for something new. Using these different menu's, we will show 
-  that the data integrity holds and creates the drink as it should. 
 
 % TODO - I think these should just be rolled into the sections they relate to
 % -Aaron
