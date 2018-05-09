@@ -8,6 +8,9 @@ import android.util.Pair;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *
+ */
 public class WifiRunner implements Runnable {
 
     private static final long EXECUTION_TIMER = TimeUnit.MILLISECONDS.convert(1, TimeUnit.SECONDS);
@@ -16,7 +19,10 @@ public class WifiRunner implements Runnable {
     private boolean connected;
     private static long timeSinceRun;
 
-
+    /**
+     *
+     * @param context
+     */
     public WifiRunner(Context context){
         wifiManager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
         timeSinceRun = 0L;

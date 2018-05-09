@@ -21,6 +21,9 @@ public class ThreadManager {
     private static final int MAX_POOL_SIZE = 16;
     private static final int KEEP_ALIVE = 1;
 
+    /**
+     *
+     */
     private static UncaughtExceptionHandler mExceptionHandler = new UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
@@ -28,6 +31,9 @@ public class ThreadManager {
         }
     };
 
+    /**
+     *
+     */
     private static final ThreadFactory mThreadFactory = new ThreadFactory() {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
