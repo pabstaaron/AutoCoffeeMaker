@@ -3,6 +3,8 @@ package com.example.ndonaldson.beanster;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -19,10 +21,9 @@ import android.util.Log;
 public class ThreadManager {
 
     private static final int MAX_POOL_SIZE = 16;
-    private static final int KEEP_ALIVE = 1;
 
     /**
-     *
+     * Exception handler for mThreadFactory
      */
     private static UncaughtExceptionHandler mExceptionHandler = new UncaughtExceptionHandler() {
         @Override
@@ -32,7 +33,17 @@ public class ThreadManager {
     };
 
     /**
-     *
+     * Logs which thread execution was rejected
+     */
+    private static RejectedExecutionHandler mRejectionHandler = new RejectedExecutionHandler() {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            Log.i("ThreadManager", r.toString() + " failed was rejected");
+        }
+    };
+
+    /**
+     *Threadfactory with personalized uncaughtExceptionHandler within this class
      */
     private static final ThreadFactory mThreadFactory = new ThreadFactory() {
         public Thread newThread(Runnable r) {
@@ -42,9 +53,8 @@ public class ThreadManager {
         }
     };
 
-    private static final BlockingQueue<Runnable> mPoolWorkQueue = new LinkedBlockingQueue<Runnable>();
-    private static final ThreadPoolExecutor mExecutor = new ThreadPoolExecutor(MAX_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE, TimeUnit.SECONDS, mPoolWorkQueue, mThreadFactory);
-
+    //runs threads
+    private static final ScheduledThreadPoolExecutor mExecutor = new ScheduledThreadPoolExecutor(MAX_POOL_SIZE, mThreadFactory, mRejectionHandler);
 
     /**
      * Empty constructor
@@ -58,8 +68,8 @@ public class ThreadManager {
      * Run bits on a background thread
      * @param runnable bits to run in the background
      */
-    public void runInBackground(Runnable runnable) {
-        mExecutor.execute(runnable);
+    public void runInBackground(Runnable runnable, long timer) {
+        mExecutor.scheduleAtFixedRate(runnable, timer, timer, TimeUnit.MILLISECONDS);
     }
 
 }
