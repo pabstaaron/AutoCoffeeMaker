@@ -3,10 +3,11 @@ SETUP:
     To run the flask server you need to install
 
     Python 3 (3.5.2). Make sure you add Python to %PATH% on install
-    Using the defualt python package manager (pip) install flask.
+    Using the defualt python package manager (pip) install flask, and pyserial
         - If pip is not available as a command, it means pip is not in your system path
 
     pip install Flask
+    pip install pyserial
 
 RUN:
     To run the program we use python app.py
