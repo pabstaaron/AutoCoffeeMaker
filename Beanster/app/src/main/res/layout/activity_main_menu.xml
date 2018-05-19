@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.ndonaldson.beanster.MainMenu">
+
+    <RelativeLayout
+        android:layout_width="576dp"
+        android:layout_height="295dp"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
+
+        <Button
+            android:id="@+id/connectButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="46dp"
+            android:text="Connect" />
+
+        <ProgressBar
+            android:id="@+id/connectProgress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/connectText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="37dp" />
+
+        <TextView
+            android:id="@+id/connectText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trying to connect...."
+            android:layout_above="@+id/connectButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="12dp" />
+    </RelativeLayout>
+</android.support.constraint.ConstraintLayout>

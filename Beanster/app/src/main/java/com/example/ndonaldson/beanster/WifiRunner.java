@@ -1,7 +1,11 @@
 package com.example.ndonaldson.beanster;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Environment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,10 +25,11 @@ public class WifiRunner implements Runnable {
 
     private ArrayList<String> deviceIDs;
     private ArrayList<String> devicesInRange;
-    private ConnectStatus connectStatus = ConnectStatus.CONNECT_TO_LAST;
+    private ConnectStatus connectStatus = ConnectStatus.UNKNOWN;
     private String connectedDevice = "";
     private HttpURLConnection client;
     private URL url;
+    private Context context;
     private int searchingCount;
 
     /**
@@ -45,6 +50,11 @@ public class WifiRunner implements Runnable {
         url = new URL("http://127.0.0.1:5000/connect/");
         client = (HttpURLConnection) url.openConnection();
         searchingCount = 0;
+        this.context = context;
+
+        LocalBroadcastManager.getInstance(context).registerReceiver(wifiStatusReceiver,
+                new IntentFilter("com.android.activity.WIFI_SATUS_IN"));
+
     }
     catch(Exception e){
         Log.i("WifiRunner", e.getLocalizedMessage());
@@ -68,6 +78,7 @@ public class WifiRunner implements Runnable {
                 if(responseCode != HttpURLConnection.HTTP_OK){
                     connectedDevice = "";
                     connectStatus = ConnectStatus.WAITING_FOR_USER;
+                    sendIntent(connectStatus.name());
                 }
             }
             else if(connectStatus == ConnectStatus.SEARCHING) {
@@ -99,6 +110,7 @@ public class WifiRunner implements Runnable {
                     if(responseCode != HttpURLConnection.HTTP_OK){
                         connectedDevice = "";
                         connectStatus = ConnectStatus.WAITING_FOR_USER;
+                        sendIntent(connectStatus.name());
                     }
                     else{
                         if(!deviceIDs.contains(connectedDevice)){
@@ -110,6 +122,7 @@ public class WifiRunner implements Runnable {
                             writer.close();
                         }
                         connectStatus = ConnectStatus.CONNECTED;
+                        sendIntent(connectStatus.name());
                     }
                 }
             }
@@ -124,14 +137,17 @@ public class WifiRunner implements Runnable {
                 if(responseCode == HttpURLConnection.HTTP_OK){
                     connectStatus = ConnectStatus.CONNECTED;
                     connectedDevice = deviceIDs.get(0);
+                    sendIntent(connectStatus.name());
                 }
                 else{
                     connectStatus = ConnectStatus.WAITING_FOR_USER;
+                    sendIntent(connectStatus.name());
                 }
             }
             else{
                 devicesInRange.clear();
                 connectStatus = ConnectStatus.UNKNOWN;
+                sendIntent(connectStatus.name());
                 Log.i("WifiRunner", "Unknown connection state");
             }
         }
@@ -140,7 +156,10 @@ public class WifiRunner implements Runnable {
         }
     }
 
-    private enum ConnectStatus{
+    /**
+     * Connection status definitions
+     */
+    public enum ConnectStatus{
         CONNECTED,
         WAITING_FOR_USER,
         SEARCHING,
@@ -149,7 +168,33 @@ public class WifiRunner implements Runnable {
         UNKNOWN
     }
 
-    public void setDeviceID(String deviceID){
-        this.connectedDevice = deviceID;
+    /**
+     * Send out connection status change to any app with proper receiver
+     * @param connectStatus
+     */
+    private void sendIntent(String connectStatus){
+        Intent intent = new Intent();
+        intent.putExtra("status",connectStatus);
+        intent.setAction("com.android.activity.WIFI_DATA_OUT");
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
+
+    /**
+     * Receive info on selected or entered deviceID from user or wifi state change
+     */
+    private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.hasExtra("status")){
+                String status = intent.getStringExtra("status");
+                Log.d("WifiRunner", "wifiStatusReceiver got status message: " + status);
+                connectStatus = ConnectStatus.valueOf(status);
+            }
+            else if(intent.hasExtra("deviceID")){
+                String deviceId = intent.getStringExtra("deviceID");
+                Log.d("WifiRunner", "wifiStatusReceiver got deviceID message: " + deviceId);
+                connectedDevice = deviceId;
+            }
+        }
+    };
 }

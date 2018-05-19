@@ -3,6 +3,7 @@ package com.example.ndonaldson.beanster;
 import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
 import android.support.v4.content.ContextCompat;
@@ -11,8 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.PermissionRequest;
+import android.widget.EditText;
 
 import java.security.Permission;
+
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 /**
  *@author Nathan Donaldson
@@ -47,6 +51,8 @@ public class main extends AppCompatActivity {
         tm = new ThreadManager();
         wr = new WifiRunner(this);
         tm.runInBackground(wr, 1000);
+        Intent intent = new Intent(this, MainMenu.class);
+        startActivity(intent);
     }
 
     /**
