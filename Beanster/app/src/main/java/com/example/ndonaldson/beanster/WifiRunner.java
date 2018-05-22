@@ -25,7 +25,7 @@ public class WifiRunner implements Runnable {
 
     private ArrayList<String> deviceIDs;
     private ArrayList<String> devicesInRange;
-    private ConnectStatus connectStatus = ConnectStatus.UNKNOWN;
+    private ConnectStatus connectStatus = ConnectStatus.CONNECT_TO_LAST;
     private String connectedDevice = "";
     private HttpURLConnection client;
     private URL url;
