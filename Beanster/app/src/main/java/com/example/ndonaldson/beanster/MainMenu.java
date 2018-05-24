@@ -33,12 +33,12 @@ public class MainMenu extends AppCompatActivity {
 
         connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
-                new IntentFilter("com.android.activity.WIFI_STATUS_OUT"));
+                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
         sendIntent(connectStatus.name(), "status");
+
         ProgressBar connecting = (ProgressBar) findViewById(R.id.connectProgress);
         Button connectButton = (Button) findViewById(R.id.connectButton);
         TextView connectingText = (TextView) findViewById(R.id.connectText);
-        connectButton.setEnabled(false);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -48,7 +48,8 @@ public class MainMenu extends AppCompatActivity {
                 finish();
             }
         });
-        connectButton.setVisibility(View.GONE);
+        connectButton.setVisibility(View.INVISIBLE);
+        connectButton.setEnabled(false);
     }
 
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
@@ -70,12 +71,16 @@ public class MainMenu extends AppCompatActivity {
                     break;
                 }
                 case WAITING_FOR_USER:{
-                    connectButton.setEnabled(true);
-                    connectButton.setVisibility(View.VISIBLE);
-                    connecting.setEnabled(false);
-                    connecting.setVisibility(View.INVISIBLE);
-                    connectingText.setEnabled(false);
-                    connectingText.setVisibility(View.INVISIBLE);
+                    try {
+                        findViewById(R.id.connectButton).setEnabled(true);
+                        findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
+                        findViewById(R.id.connectProgress).setVisibility(View.INVISIBLE);
+                        findViewById(R.id.connectText).setVisibility(View.INVISIBLE);
+                    }
+                    catch(Exception e)
+                    {
+                        Log.i("MainMenu", e.getLocalizedMessage());
+                    }
                 }
             }
         }
@@ -117,9 +122,7 @@ public class MainMenu extends AppCompatActivity {
             case WAITING_FOR_USER:{
                 connectButton.setEnabled(true);
                 connectButton.setVisibility(View.VISIBLE);
-                connecting.setEnabled(false);
                 connecting.setVisibility(View.INVISIBLE);
-                connectingText.setEnabled(false);
                 connectingText.setVisibility(View.INVISIBLE);
             }
         }

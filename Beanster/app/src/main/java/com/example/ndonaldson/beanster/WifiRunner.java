@@ -39,13 +39,15 @@ public class WifiRunner implements Runnable {
     public WifiRunner(Context context){
     try {
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "deviceIds.txt");
-        Scanner s = new Scanner(file);
-        deviceIDs = new ArrayList<>();
-        devicesInRange = new ArrayList<>();
-        while(s.hasNext()){
-            deviceIDs.add(s.next());
+        if(file.exists()) {
+            Scanner s = new Scanner(file);
+            deviceIDs = new ArrayList<>();
+            devicesInRange = new ArrayList<>();
+            while (s.hasNext()) {
+                deviceIDs.add(s.next());
+            }
+            s.close();
         }
-        s.close();
 
         url = new URL("http://127.0.0.1:5000/connect/");
         client = (HttpURLConnection) url.openConnection();
@@ -53,7 +55,7 @@ public class WifiRunner implements Runnable {
         this.context = context;
 
         LocalBroadcastManager.getInstance(context).registerReceiver(wifiStatusReceiver,
-                new IntentFilter("com.android.activity.WIFI_SATUS_IN"));
+                new IntentFilter("com.android.activity.WIFI_DATA_IN"));
 
     }
     catch(Exception e){
@@ -71,32 +73,36 @@ public class WifiRunner implements Runnable {
     public void run() {
         try {
             if(connectStatus == ConnectStatus.CONNECTED){
-                devicesInRange.clear();
+                if(devicesInRange != null) devicesInRange.clear();
                 client.setRequestMethod("GET");
                 client.setRequestProperty("serial", deviceIDs.get(searchingCount));
                 int responseCode = client.getResponseCode();
                 if(responseCode != HttpURLConnection.HTTP_OK){
                     connectedDevice = "";
                     connectStatus = ConnectStatus.WAITING_FOR_USER;
-                    sendIntent(connectStatus.name());
+                    sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                 }
             }
             else if(connectStatus == ConnectStatus.SEARCHING) {
+
                 client.setRequestMethod("GET");
-                client.setRequestProperty("serial", deviceIDs.get(searchingCount));
-                int responseCode = client.getResponseCode();
-                if(responseCode != HttpURLConnection.HTTP_OK){
-                    if(devicesInRange.contains(deviceIDs.get(searchingCount))){
-                        int positionToRemove = 0;
-                        for(int i = 0; i <= devicesInRange.size()-1; i++){
-                            if(deviceIDs.get(searchingCount).equals(devicesInRange.get(i))) positionToRemove = i;
+                if(deviceIDs != null) {
+                    client.setRequestProperty("serial", deviceIDs.get(searchingCount));
+                    int responseCode = client.getResponseCode();
+                    if (responseCode != HttpURLConnection.HTTP_OK) {
+                        if (devicesInRange.contains(deviceIDs.get(searchingCount))) {
+                            int positionToRemove = 0;
+                            for (int i = 0; i <= devicesInRange.size() - 1; i++) {
+                                if (deviceIDs.get(searchingCount).equals(devicesInRange.get(i)))
+                                    positionToRemove = i;
+                            }
+                            devicesInRange.remove(positionToRemove);
+                            sendIntent(devicesInRange, MessageType.DATA);
                         }
-                        devicesInRange.remove(positionToRemove);
                     }
-                }
-                else{
                     if(!devicesInRange.contains(deviceIDs.get(searchingCount))){
                         devicesInRange.add(deviceIDs.get(searchingCount));
+                        sendIntent(devicesInRange, MessageType.DATA);
                     }
                 }
                 if(searchingCount == deviceIDs.size()-1) searchingCount = 0;
@@ -110,7 +116,7 @@ public class WifiRunner implements Runnable {
                     if(responseCode != HttpURLConnection.HTTP_OK){
                         connectedDevice = "";
                         connectStatus = ConnectStatus.WAITING_FOR_USER;
-                        sendIntent(connectStatus.name());
+                        sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                     }
                     else{
                         if(!deviceIDs.contains(connectedDevice)){
@@ -122,37 +128,51 @@ public class WifiRunner implements Runnable {
                             writer.close();
                         }
                         connectStatus = ConnectStatus.CONNECTED;
-                        sendIntent(connectStatus.name());
+                        sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                     }
                 }
             }
             else if(connectStatus == ConnectStatus.WAITING_FOR_USER){
-                devicesInRange.clear();
+                Log.i("WifiRunner", "WAITING FOR USER!");
+                if(devicesInRange != null) devicesInRange.clear();
             }
             else if(connectStatus == ConnectStatus.CONNECT_TO_LAST){
-                devicesInRange.clear();
-                client.setRequestMethod("GET");
-                client.setRequestProperty("serial", deviceIDs.get(0));
-                int responseCode = client.getResponseCode();
-                if(responseCode == HttpURLConnection.HTTP_OK){
-                    connectStatus = ConnectStatus.CONNECTED;
-                    connectedDevice = deviceIDs.get(0);
-                    sendIntent(connectStatus.name());
+                Log.i("WifiRunner", "CONNECTING TO LAST!");
+                if(devicesInRange != null) devicesInRange.clear();
+                if(client == null) Log.i("FUCK YOU BITCH FACE", "YUH");
+                if(deviceIDs != null && deviceIDs.size() > 0) {
+                    client.setRequestMethod("GET");
+                    client.setRequestProperty("serial", deviceIDs.get(0));
+                    client.setConnectTimeout(900);
+                    int responseCode = client.getResponseCode();
+                    Log.i("WifiRunner", "responseCode is: " + responseCode);
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        connectStatus = ConnectStatus.CONNECTED;
+                        connectedDevice = deviceIDs.get(0);
+                        sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
+                    }
+                    else{
+                        connectStatus = ConnectStatus.WAITING_FOR_USER;
+                        Log.i("WifiRunner", "SENDING WAITING_FOR_USER INTENT!");
+                        sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
+                    }
                 }
                 else{
                     connectStatus = ConnectStatus.WAITING_FOR_USER;
-                    sendIntent(connectStatus.name());
+                    Log.i("WifiRunner", "SENDING WAITING_FOR_USER INTENT!");
+                    sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                 }
             }
             else{
-                devicesInRange.clear();
+                if(devicesInRange != null) devicesInRange.clear();
                 connectStatus = ConnectStatus.UNKNOWN;
-                sendIntent(connectStatus.name());
+                sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                 Log.i("WifiRunner", "Unknown connection state");
             }
         }
         catch(Exception e){
             Log.i("WifiRunner", e.getLocalizedMessage());
+            e.printStackTrace();
         }
     }
 
@@ -169,12 +189,40 @@ public class WifiRunner implements Runnable {
     }
 
     /**
-     * Send out connection status change to any app with proper receiver
-     * @param connectStatus
+     * Type of Broadcast to Send
      */
-    private void sendIntent(String connectStatus){
+    public enum MessageType{
+        DATA,
+        CONNECT_STATUS
+    }
+
+    /**
+     * Send out connection status change to any app with proper receiver
+     * @param data
+     */
+    private void sendIntent(Object data, MessageType type){
         Intent intent = new Intent();
-        intent.putExtra("status",connectStatus);
+        switch(type){
+            case CONNECT_STATUS:{
+                try{
+                    String connectStatus = (String) data;
+                    intent.putExtra("status",connectStatus);
+                }
+                catch(Exception e){
+                    Log.i("WifiRunner",e.getLocalizedMessage());
+                }
+            }
+            case DATA:{
+                try{
+                    ArrayList deviceIDs = (ArrayList) data;
+                    intent.putParcelableArrayListExtra("deviceIds", deviceIDs);
+                }
+                catch(Exception e){
+                    Log.i("WifiRunner",e.getLocalizedMessage());
+                }
+            }
+        }
+
         intent.setAction("com.android.activity.WIFI_DATA_OUT");
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }

@@ -4,11 +4,11 @@ package com.example.ndonaldson.beanster;
  * Created by ndonaldson on 5/21/18.
  */
 
-public class WifiSelection {
+public class WifiSelectItem {
 
     private String deviceID;
 
-    public WifiSelection(String deviceID){
+    public WifiSelectItem(String deviceID){
         this.deviceID = deviceID;
     }
 
@@ -25,7 +25,7 @@ public class WifiSelection {
         if(obj == null)
             return false;
 
-        WifiSelection itemCompare = (WifiSelection) obj;
+        WifiSelectItem itemCompare = (WifiSelectItem) obj;
         if(itemCompare.getDeviceID().equals(this.getDeviceID()))
             return true;
 

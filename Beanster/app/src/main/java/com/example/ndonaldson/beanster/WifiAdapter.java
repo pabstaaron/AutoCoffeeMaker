@@ -1,6 +1,5 @@
 package com.example.ndonaldson.beanster;
 
-import android.content.ClipData;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -22,12 +21,12 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
 
 
     public WifiAdapter(WifiViewHolder.OnItemSelectedListener listener,
-                             List<WifiSelection> items, boolean isMultiSelectionEnabled) {
+                       List<WifiSelectItem> items, boolean isMultiSelectionEnabled) {
         this.listener = listener;
         this.isMultiSelectionEnabled = isMultiSelectionEnabled;
 
         mValues = new ArrayList<>();
-        for (WifiSelection item : items) {
+        for (WifiSelectItem item : items) {
             mValues.add(new SelectableWifi(item, false));
         }
     }
@@ -35,7 +34,7 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
     @Override
     public WifiViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.wifi_layout, parent, false);
+                .inflate(R.layout.checkedtextview, parent, false);
 
         return new WifiViewHolder(itemView, this);
     }
@@ -105,5 +104,9 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
             notifyDataSetChanged();
         }
         listener.onItemSelected(item);
+    }
+
+    public void addItem(WifiSelectItem item){
+        mValues.add(new SelectableWifi(item, false));
     }
 }

@@ -4,12 +4,12 @@ package com.example.ndonaldson.beanster;
  * Created by ndonaldson on 5/21/18.
  */
 
-public class SelectableWifi extends WifiSelection {
+public class SelectableWifi extends WifiSelectItem {
     private boolean isSelected = false;
 
 
-    public SelectableWifi(WifiSelection item, boolean isSelected) {
-        super.WifiSelection(item.getDeviceID());
+    public SelectableWifi(WifiSelectItem item, boolean isSelected) {
+        super(item.getDeviceID());
         this.isSelected = isSelected;
     }
 

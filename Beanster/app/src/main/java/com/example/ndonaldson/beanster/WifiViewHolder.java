@@ -21,7 +21,7 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
     public WifiViewHolder(View view, OnItemSelectedListener listener) {
         super(view);
         itemSelectedListener = listener;
-        textView = (CheckedTextView) view.findViewById(R.id.wifi_item);
+        textView = (CheckedTextView) view.findViewById(R.id.checked_text_item);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -29,9 +29,10 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
 
                 if (mItem.isSelected() && getItemViewType() == MULTI_SELECTION) {
                     setChecked(false);
-                } else {
+                } else if(mItem.isSelected()) {
+                    setChecked(false);
+                } else
                     setChecked(true);
-                }
                 itemSelectedListener.onItemSelected(mItem);
 
             }
