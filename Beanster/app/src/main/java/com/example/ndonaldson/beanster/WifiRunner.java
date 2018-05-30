@@ -32,6 +32,7 @@ public class WifiRunner implements Runnable {
     private Context context;
     private int searchingCount;
 
+
     /**
      * @param context
      * Constructor for WifiRunner
@@ -50,7 +51,6 @@ public class WifiRunner implements Runnable {
         }
 
         url = new URL("http://127.0.0.1:5000/connect/");
-        client = (HttpURLConnection) url.openConnection();
         searchingCount = 0;
         this.context = context;
 
@@ -84,7 +84,7 @@ public class WifiRunner implements Runnable {
                 }
             }
             else if(connectStatus == ConnectStatus.SEARCHING) {
-
+                client = (HttpURLConnection) url.openConnection();
                 client.setRequestMethod("GET");
                 if(deviceIDs != null) {
                     client.setRequestProperty("serial", deviceIDs.get(searchingCount));
@@ -104,11 +104,13 @@ public class WifiRunner implements Runnable {
                         devicesInRange.add(deviceIDs.get(searchingCount));
                         sendIntent(devicesInRange, MessageType.DATA);
                     }
+                    if(searchingCount == deviceIDs.size()-1) searchingCount = 0;
                 }
-                if(searchingCount == deviceIDs.size()-1) searchingCount = 0;
-                else searchingCount++;
+                client.disconnect();
             }
+            //Maybe add a timer here
             else if(connectStatus == ConnectStatus.WAITING_FOR_RESPONSE){
+                client = (HttpURLConnection) url.openConnection();
                 if(!connectedDevice.isEmpty()){
                     client.setRequestMethod("GET");
                     client.setRequestProperty("serial", connectedDevice);
@@ -131,16 +133,17 @@ public class WifiRunner implements Runnable {
                         sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                     }
                 }
+                client.disconnect();
             }
             else if(connectStatus == ConnectStatus.WAITING_FOR_USER){
                 Log.i("WifiRunner", "WAITING FOR USER!");
                 if(devicesInRange != null) devicesInRange.clear();
             }
             else if(connectStatus == ConnectStatus.CONNECT_TO_LAST){
+                client = (HttpURLConnection) url.openConnection();
                 Log.i("WifiRunner", "CONNECTING TO LAST!");
                 if(devicesInRange != null) devicesInRange.clear();
-                if(client == null) Log.i("FUCK YOU BITCH FACE", "YUH");
-                if(deviceIDs != null && deviceIDs.size() > 0) {
+                if(deviceIDs != null && deviceIDs.size() > 0 && client != null) {
                     client.setRequestMethod("GET");
                     client.setRequestProperty("serial", deviceIDs.get(0));
                     client.setConnectTimeout(900);
@@ -169,6 +172,7 @@ public class WifiRunner implements Runnable {
                 sendIntent(connectStatus.name(), MessageType.CONNECT_STATUS);
                 Log.i("WifiRunner", "Unknown connection state");
             }
+            client.disconnect();
         }
         catch(Exception e){
             Log.i("WifiRunner", e.getLocalizedMessage());

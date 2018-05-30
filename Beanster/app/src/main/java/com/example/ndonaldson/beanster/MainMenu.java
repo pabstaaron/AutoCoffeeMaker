@@ -30,8 +30,8 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-
-        connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
+        if(savedInstanceState != null && savedInstanceState.containsKey("selection")) connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+        else connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
         sendIntent(connectStatus.name(), "status");
@@ -82,6 +82,7 @@ public class MainMenu extends AppCompatActivity {
                         Log.i("MainMenu", e.getLocalizedMessage());
                     }
                 }
+                break;
             }
         }
     };
@@ -98,33 +99,33 @@ public class MainMenu extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle bundle){
-        bundle.putString("connectStatus", connectStatus.name());
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-
-        if(savedInstanceState.containsKey("connectStatus")) connectStatus = WifiRunner.ConnectStatus.valueOf(savedInstanceState.getString("connectStatus"));
-
-        switch(connectStatus){
-            case CONNECTED:{
-                Intent brewIntent = new Intent(getApplicationContext(), DeviceSelection.class);
-                startActivity(brewIntent);
-                finish();
-                break;
-            }
-            case UNKNOWN:{
-                //Default state....don't know what to do with it.
-                break;
-            }
-            case WAITING_FOR_USER:{
-                connectButton.setEnabled(true);
-                connectButton.setVisibility(View.VISIBLE);
-                connecting.setVisibility(View.INVISIBLE);
-                connectingText.setVisibility(View.INVISIBLE);
-            }
-        }
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle bundle){
+//        bundle.putString("connectStatus", connectStatus.name());
+//    }
+//
+//    @Override
+//    public void onRestoreInstanceState(Bundle savedInstanceState) {
+//
+//        if(savedInstanceState.containsKey("connectStatus")) connectStatus = WifiRunner.ConnectStatus.valueOf(savedInstanceState.getString("connectStatus"));
+//
+//        switch(connectStatus){
+//            case CONNECTED:{
+//                Intent brewIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+//                startActivity(brewIntent);
+//                finish();
+//                break;
+//            }
+//            case UNKNOWN:{
+//                //Default state....don't know what to do with it.
+//                break;
+//            }
+//            case WAITING_FOR_USER:{
+//                connectButton.setEnabled(true);
+//                connectButton.setVisibility(View.VISIBLE);
+//                connecting.setVisibility(View.INVISIBLE);
+//                connectingText.setVisibility(View.INVISIBLE);
+//            }
+//        }
+//    }
 }
