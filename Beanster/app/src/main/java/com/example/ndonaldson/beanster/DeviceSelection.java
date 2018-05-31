@@ -42,6 +42,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
+            overridePendingTransition(R.anim.slide_in, R.anim.slide_in);
             context = this;
             deviceSelected = "";
             mDeviceText = "";
@@ -53,6 +54,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             cancelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
                     Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                     intent.putExtra("selection", true);
                     startActivity(intent);

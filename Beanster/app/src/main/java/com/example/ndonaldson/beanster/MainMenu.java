@@ -9,10 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import org.w3c.dom.Text;
 
@@ -24,20 +29,51 @@ public class MainMenu extends AppCompatActivity {
     private ProgressBar connecting;
     private Button connectButton;
     private TextView connectingText;
+    private Animation fade_in, fade_out;
+    private ViewFlipper viewFlipper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        if(savedInstanceState != null && savedInstanceState.containsKey("selection")) connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
-        else connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
+        try {
+            viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundView);
+            fade_in = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+            fade_out = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+            fade_in.setInterpolator(new DecelerateInterpolator());
+            fade_out.setInterpolator(new AccelerateDecelerateInterpolator());
+            fade_in.setDuration(3000);
+            fade_out.setStartOffset(1000);
+            fade_out.setDuration(3000);
+            viewFlipper.setInAnimation(fade_in);
+            viewFlipper.setOutAnimation(fade_out);
+            viewFlipper.setAutoStart(true);
+            viewFlipper.setFlipInterval(10000);
+            viewFlipper.startFlipping();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            Log.i("MainMenu", e.getLocalizedMessage());
+        }
+
+        Button connectButton = (Button) findViewById(R.id.connectButton);
+
+        if(getIntent() != null && getIntent().hasExtra("selection")){
+            connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+            overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
+        }
+        else {
+           // overridePendingTransition(R.anim.slide_in, R.anim.slide_in);
+            connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
+            connectButton.setVisibility(View.INVISIBLE);
+            connectButton.setEnabled(false);
+        }
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
         sendIntent(connectStatus.name(), "status");
 
         ProgressBar connecting = (ProgressBar) findViewById(R.id.connectProgress);
-        Button connectButton = (Button) findViewById(R.id.connectButton);
         TextView connectingText = (TextView) findViewById(R.id.connectText);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -48,8 +84,7 @@ public class MainMenu extends AppCompatActivity {
                 finish();
             }
         });
-        connectButton.setVisibility(View.INVISIBLE);
-        connectButton.setEnabled(false);
+
     }
 
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
