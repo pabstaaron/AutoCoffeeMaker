@@ -6,4 +6,12 @@
     android:layout_height="match_parent"
     tools:context="com.example.ndonaldson.beanster.CoffeeBrew">
 
+    <TextView
+        android:id="@+id/toBeContinued"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="In development....."
+        android:textSize="20dp"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp" />
 </android.support.constraint.ConstraintLayout>

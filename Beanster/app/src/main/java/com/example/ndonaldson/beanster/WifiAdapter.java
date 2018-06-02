@@ -1,5 +1,6 @@
 package com.example.ndonaldson.beanster;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -35,7 +36,6 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
     public WifiViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.checkedtextview, parent, false);
-
         return new WifiViewHolder(itemView, this);
     }
 

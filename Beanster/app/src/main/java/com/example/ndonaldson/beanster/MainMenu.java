@@ -19,6 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.victor.loading.newton.NewtonCradleLoading;
+import com.victor.loading.rotate.RotateLoading;
+
 import org.w3c.dom.Text;
 
 import static android.R.attr.value;
@@ -26,9 +29,10 @@ import static android.R.attr.value;
 public class MainMenu extends AppCompatActivity {
 
     private WifiRunner.ConnectStatus connectStatus;
-    private ProgressBar connecting;
     private Button connectButton;
     private TextView connectingText;
+    private NewtonCradleLoading cradle;
+    private ProgressBar circle;
     private Animation fade_in, fade_out;
     private ViewFlipper viewFlipper;
 
@@ -50,6 +54,9 @@ public class MainMenu extends AppCompatActivity {
             viewFlipper.setOutAnimation(fade_out);
             viewFlipper.setAutoStart(true);
             viewFlipper.setFlipInterval(10000);
+            if(getIntent() != null && getIntent().hasExtra("flipper")){
+                viewFlipper.setDisplayedChild(getIntent().getIntExtra("flipper", 0));
+            }
             viewFlipper.startFlipping();
         }
         catch(Exception e){
@@ -57,33 +64,42 @@ public class MainMenu extends AppCompatActivity {
             Log.i("MainMenu", e.getLocalizedMessage());
         }
 
-        Button connectButton = (Button) findViewById(R.id.connectButton);
+        connectButton = (Button) findViewById(R.id.connectButton);
+        cradle = (NewtonCradleLoading) findViewById(R.id.newton_cradle_loading);
+        circle = (ProgressBar) findViewById(R.id.progressBar);
 
-        if(getIntent() != null && getIntent().hasExtra("selection")){
-            connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
-            overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
-        }
-        else {
-           // overridePendingTransition(R.anim.slide_in, R.anim.slide_in);
-            connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
-            connectButton.setVisibility(View.INVISIBLE);
-            connectButton.setEnabled(false);
-        }
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
-                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
-        sendIntent(connectStatus.name(), "status");
-
-        ProgressBar connecting = (ProgressBar) findViewById(R.id.connectProgress);
-        TextView connectingText = (TextView) findViewById(R.id.connectText);
+        connectingText = (TextView) findViewById(R.id.connectText);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 sendIntent(WifiRunner.ConnectStatus.SEARCHING.name(), "status");
                 Intent brewIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                brewIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
                 startActivity(brewIntent);
                 finish();
             }
         });
+
+
+        if(getIntent() != null && getIntent().hasExtra("selection")){
+            connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+            cradle.setVisibility(View.INVISIBLE);
+            circle.setVisibility(View.INVISIBLE);
+            connectingText.setVisibility(View.INVISIBLE);
+        }
+        else {
+            connectStatus = WifiRunner.ConnectStatus.CONNECT_TO_LAST;
+            connectButton.setVisibility(View.INVISIBLE);
+            connectButton.setEnabled(false);
+            cradle.setVisibility(View.VISIBLE);
+            circle.setVisibility(View.VISIBLE);
+            connectingText.setVisibility(View.VISIBLE);
+            cradle.start();
+        }
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
+                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
+        sendIntent(connectStatus.name(), "status");
+
 
     }
 
@@ -108,8 +124,9 @@ public class MainMenu extends AppCompatActivity {
                 case WAITING_FOR_USER:{
                     try {
                         findViewById(R.id.connectButton).setEnabled(true);
+                        findViewById(R.id.newton_cradle_loading).setVisibility(View.INVISIBLE);
+                        findViewById(R.id.progressBar).setVisibility(View.INVISIBLE);
                         findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
-                        findViewById(R.id.connectProgress).setVisibility(View.INVISIBLE);
                         findViewById(R.id.connectText).setVisibility(View.INVISIBLE);
                     }
                     catch(Exception e)

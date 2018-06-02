@@ -39,7 +39,7 @@
                     android:id="@+id/image3"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitXY"
                     android:src="@drawable/coffee3"/>
                 <ImageView
                     android:id="@+id/image4"
@@ -62,41 +62,72 @@
             </ViewFlipper>
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
         <Button
             android:id="@+id/connectButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/connectText"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="86dp"
             android:textColor="#ffefcc"
             android:width="200dp"
             android:background="@drawable/buttonstyle"
-            android:text="Connect" />
+            android:text="Connect"
+            android:layout_marginBottom="91dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
 
         <ProgressBar
-            android:id="@+id/connectProgress"
+            android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/connectText"
-            android:scaleX="2.5"
-            android:scaleY="2.5"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:scaleX="3"
+            android:scaleY="3"
             android:indeterminate="true"
             android:indeterminateDrawable="@drawable/progress"
-            android:layout_marginBottom="36dp"
-            android:layout_alignEnd="@+id/connectText"
-            android:layout_alignStart="@+id/connectText" />
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+            <com.victor.loading.newton.NewtonCradleLoading
+                android:id="@+id/newton_cradle_loading"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
+                android:layout_marginBottom="27dp"
+                android:layout_above="@+id/connectButton"
+                android:layout_alignStart="@+id/connectButton" />
 
         <TextView
             android:id="@+id/connectText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
             android:text="Trying to connect...."
             android:textStyle="bold"
-            android:textSize="18dp"/>
+            android:textColor="#ffefcc"
+            android:textSize="15dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="1400dp"
+                android:layout_height="300dp"
+                android:background="@drawable/logotext"
+                android:rotation="15"
+                android:layout_alignBottom="@+id/connectText"
+                android:layout_alignStart="@+id/connectText" />
+        </RelativeLayout>
+        <ImageView
+            android:layout_width="90dp"
+            android:layout_height="130dp"
+            android:rotation="-40"
+            android:background="@drawable/coffeelogoo"
+            android:id="@+id/bean"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="24dp" />
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
