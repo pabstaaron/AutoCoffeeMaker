@@ -91,7 +91,6 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
     @Override
     public void onItemSelected(SelectableWifi item) {
         if (!isMultiSelectionEnabled) {
-
             for (SelectableWifi selectableItem : mValues) {
                 if (!selectableItem.equals(item)
                         && selectableItem.isSelected()) {

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Beanster</string>
+    <string name="devicesTitle"> &lt;u>Devices&lt;/u></string>
 </resources>

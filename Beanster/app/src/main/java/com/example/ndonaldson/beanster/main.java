@@ -31,11 +31,13 @@ public class main extends AppCompatActivity {
     private static final int READ_EXTERNAL_STORAGE_CODE = 2;
     private static final int INTERNET_CODE = 3;
     private static final int ACCESS_NETWORK_STATE_CODE = 4;
+    private static final int ACCESS_WIFI_STATE_CODE = 5;
 
     private static final String REQUEST_WRITE_EXTERNAL_STORAGE= Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String REQUEST_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     private static final String REQUEST_INTERNET = Manifest.permission.INTERNET;
     private static final String REQUEST_ACCESS_NETWORK_STATE = Manifest.permission.ACCESS_NETWORK_STATE;
+    private static final String REQUEST_ACCESS_WIFI_STATE = Manifest.permission.ACCESS_WIFI_STATE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +130,16 @@ public class main extends AppCompatActivity {
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_ACCESS_NETWORK_STATE, ACCESS_NETWORK_STATE_CODE, this);
         }
+        else checkWifiState();
+    }
+
+    /**
+     * Check wifi state permissions
+     */
+    private void checkWifiState(){
+        if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(REQUEST_ACCESS_WIFI_STATE, ACCESS_WIFI_STATE_CODE, this);
+        }
         else begin();
     }
 
@@ -157,6 +169,10 @@ public class main extends AppCompatActivity {
                 }
                 else if (permission.equals(REQUEST_ACCESS_NETWORK_STATE)){
                     alertBuilder.setTitle("Network access permission necessary");
+                    alertBuilder.setMessage("Permission needed to connect with device");
+                }
+                else if (permission.equals(REQUEST_ACCESS_WIFI_STATE)){
+                    alertBuilder.setTitle("Wifi state access permission necessary");
                     alertBuilder.setMessage("Permission needed to connect with device");
                 }
                 else{
@@ -189,6 +205,10 @@ public class main extends AppCompatActivity {
                             break;
                         }
                         case REQUEST_ACCESS_NETWORK_STATE:{
+                            checkYourPriveledge();
+                            break;
+                        }
+                        case REQUEST_ACCESS_WIFI_STATE:{
                             checkYourPriveledge();
                             break;
                         }
@@ -240,6 +260,14 @@ public class main extends AppCompatActivity {
                     begin();
                 } else {
                      checkYourPriveledge();
+                }
+                break;
+            }
+            case ACCESS_WIFI_STATE_CODE: {
+                if (result == PackageManager.PERMISSION_GRANTED) {
+                    begin();
+                } else {
+                    checkYourPriveledge();
                 }
                 break;
             }

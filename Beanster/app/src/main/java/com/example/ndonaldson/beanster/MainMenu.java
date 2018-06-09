@@ -57,6 +57,10 @@ public class MainMenu extends AppCompatActivity {
             if(getIntent() != null && getIntent().hasExtra("flipper")){
                 viewFlipper.setDisplayedChild(getIntent().getIntExtra("flipper", 0));
             }
+            else if(savedInstanceState != null && savedInstanceState.containsKey("flipper")) {
+                viewFlipper.setDisplayedChild(savedInstanceState.getInt("flipper",0));
+            }
+
             viewFlipper.startFlipping();
         }
         catch(Exception e){
@@ -151,33 +155,13 @@ public class MainMenu extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle bundle){
-//        bundle.putString("connectStatus", connectStatus.name());
-//    }
-//
-//    @Override
-//    public void onRestoreInstanceState(Bundle savedInstanceState) {
-//
-//        if(savedInstanceState.containsKey("connectStatus")) connectStatus = WifiRunner.ConnectStatus.valueOf(savedInstanceState.getString("connectStatus"));
-//
-//        switch(connectStatus){
-//            case CONNECTED:{
-//                Intent brewIntent = new Intent(getApplicationContext(), DeviceSelection.class);
-//                startActivity(brewIntent);
-//                finish();
-//                break;
-//            }
-//            case UNKNOWN:{
-//                //Default state....don't know what to do with it.
-//                break;
-//            }
-//            case WAITING_FOR_USER:{
-//                connectButton.setEnabled(true);
-//                connectButton.setVisibility(View.VISIBLE);
-//                connecting.setVisibility(View.INVISIBLE);
-//                connectingText.setVisibility(View.INVISIBLE);
-//            }
-//        }
-//    }
+    @Override
+    public void onBackPressed(){
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle){
+        bundle.putInt("flipper", viewFlipper.getDisplayedChild());
+    }
 }
