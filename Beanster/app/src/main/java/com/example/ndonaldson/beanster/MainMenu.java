@@ -76,7 +76,7 @@ public class MainMenu extends AppCompatActivity {
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                sendIntent(WifiRunner.ConnectStatus.SEARCHING.name(), "status");
+                sendIntent(WifiRunner.ConnectStatus.WAITING_FOR_USER.name(), "status");
                 Intent brewIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                 brewIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
                 startActivity(brewIntent);

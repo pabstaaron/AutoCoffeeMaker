@@ -91,7 +91,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 Log.i("MainMenu", e.getLocalizedMessage());
             }
 
-            mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
+            mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
             mDeviceIds = new ArrayList<>();
             cancelButton = (Button) findViewById(R.id.deviceSelectCancel);
             cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -252,7 +252,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         startActivity(brewIntent);
                     break;
                     }
-                    case SEARCHING:{
+                    case WAITING_FOR_USER:{
                         progressBack = (ProgressBar) findViewById(R.id.progressBar);
                         progressBack.setVisibility(View.INVISIBLE);
                         mLoadingProgress = (NewtonCradleLoading) findViewById(R.id.progressLoading);
@@ -261,7 +261,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         recyclerView.setVisibility(View.VISIBLE);
                         devicesLabel.setVisibility(View.VISIBLE);
                         connectText.setVisibility(View.INVISIBLE);
-                        mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
+                        mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
                         generateItems();
                         break;
                     }
@@ -273,19 +273,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     }
                     case UNKNOWN:{
                         //Default state....don't know what to do with it.
-                        break;
-                    }
-                    case WAITING_FOR_USER:{
-                        progressBack = (ProgressBar) findViewById(R.id.progressBar);
-                        progressBack.setVisibility(View.INVISIBLE);
-                        connectText.setVisibility(View.INVISIBLE);
-                        mLoadingProgress.setVisibility(View.INVISIBLE);
-                        recyclerView.setEnabled(true);
-                        recyclerView.setVisibility(View.VISIBLE);
-                        devicesLabel.setVisibility(View.VISIBLE);
-                        mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
-                        sendIntent(WifiRunner.ConnectStatus.SEARCHING.name(), "status");
-                        mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
                         break;
                     }
                 }
