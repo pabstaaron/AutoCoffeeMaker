@@ -74,7 +74,7 @@
             android:textColor="#ffefcc"
             android:width="200dp"
             android:background="@drawable/buttonstyle"
-            android:text="Connect"
+            android:text="Connect Device"
             android:layout_marginBottom="91dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
@@ -103,7 +103,8 @@
             android:id="@+id/connectText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Trying to connect...."
+            android:paddingLeft="8dp"
+            android:text="Loading...."
             android:textStyle="bold"
             android:textColor="#ffefcc"
             android:textSize="15dp"
@@ -116,8 +117,27 @@
                 android:layout_height="300dp"
                 android:background="@drawable/logotext"
                 android:rotation="15"
-                android:layout_alignBottom="@+id/connectText"
-                android:layout_alignStart="@+id/connectText" />
+                android:layout_alignBottom="@+id/progressBar"
+                android:layout_alignStart="@+id/progressBar"
+                android:layout_alignParentTop="true" />
+            <ProgressBar
+                android:id="@+id/wifiStatusBack"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:indeterminateDrawable="@drawable/wifibackground"
+                android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/wifiStatus" /> "
+                android:layout_marginStart="12dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+            <ImageButton
+                android:id="@+id/wifiStatus"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="12dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+
         </RelativeLayout>
         <ImageView
             android:layout_width="90dp"
@@ -128,6 +148,5 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="24dp" />
-
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

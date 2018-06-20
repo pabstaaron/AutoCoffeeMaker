@@ -6,13 +6,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.PermissionRequest;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ViewFlipper;
+
+import com.victor.loading.newton.NewtonCradleLoading;
 
 import java.security.Permission;
 
@@ -24,8 +34,10 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
  */
 public class main extends AppCompatActivity {
 
-    private static ThreadManager tm;
-    private static WifiRunner wr;
+    private Animation fade_in, fade_out;
+    private ViewFlipper viewFlipper;
+    private Button connectButton;
+
 
     private static final int WRITE_EXTERNAL_STORAGE_CODE = 1;
     private static final int READ_EXTERNAL_STORAGE_CODE = 2;
@@ -39,10 +51,47 @@ public class main extends AppCompatActivity {
     private static final String REQUEST_ACCESS_NETWORK_STATE = Manifest.permission.ACCESS_NETWORK_STATE;
     private static final String REQUEST_ACCESS_WIFI_STATE = Manifest.permission.ACCESS_WIFI_STATE;
 
+    private NewtonCradleLoading cradle;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        connectButton = (Button) findViewById(R.id.connectButtonMain);
+        connectButton.setVisibility(View.INVISIBLE);
+
+        try {
+            viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundViewMain);
+            fade_in = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+            fade_out = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+            fade_in.setInterpolator(new DecelerateInterpolator());
+            fade_out.setInterpolator(new AccelerateDecelerateInterpolator());
+            fade_in.setDuration(3000);
+            fade_out.setStartOffset(1000);
+            fade_out.setDuration(3000);
+            viewFlipper.setInAnimation(fade_in);
+            viewFlipper.setOutAnimation(fade_out);
+            viewFlipper.setAutoStart(true);
+            viewFlipper.setFlipInterval(10000);
+            if(getIntent() != null && getIntent().hasExtra("flipper")){
+                viewFlipper.setDisplayedChild(getIntent().getIntExtra("flipper", 0));
+            }
+            else if(savedInstanceState != null && savedInstanceState.containsKey("flipper")) {
+                viewFlipper.setDisplayedChild(savedInstanceState.getInt("flipper",0));
+            }
+
+            viewFlipper.startFlipping();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            Log.i("MainMenu", e.getLocalizedMessage());
+        }
+
+        cradle = (NewtonCradleLoading) findViewById(R.id.newton_cradle_loading_main);
+        cradle.start();
+
         checkWrite();
     }
 
@@ -50,9 +99,6 @@ public class main extends AppCompatActivity {
      * Finished permissions, start the program
      */
     private void begin(){
-        tm = new ThreadManager();
-        wr = new WifiRunner(this);
-        tm.runInBackground(wr, 1000);
         Intent intent = new Intent(this, MainMenu.class);
         startActivity(intent);
     }
@@ -97,6 +143,7 @@ public class main extends AppCompatActivity {
      *Check write permissions for external storage
      */
     private void checkWrite(){
+        Log.i("Main", "Request_Write_External_Storage: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_WRITE_EXTERNAL_STORAGE));
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_WRITE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE_CODE, this);
         }
@@ -107,6 +154,7 @@ public class main extends AppCompatActivity {
      * Check read permissions for external storage
      */
     private void checkRead(){
+        Log.i("Main", "Request_Read_External_Storage: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_READ_EXTERNAL_STORAGE));
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_READ_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE_CODE, this);
         }
@@ -117,6 +165,7 @@ public class main extends AppCompatActivity {
      * Check internet permissions
      */
     private void checkInternet(){
+        Log.i("Main", "Request_Internet: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_INTERNET));
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_INTERNET) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_INTERNET, INTERNET_CODE, this);
         }
@@ -127,6 +176,7 @@ public class main extends AppCompatActivity {
      * Check network permissions
      */
     private void checkNetwork(){
+        Log.i("Main", "Request_Access_Network_State: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_NETWORK_STATE));
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_ACCESS_NETWORK_STATE, ACCESS_NETWORK_STATE_CODE, this);
         }
@@ -137,6 +187,7 @@ public class main extends AppCompatActivity {
      * Check wifi state permissions
      */
     private void checkWifiState(){
+        Log.i("Main", "Request_Access_Wifi_State: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_WIFI_STATE));
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_ACCESS_WIFI_STATE, ACCESS_WIFI_STATE_CODE, this);
         }

@@ -6,18 +6,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.text.Html;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -32,39 +30,33 @@ import android.widget.ViewFlipper;
 
 import com.victor.loading.newton.NewtonCradleLoading;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class DeviceSelection extends AppCompatActivity implements WifiViewHolder.OnItemSelectedListener{
 
     private WifiRunner.ConnectStatus mConnectStatus;
-    private ArrayList<String> mDeviceIds;
+    private ArrayList<Device> mDeviceIds;
     private Button cancelButton;
     private Button connectButton;
-    private Button newDeviceButton;
+    private Button searchButton;
     private TextView connectText;
-    private NewtonCradleLoading mLoadingProgress;
-    private String deviceSelected;
+    private NewtonCradleLoading mLoadingProgress, mSearchProgress;
+    private String deviceSelectedName;
+    private Device deviceSelected;
     private ViewFlipper viewFlipper;
-    private String mDeviceText;
-    private Context context;
+    private Context mContext;
     private ProgressBar progressBack;
     private Animation fade_in, fade_out;
     private TextView devicesLabel;
     private RecyclerView recyclerView;
     private WifiAdapter adapter;
-    private View.OnClickListener connectListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
-            context = this;
-            deviceSelected = "";
-            mDeviceText = "";
+            mContext = this;
+            deviceSelectedName = "";
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_device_select);
 
@@ -88,10 +80,10 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             }
             catch(Exception e){
                 e.printStackTrace();
-                Log.i("MainMenu", e.getLocalizedMessage());
+                Log.i("DeviceSelection", "" + e.getLocalizedMessage());
             }
 
-            mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+            mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
             mDeviceIds = new ArrayList<>();
             cancelButton = (Button) findViewById(R.id.deviceSelectCancel);
             cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -103,23 +95,62 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     intent.putExtra("flipper", viewFlipper.getDisplayedChild());
                     startActivity(intent);
                     finish();
-                    sendIntent(WifiRunner.ConnectStatus.WAITING_FOR_USER.name(), "status");
+                    mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+                    sendIntent("status");
+                }
+            });
+            searchButton = (Button) findViewById(R.id.searchDevices);
+            searchButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
+                    sendIntent("status");
+                    searchButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                    searchButton.setTextColor(Color.rgb(204, 204, 204));
+                    searchButton.setEnabled(false);
+                    connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                    connectButton.setTextColor(Color.rgb(204, 204, 204));
+                    connectButton.setEnabled(false);
+                    mSearchProgress.setVisibility(View.VISIBLE);
+                    deviceSelectedName = "";
+
                 }
             });
             connectButton = (Button) findViewById(R.id.deviceConnect);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
             connectButton.setTextColor(Color.rgb(204, 204, 204));
-            newDeviceButton = (Button) findViewById(R.id.newDevice);
-            newDeviceButton.setOnClickListener(new View.OnClickListener() {
+            connectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    for(Device d : mDeviceIds){
+                        if(d.getMacAddress().equals(deviceSelectedName) && !d.getsN().isEmpty()){
+                            progressBack.setVisibility(View.VISIBLE);
+                            mLoadingProgress.setVisibility(View.VISIBLE);
+                            connectText.setVisibility(View.VISIBLE);
+                            recyclerView.setVisibility(View.INVISIBLE);
+                            recyclerView.setEnabled(false);
+                            devicesLabel.setVisibility(View.INVISIBLE);
+                            searchButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                            searchButton.setTextColor(Color.rgb(204, 204, 204));
+                            searchButton.setEnabled(false);
+                            connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                            connectButton.setTextColor(Color.rgb(204, 204, 204));
+                            connectButton.setEnabled(false);
+                            deviceSelected = d;
+                            sendIntent("deviceID");
+                            mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_RESPONSE;
+                            sendIntent("status");
+                            return;
+                        }
+                    }
 
                     final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 
-                    AlertDialog.Builder alert = new AlertDialog.Builder(context);
+                    AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
 
-                    final EditText edittext = new EditText(context);
+                    final EditText edittext = new EditText(mContext);
                     alert.setTitle("Please enter the SN on the device: ");
 
                     alert.setView(edittext);
@@ -127,20 +158,33 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             dialog.dismiss();
-                            mDeviceText = edittext.getText().toString();
-                            if (!mDeviceText.isEmpty()){
-                                mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_RESPONSE;
-                                sendIntent(mDeviceText, "deviceID");
-                                sendIntent(mConnectStatus.name(), "status");
+                            String deviceSn = edittext.getText().toString();
+                            if (!deviceSn.isEmpty()){
+                                for(Device d : mDeviceIds){
+                                    if(deviceSelectedName.equals(d.getMacAddress())){
+                                        d.setsN(deviceSn);
+                                        deviceSelected = d;
+                                    }
+                                }
                                 progressBack.setVisibility(View.VISIBLE);
                                 mLoadingProgress.setVisibility(View.VISIBLE);
                                 connectText.setVisibility(View.VISIBLE);
                                 recyclerView.setVisibility(View.INVISIBLE);
                                 recyclerView.setEnabled(false);
                                 devicesLabel.setVisibility(View.INVISIBLE);
+                                searchButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                                searchButton.setTextColor(Color.rgb(204, 204, 204));
+                                searchButton.setEnabled(false);
+                                connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                                connectButton.setTextColor(Color.rgb(204, 204, 204));
+                                connectButton.setEnabled(false);
+                                mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_RESPONSE;
+                                sendIntent("deviceID");
+                                sendIntent("status");
+
                             }
                             else{
-                                Toast.makeText(context, "SN cannot be empty", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "SN cannot be empty", Toast.LENGTH_SHORT).show();
                             }
                             imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
                         }
@@ -163,20 +207,23 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             connectText.setVisibility(View.INVISIBLE);
             progressBack = (ProgressBar) findViewById(R.id.progressBar);
             progressBack.setVisibility(View.INVISIBLE);
+            mSearchProgress = (NewtonCradleLoading) findViewById(R.id.searchDeviceLoad);
+            mSearchProgress.setLoadingColor(Color.BLACK);
+            mSearchProgress.setVisibility(View.INVISIBLE);
+            mSearchProgress.start();
             mLoadingProgress = (NewtonCradleLoading) findViewById(R.id.progressLoading);
             mLoadingProgress.setVisibility(View.INVISIBLE);
             mLoadingProgress.start();
             LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                     new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
-            sendIntent(mConnectStatus.name(), "status");
+            sendIntent("status");
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             recyclerView = (RecyclerView) this.findViewById(R.id.selection_list);
             recyclerView.setLayoutManager(layoutManager);
-            List<WifiSelectItem> selectableItems = generateItems();
-            adapter = new WifiAdapter(this, selectableItems, false);
-            recyclerView.setAdapter(adapter);
+            makeWifiAdapter();
 
+            sendIntent("sendDevices");
         }
         catch(Exception e){
             e.printStackTrace();
@@ -191,8 +238,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     public List<WifiSelectItem> generateItems(){
 
         List<WifiSelectItem> selectableItems = new ArrayList<>();
-        for(String s: mDeviceIds){
-            selectableItems.add(new WifiSelectItem(s));
+        selectableItems.clear();
+        for(Device d: mDeviceIds){
+            selectableItems.add(new WifiSelectItem(d.getMacAddress()));
         }
 
         return selectableItems;
@@ -205,32 +253,16 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     @Override
     public void onItemSelected(SelectableWifi selectableItem) {
         if(adapter.getSelectedItems().isEmpty()) {
-            connectButton.setEnabled(false);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
             connectButton.setTextColor(Color.rgb(204, 204, 204));
-            deviceSelected = "";
+            deviceSelectedName = "";
+            connectButton.setEnabled(false);
         }
         else {
             connectButton.setEnabled(true);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
             connectButton.setTextColor(Color.rgb(255, 239, 204));
-            deviceSelected = selectableItem.getDeviceID();
-            connectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    progressBack.setVisibility(View.VISIBLE);
-                    mLoadingProgress.setVisibility(View.VISIBLE);
-                    connectText.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.INVISIBLE);
-                    recyclerView.setEnabled(false);
-                    devicesLabel.setVisibility(View.INVISIBLE);
-                    Intent intent = new Intent();
-                    intent.putExtra("deviceID", deviceSelected);
-                    intent.putExtra("status", WifiRunner.ConnectStatus.WAITING_FOR_RESPONSE.name());
-                    intent.setAction("com.android.activity.WIFI_DATA_IN");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-                }
-            });
+            deviceSelectedName = selectableItem.getDeviceID();
         }
     }
 
@@ -249,6 +281,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         intent.putExtra("selection", true);
+                        mSearchProgress.setVisibility(View.INVISIBLE);
                         startActivity(brewIntent);
                     break;
                     }
@@ -262,6 +295,15 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         devicesLabel.setVisibility(View.VISIBLE);
                         connectText.setVisibility(View.INVISIBLE);
                         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+                        searchButton.setEnabled(true);
+                        searchButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        searchButton.setTextColor(Color.rgb(255, 239, 204));
+                        if(!adapter.getSelectedItems().isEmpty()){
+                            connectButton.setEnabled(true);
+                            connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                            connectButton.setTextColor(Color.rgb(255, 239, 204));
+                        }
+                        mSearchProgress.setVisibility(View.INVISIBLE);
                         generateItems();
                         break;
                     }
@@ -269,42 +311,72 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         progressBack.setVisibility(View.VISIBLE);
                         connectText.setVisibility(View.VISIBLE);
                         mLoadingProgress.setVisibility(View.VISIBLE);
+                        mSearchProgress.setVisibility(View.INVISIBLE);
                         break;
                     }
                     case UNKNOWN:{
                         //Default state....don't know what to do with it.
                         break;
                     }
-                }
-            }
-            if(intent.hasExtra("deviceIds")){
-                ArrayList<? extends String> deviceIds;
-                // use local var intent
-                deviceIds = intent.getParcelableArrayListExtra("deviceIds");
-                Log.d("onReceive", "got myList");
-
-                for (String s: deviceIds) {
-                    if(!mDeviceIds.contains(s)){
-                        mDeviceIds.add(s);
-                        adapter.addItem(new WifiSelectItem(s));   //Might have to set recycler view adapter again but not sure.....
+                    case NO_WIFI:{
+                        intent = new Intent(getApplicationContext(), MainMenu.class);
+                        intent.putExtra("noWifi", true);
+                        intent.putExtra("flipper", viewFlipper.getDisplayedChild());
+                        startActivity(intent);
+                        finish();
                     }
                 }
             }
-            Log.d("DeviceSelection", "wifiStatusReceiver got message: " );
-
+            else if(intent.hasExtra("deviceIds")){
+                ArrayList<Device> deviceIds;
+                deviceIds = intent.getParcelableArrayListExtra("deviceIds");
+                Log.i("Device Selection", "FUCK YOU");
+                mDeviceIds.clear();
+                for (Device d: deviceIds) {
+                    Log.i("Device Selection", "Bitch!" + d.getMacAddress());
+                    mDeviceIds.add(d);
+                }
+                makeWifiAdapter();
+            }
+            else if(intent.hasExtra("Failure")){
+                for(Device d: mDeviceIds){
+                    if(d.getMacAddress().equals(deviceSelected.getMacAddress())){
+                        d.setsN("");
+                        deviceSelected = d;
+                    }
+                }
+            }
         }
     };
 
+    private void makeWifiAdapter(){
+        List<WifiSelectItem> selectableItems = generateItems();
+        adapter = new WifiAdapter(this, selectableItems, false);
+        recyclerView.setAdapter(adapter);
+    }
+
     /**
      * Send selected deviceID or connection status change to wifirunner
-     * @param connectStatus
      * @param type
      */
-    private void sendIntent(String connectStatus, String type){
+    private void sendIntent(String type){
         Intent intent = new Intent();
-        intent.putExtra(type,connectStatus);
-        intent.setAction("com.android.activity.WIFI_DATA_IN");
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+        if(type.equals("status")){
+            intent.putExtra(type,mConnectStatus.name());
+            intent.setAction("com.android.activity.WIFI_DATA_IN");
+        }
+        else if(type.equals("deviceID")){
+            intent.putExtra("deviceID", (Parcelable) deviceSelected);
+            intent.setAction("com.android.activity.WIFI_DATA_IN");
+        }
+        else if(type.equals("sendDevices")){
+            intent.putExtra("sendDevices","");
+            intent.setAction("com.android.activity.WIFI_DATA_IN");
+        }
+        if(!intent.getExtras().isEmpty()) {
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
     }
 
     @Override
@@ -315,7 +387,11 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
         startActivity(intent);
         finish();
-        sendIntent(WifiRunner.ConnectStatus.WAITING_FOR_USER.name(), "status");
+        mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+        sendIntent("status");
+        intent.putExtra("status",mConnectStatus.name());
+        intent.setAction("com.android.activity.WIFI_DATA_OUT");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
     @Override
