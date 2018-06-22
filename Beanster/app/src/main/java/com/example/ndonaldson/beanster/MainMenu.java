@@ -27,6 +27,9 @@ import android.widget.ViewFlipper;
 
 import com.victor.loading.newton.NewtonCradleLoading;
 
+/**
+ *
+ */
 public class MainMenu extends AppCompatActivity {
 
     private WifiRunner.ConnectStatus connectStatus;
@@ -146,6 +149,9 @@ public class MainMenu extends AppCompatActivity {
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
     }
 
+    /**
+     *
+     */
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -230,11 +236,18 @@ public class MainMenu extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
+    /**
+     *
+     */
     @Override
     public void onBackPressed(){
         finishAndRemoveTask();
     }
 
+    /**
+     *
+     * @param bundle
+     */
     @Override
     public void onSaveInstanceState(Bundle bundle){
         bundle.putInt("flipper", viewFlipper.getDisplayedChild());

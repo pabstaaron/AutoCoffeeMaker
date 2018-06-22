@@ -58,6 +58,7 @@ public class    WifiRunner implements Runnable {
     private ConnectivityManager mConnManager;
     private NetworkInfo mWifi;
     private boolean isRunning;
+    private boolean firstConnect;
     private String myIP;
     private static final String  DEVICES_LOCATION = Environment.getExternalStorageDirectory().getAbsolutePath() + "/deviceIds.txt";
 
@@ -68,6 +69,7 @@ public class    WifiRunner implements Runnable {
      */
     public WifiRunner(Context context){
     try {
+        firstConnect = true;
         isRunning = false;
         this.context = context;
         try {
@@ -79,8 +81,10 @@ public class    WifiRunner implements Runnable {
                 FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream is = new ObjectInputStream(fis);
                 savedDevices = (ArrayList<Device>) is.readObject();
-                if (savedDevices != null || !savedDevices.isEmpty())
+                if (savedDevices != null || !savedDevices.isEmpty()) {
                     lastDevice = savedDevices.get(savedDevices.size() - 1);
+                    Log.i("WifiRunner", "lastDevice is: " + lastDevice.getMacAddress() + " with sN: " + lastDevice.getsN());
+                }
                 is.close();
                 fis.close();
             }
@@ -101,20 +105,6 @@ public class    WifiRunner implements Runnable {
             myIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
             Log.i("WifiRunner", "My IP Address is: " + myIP);
             connectStatus = ConnectStatus.SEARCHING;
-            sendIntent("status");
-        }
-
-
-        if(devicesInRange != null && !devicesInRange.isEmpty() && lastDevice != null && !lastDevice.getMacAddress().isEmpty()
-                && connectStatus != ConnectStatus.NO_WIFI) {
-            for (Device d : devicesInRange) {
-                if (d.getMacAddress().equals(lastDevice.getMacAddress()))
-                    connectStatus = ConnectStatus.CONNECT_TO_LAST;
-                    sendIntent("status");
-            }
-        }
-        else if(connectStatus == ConnectStatus.UNKNOWN){
-            connectStatus = ConnectStatus.WAITING_FOR_USER;
             sendIntent("status");
         }
 
@@ -147,7 +137,6 @@ public class    WifiRunner implements Runnable {
                 else if (connectStatus == ConnectStatus.CONNECTED) {
                     Log.i("WifiRunner", "CONNECTED!");
                     client = (HttpURLConnection) url.openConnection();
-                    if (devicesInRange != null) devicesInRange.clear();
                     client.setRequestMethod("GET");
                     //client.setRequestProperty("serial", deviceIDs.get(searchingCount));
                     int responseCode = 404;
@@ -168,11 +157,18 @@ public class    WifiRunner implements Runnable {
                     Log.i("WifiRunner", "SEARCHING!");
                     pingDevices();
                     createArpMap();
-                    connectStatus = ConnectStatus.WAITING_FOR_USER;
-                    sendIntent("data");
-                    sendIntent("status");
+                    if(firstConnect) {
+                        connectStatus = ConnectStatus.CONNECT_TO_LAST;
+                        firstConnect = false;
+                        sendIntent("status");
+                    }
+                    else {
+                        connectStatus = ConnectStatus.WAITING_FOR_USER;
+                        sendIntent("data");
+                        sendIntent("status");
+                    }
                 }
-                else if (connectStatus == ConnectStatus.WAITING_FOR_RESPONSE) {
+                else if (connectStatus == ConnectStatus.WAITING_FOR_RESPONSE || connectStatus == ConnectStatus.CONNECT_TO_LAST) {
                     Log.i("WifiRunner", "WAITING FOR RESPONSE!");
                     url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
                     client = (HttpURLConnection) url.openConnection();
@@ -209,11 +205,19 @@ public class    WifiRunner implements Runnable {
                             if(!exists) {
                                 if (savedDevices == null) savedDevices = new ArrayList<>();
                                 savedDevices.add(lastDevice);
-                                FileOutputStream fos = context.openFileOutput(DEVICES_LOCATION, Context.MODE_PRIVATE);
-                                ObjectOutputStream os = new ObjectOutputStream(fos);
-                                os.writeObject(savedDevices);
-                                os.close();
-                                fos.close();
+                                try {
+                                    File file = new File(DEVICES_LOCATION);
+                                    FileOutputStream fos = new FileOutputStream(file);
+                                    ObjectOutputStream os = new ObjectOutputStream(fos);
+                                    os.writeObject(savedDevices);
+                                    os.flush();
+                                    fos.getFD().sync();
+                                    os.close();
+                                } catch(EOFException e){
+                                    e.printStackTrace();
+                                    Log.i("WifiRunner", "" + e.getLocalizedMessage());
+                                }
+
                             }
                             connectStatus = ConnectStatus.CONNECTED;
                             sendIntent("status");
@@ -226,29 +230,6 @@ public class    WifiRunner implements Runnable {
                     client.disconnect();
                 } else if (connectStatus == ConnectStatus.WAITING_FOR_USER) {
                     Log.i("WifiRunner", "WAITING FOR USER!");
-                } else if (connectStatus == ConnectStatus.CONNECT_TO_LAST) {
-                    Log.i("WifiRunner", "CONNECTING TO LAST!");
-                    if (client != null && lastDevice != null) {
-                        url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
-                        client = (HttpURLConnection) url.openConnection();
-                        client.setRequestMethod("GET");
-                        client.setConnectTimeout(1000);
-                        int responseCode = client.getResponseCode();
-                        Log.i("WifiRunner", "responseCode is: " + responseCode);
-                        if (responseCode == HttpURLConnection.HTTP_OK) {
-                            connectStatus = ConnectStatus.CONNECTED;
-                            sendIntent("status");
-                        } else {
-                            connectStatus = ConnectStatus.WAITING_FOR_USER;
-                            Log.i("WifiRunner", "SENDING WAITING_FOR_USER INTENT!");
-                            sendIntent("status");
-                        }
-                        client.disconnect();
-                    } else {
-                        connectStatus = ConnectStatus.WAITING_FOR_USER;
-                        Log.i("WifiRunner", "SENDING WAITING_FOR_USER INTENT!");
-                        sendIntent("status");
-                    }
                 }
                 else if(connectStatus == ConnectStatus.NO_WIFI){
                     Log.i("WifiRunner", "NO WIFI!");
@@ -299,6 +280,15 @@ public class    WifiRunner implements Runnable {
             }
             else if (type.equals("data") || type.equals("sendDevices")){
                 try{
+                    for(Device d: devicesInRange){
+                        for(Device d2: savedDevices){
+                            if(d.getMacAddress().equals(d2.getMacAddress())){
+                                d.setsN(d2.getsN());
+                                d.setHostName(d2.getHostName());
+                                d.setiP(d2.getiP());
+                            }
+                        }
+                    }
                     intent.putParcelableArrayListExtra("deviceIds", devicesInRange);
                 }
                 catch(Exception e){
@@ -330,6 +320,7 @@ public class    WifiRunner implements Runnable {
                 lastDevice = device;
             }
             else if(intent.hasExtra("sendDevices")){
+                Log.d("WifiRunner", "wifiStatusReceiver got message SEND DEVICES");
                 sendIntent("sendDevices");
             }
         }

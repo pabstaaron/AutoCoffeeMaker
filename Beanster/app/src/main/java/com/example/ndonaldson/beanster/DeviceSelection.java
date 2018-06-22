@@ -83,7 +83,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 Log.i("DeviceSelection", "" + e.getLocalizedMessage());
             }
 
-            mConnectStatus = WifiRunner.ConnectStatus.SEARCHING;
+            mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
             mDeviceIds = new ArrayList<>();
             cancelButton = (Button) findViewById(R.id.deviceSelectCancel);
             cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +124,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 public void onClick(View v) {
 
                     for(Device d : mDeviceIds){
+                        Log.i("DeviceSelection", "d.MacAddress: " + d.getMacAddress() + ", d.sN: " + d.getsN() + ", deviceSelectedName: " + deviceSelectedName);
                         if(d.getMacAddress().equals(deviceSelectedName) && !d.getsN().isEmpty()){
                             progressBack.setVisibility(View.VISIBLE);
                             mLoadingProgress.setVisibility(View.VISIBLE);
@@ -208,8 +209,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             progressBack = (ProgressBar) findViewById(R.id.progressBar);
             progressBack.setVisibility(View.INVISIBLE);
             mSearchProgress = (NewtonCradleLoading) findViewById(R.id.searchDeviceLoad);
-            mSearchProgress.setLoadingColor(Color.BLACK);
             mSearchProgress.setVisibility(View.INVISIBLE);
+            mSearchProgress.setLoadingColor(Color.BLACK);
             mSearchProgress.start();
             mLoadingProgress = (NewtonCradleLoading) findViewById(R.id.progressLoading);
             mLoadingProgress.setVisibility(View.INVISIBLE);
@@ -218,12 +219,13 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
             sendIntent("status");
 
+
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             recyclerView = (RecyclerView) this.findViewById(R.id.selection_list);
             recyclerView.setLayoutManager(layoutManager);
-            makeWifiAdapter();
 
             sendIntent("sendDevices");
+
         }
         catch(Exception e){
             e.printStackTrace();
@@ -330,10 +332,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             else if(intent.hasExtra("deviceIds")){
                 ArrayList<Device> deviceIds;
                 deviceIds = intent.getParcelableArrayListExtra("deviceIds");
-                Log.i("Device Selection", "FUCK YOU");
                 mDeviceIds.clear();
                 for (Device d: deviceIds) {
-                    Log.i("Device Selection", "Bitch!" + d.getMacAddress());
+                    Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.sN: %s", d.getMacAddress(), d.getsN()));
                     mDeviceIds.add(d);
                 }
                 makeWifiAdapter();
@@ -341,6 +342,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             else if(intent.hasExtra("Failure")){
                 for(Device d: mDeviceIds){
                     if(d.getMacAddress().equals(deviceSelected.getMacAddress())){
+                        Log.i("DeviceSelection", "FAILURE!");
                         d.setsN("");
                         deviceSelected = d;
                     }
@@ -379,6 +381,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void onBackPressed(){
         //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
