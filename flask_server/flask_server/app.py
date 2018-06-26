@@ -34,9 +34,9 @@ def am_i_connected(serial):
                  'type': _settings,
                  'serial number': _serial}
     if(_settings == "computer" or serial != _serial):
-        return jsonify(post_data), 200
+        return jsonify(post_data), 400
     else:
-        return jsonify(post_data), 201
+        return jsonify(post_data), 200
 
 
 @app.route('/coffee/<serial>', methods=['GET'])
