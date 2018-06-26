@@ -148,6 +148,9 @@ public class    WifiRunner implements Runnable {
                         sendIntent("failure");
                     }
                     if (responseCode != HttpURLConnection.HTTP_OK) {
+                        if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                            sendIntent("badRequest");
+                        }
                         connectStatus = ConnectStatus.WAITING_FOR_USER;
                         sendIntent("status");
                     }
@@ -170,9 +173,9 @@ public class    WifiRunner implements Runnable {
                 }
                 else if (connectStatus == ConnectStatus.WAITING_FOR_RESPONSE || connectStatus == ConnectStatus.CONNECT_TO_LAST) {
                     Log.i("WifiRunner", "WAITING FOR RESPONSE!");
-                    url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
-                    client = (HttpURLConnection) url.openConnection();
                     if (lastDevice != null && !lastDevice.getiP().isEmpty()) {
+                        url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
+                        client = (HttpURLConnection) url.openConnection();
                         client.setRequestMethod("GET");
                         client.setConnectTimeout(1000);
 
@@ -188,23 +191,32 @@ public class    WifiRunner implements Runnable {
                         }
                         Log.i("WifiRunner", "responseCode:" + responseCode);
                         if (responseCode != HttpURLConnection.HTTP_OK) {
+                            if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                               if(connectStatus != ConnectStatus.CONNECT_TO_LAST) sendIntent("badRequest");
+                            }
                             Log.i("WifiRunner", "Failed to connect");
                             connectStatus = ConnectStatus.WAITING_FOR_USER;
                             lastDevice = null;
                             sendIntent("status");
-                        } else {
+                        }
+                        else {
                             Log.i("WifiRunner", "Connected");
                             boolean exists = false;
+                            boolean update = false;
                             if(savedDevices != null) {
                                 for (Device d : savedDevices) {
                                     if (d.getMacAddress().equals(lastDevice.getMacAddress()))
+                                        if(d.getsN() != lastDevice.getsN()) {
+                                            d.setsN(lastDevice.getsN());
+                                            update = true;
+                                        }
                                         exists = true;
                                 }
                             }
 
-                            if(!exists) {
+                            if(!exists || update) {
                                 if (savedDevices == null) savedDevices = new ArrayList<>();
-                                savedDevices.add(lastDevice);
+                                if(!update) savedDevices.add(lastDevice);
                                 try {
                                     File file = new File(DEVICES_LOCATION);
                                     FileOutputStream fos = new FileOutputStream(file);
@@ -298,9 +310,14 @@ public class    WifiRunner implements Runnable {
             else if (type.equals("failure")){
                 intent.putExtra("Failure", "");
             }
+            else if (type.equals("badRequest")){
+                intent.putExtra("badRequest", "");
+            }
 
-        intent.setAction("com.android.activity.WIFI_DATA_OUT");
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        if(!intent.getExtras().isEmpty()) {
+            intent.setAction("com.android.activity.WIFI_DATA_OUT");
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        }
     }
 
     /**

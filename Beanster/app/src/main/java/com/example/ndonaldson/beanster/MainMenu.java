@@ -179,7 +179,7 @@ public class MainMenu extends AppCompatActivity {
                     wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
                     circle.setVisibility(View.INVISIBLE);
                     connectingText.setVisibility(View.INVISIBLE);
-                    Toast toast = Toast.makeText(context, "Application requires wireless connection", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(context, "Application requires wireless connection...", Toast.LENGTH_SHORT);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                     break;

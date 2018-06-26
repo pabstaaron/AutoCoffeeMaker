@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -185,8 +186,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
 
                             }
                             else{
-                                Toast.makeText(mContext, "SN cannot be empty", Toast.LENGTH_SHORT).show();
-                            }
+                                Toast toast = Toast.makeText(mContext, "SN cannot be empty...", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();                            }
                             imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
                         }
                     });
@@ -339,14 +341,21 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 }
                 makeWifiAdapter();
             }
-            else if(intent.hasExtra("Failure")){
-                for(Device d: mDeviceIds){
-                    if(d.getMacAddress().equals(deviceSelected.getMacAddress())){
-                        Log.i("DeviceSelection", "FAILURE!");
+            else if(intent.hasExtra("Failure") || intent.hasExtra("badRequest")) {
+                String previousSN = "";
+                for (Device d : mDeviceIds) {
+                    if (d.getMacAddress().equals(deviceSelected.getMacAddress())) {
+                        previousSN = d.getsN();
                         d.setsN("");
                         deviceSelected = d;
                     }
                 }
+                String message = "";
+                if(intent.hasExtra("Failure")) message = "Failure to get response from " + deviceSelected.getMacAddress() + "...";
+                else if(!previousSN.isEmpty()) message = "SN " + previousSN + " for device " + deviceSelected.getMacAddress() + " is not correct...";
+                Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         }
     };
