@@ -64,8 +64,10 @@ public class    WifiRunner implements Runnable {
 
 
     /**
+     * CONSTRUCTOR
+     * Retreive list of devices saved on this device so we can have a cache of passwords for each device as well as other info.
+     * Also get current LAN information
      * @param context
-     * Constructor for WifiRunner
      */
     public WifiRunner(Context context){
     try {
@@ -120,9 +122,11 @@ public class    WifiRunner implements Runnable {
     }
 
     /**
-     * Check wifi connection every second to make sure that we are still connected.
-     * If no connection kick out to main screen.
-     * Keep checking response from raspberry PI.
+     * - This checks to see if we are STILL connected to a device or wifi.
+     * - If not connected to wifi, it kicks user to main screen and waits for wifi connection.
+     * - If not connected to a device, it kicks the user to the device selection activity if they have gotten to that point,
+     * otherwise it waits for user input on main screen.
+     * - Tries to connect to a device once receiving broadcast from other activities.
      */
     @Override
     public void run() {
@@ -276,7 +280,8 @@ public class    WifiRunner implements Runnable {
 
 
     /**
-     * Send out connection status change to any app with proper receiver
+     * Send out connection status change, deviceId's, failures to connect, or bad requests
+     * to other activities.
      * @param type
      */
     private void sendIntent(String type){
@@ -370,6 +375,10 @@ public class    WifiRunner implements Runnable {
         }
     }
 
+    /**
+     * Ping all devices on LAN
+     * The reason for this is to refresh the /proc/net/arp/ table on the device.
+     */
     public void pingDevices(){
         try {
             NetworkInterface iFace = NetworkInterface

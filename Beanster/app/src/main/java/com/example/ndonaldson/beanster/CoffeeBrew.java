@@ -12,14 +12,13 @@ public class CoffeeBrew extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coffee_brew);
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
     }
 
     /**
-     *
+     * Return to device selection screen
      */
     @Override
     public void onBackPressed(){

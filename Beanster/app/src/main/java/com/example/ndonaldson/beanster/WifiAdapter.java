@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * RecyclerView that holds WifiSelectItems in WifiViewHolders
  * Created by ndonaldson on 5/21/18.
  */
 

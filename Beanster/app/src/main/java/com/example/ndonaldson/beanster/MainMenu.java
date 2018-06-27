@@ -28,7 +28,12 @@ import android.widget.ViewFlipper;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 /**
+ * This class starts the WifiRunner, which scans the network and either:
+ * A) Connects to previous device with successful connection
+ * B) Waits for user input to proceed
  *
+ * Also displays current connection state and requires LAN connection
+ * to proceed.
  */
 public class MainMenu extends AppCompatActivity {
 
@@ -150,7 +155,19 @@ public class MainMenu extends AppCompatActivity {
     }
 
     /**
+     * Messages received from WifiRunner:
      *
+     * CONNECTED: Happen from successful connection to previous device with successful communication.
+     *
+     * UNKNOWN: UNDEFINED
+     *
+     * NO_WIFI: Warns user to be connected to wifi and prevents further process.
+     *
+     * WAITING_FOR_USER: Unsuccessful reconnection to previous device with communication. Wait for user input.
+     *
+     * CONNECT_TO_LAST: Trying to connect to last device, display proper indications.
+     *
+     * SEARCHING: Scanning network on bootup, refreshes device's /proc/net/arp by pinging all devices on LAN
      */
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -237,7 +254,7 @@ public class MainMenu extends AppCompatActivity {
     }
 
     /**
-     *
+     * Closes application
      */
     @Override
     public void onBackPressed(){
@@ -245,7 +262,7 @@ public class MainMenu extends AppCompatActivity {
     }
 
     /**
-     *
+     * Keep track of image we are currently on
      * @param bundle
      */
     @Override

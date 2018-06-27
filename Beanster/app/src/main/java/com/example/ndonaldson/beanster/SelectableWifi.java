@@ -1,6 +1,7 @@
 package com.example.ndonaldson.beanster;
 
 /**
+ * Wrapper to identify if viewHolder is selected
  * Created by ndonaldson on 5/21/18.
  */
 

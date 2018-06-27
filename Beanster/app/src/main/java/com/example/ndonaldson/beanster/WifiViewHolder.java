@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.CheckedTextView;
 
 /**
+ * The display for each card in the recyclerview
  * Created by ndonaldson on 5/21/18.
  */
 
@@ -18,6 +19,11 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
     OnItemSelectedListener itemSelectedListener;
 
 
+    /**
+     * Sets onClickListener for the card.
+     * @param view
+     * @param listener
+     */
     public WifiViewHolder(View view, OnItemSelectedListener listener) {
         super(view);
         itemSelectedListener = listener;
@@ -39,6 +45,10 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
+    /**
+     * Sets color scheme of card
+     * @param value
+     */
     public void setChecked(boolean value) {
         if (value) {
             textView.setBackgroundColor(Color.LTGRAY);
@@ -49,6 +59,9 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
         textView.setChecked(value);
     }
 
+    /**
+     * Used in DeviceSelection to decide what to do when selecting item.
+     */
     public interface OnItemSelectedListener {
 
         void onItemSelected(SelectableWifi item);

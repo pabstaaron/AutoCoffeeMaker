@@ -1,10 +1,11 @@
 package com.example.ndonaldson.beanster;
 
 /**
+ * Holds info for selectable wifi, right now just a string.
  * Created by ndonaldson on 5/21/18.
  */
 
-public class    WifiSelectItem {
+public class WifiSelectItem {
 
     private String deviceID;
 

@@ -236,7 +236,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
-     *
+     * Create all the items in the recyclerView based on the raspberry PI's on the LAN found by WifiRunner scan
      * @return
      */
     public List<WifiSelectItem> generateItems(){
@@ -251,7 +251,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
-     *
+     * Allow/Disallow use of connect button when an item is selected.
      * @param selectableItem
      */
     @Override
@@ -271,7 +271,17 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
+     * Messages received from WifiRunner:
      *
+     * CONNECTED: Happen from successful connection to requested device.
+     *
+     * UNKNOWN: UNDEFINED
+     *
+     * NO_WIFI: Warns user to be connected to wifi and kicks them to main screen.
+     *
+     * WAITING_FOR_USER: Waiting for user input
+     *
+     * WAITING_FOR_RESPONSE: Waiting for connection response on selected device
      */
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -360,6 +370,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         }
     };
 
+    /**
+     * creates new recyclerview of raspberryPI devices on network.
+     */
     private void makeWifiAdapter(){
         List<WifiSelectItem> selectableItems = generateItems();
         adapter = new WifiAdapter(this, selectableItems, false);
@@ -391,7 +404,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
-     *
+     * Go back to main screen
      */
     @Override
     public void onBackPressed(){
@@ -408,6 +421,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
+    /**
+     * @param bundle
+     */
     @Override
     public void onSaveInstanceState(Bundle bundle){
     }
