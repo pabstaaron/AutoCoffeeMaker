@@ -294,7 +294,10 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     case CONNECTED:{
                         //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
-                        intent.putExtra("selection", true);
+                        brewIntent.putExtra("selection", true);
+                        Log.i("DeviceSelection", "Starting brewActivity with IP: " + deviceSelected.getiP() + " and macAddress: " + deviceSelected.getMacAddress());
+                        brewIntent.putExtra("address", deviceSelected.getiP());
+                        brewIntent.putExtra("macAddress", deviceSelected.getMacAddress());
                         mSearchProgress.setVisibility(View.INVISIBLE);
                         startActivity(brewIntent);
                     break;

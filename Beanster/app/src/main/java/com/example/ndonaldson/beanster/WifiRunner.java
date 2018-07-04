@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
@@ -236,6 +237,7 @@ public class    WifiRunner implements Runnable {
 
                             }
                             connectStatus = ConnectStatus.CONNECTED;
+                            sendIntent("lastDevice");
                             sendIntent("status");
                         }
                     } else {
@@ -311,6 +313,9 @@ public class    WifiRunner implements Runnable {
                 catch(Exception e){
                     Log.i("WifiRunner",e.getLocalizedMessage());
                 }
+            }
+            else if(type.equals("lastDevice")){
+                intent.putExtra("lastDevice", (Parcelable) lastDevice);
             }
             else if (type.equals("failure")){
                 intent.putExtra("Failure", "");
