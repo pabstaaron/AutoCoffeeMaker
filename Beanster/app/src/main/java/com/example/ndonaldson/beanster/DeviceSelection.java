@@ -411,7 +411,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
      */
     @Override
     public void onBackPressed(){
-        //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra("selection", true);
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
@@ -419,9 +418,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         finish();
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
         sendIntent("status");
-        intent.putExtra("status",mConnectStatus.name());
-        intent.setAction("com.android.activity.WIFI_DATA_OUT");
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
     /**

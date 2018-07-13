@@ -195,8 +195,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 String status = intent.getStringExtra("status");
                 mConnectStatus = WifiRunner.ConnectStatus.valueOf(status);
                 switch (mConnectStatus) {
-                    case WAITING_FOR_RESPONSE: {
-                        sendIntent("status");
+                    case WAITING_FOR_USER: {
                         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                         startActivity(deviceIntent);
                         finish();
@@ -207,8 +206,8 @@ public class CoffeeBrew extends AppCompatActivity {
                         break;
                     }
                     case NO_WIFI: {
-                        sendIntent("status");
-                        Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                        Intent deviceIntent = new Intent(getApplicationContext(), MainMenu.class);
+                        intent.putExtra("noWifi", true);
                         startActivity(deviceIntent);
                         finish();
                         break;
