@@ -47,7 +47,7 @@ public class MainMenu extends AppCompatActivity {
     private ImageButton wifiStatus;
     private Context mContext;
     private String deviceIP;
-    private String deviceMac;
+    private String deviceSn;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -59,7 +59,7 @@ public class MainMenu extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
 
         deviceIP = "";
-        deviceMac = "";
+        deviceSn = "";
         mContext = this;
         try {
             viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundView);
@@ -185,7 +185,7 @@ public class MainMenu extends AppCompatActivity {
                     case CONNECTED: {
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("address", deviceIP);
-                        brewIntent.putExtra("macAddress", deviceMac);
+                        brewIntent.putExtra("sN", deviceSn);
                         startActivity(brewIntent);
                         finish();
                         break;
@@ -249,7 +249,7 @@ public class MainMenu extends AppCompatActivity {
             else if(intent.hasExtra("lastDevice")){
                 Device d = intent.getParcelableExtra("lastDevice");
                 deviceIP = d.getiP();
-                deviceMac = d.getMacAddress();
+                deviceSn = d.getsN();
             }
         }
     };
