@@ -3,6 +3,7 @@ from flask import jsonify
 from flask import request
 import time
 import settings
+import json
 
 app = Flask(__name__)
 _settings = settings.grab_type()
@@ -26,35 +27,38 @@ def am_i_connected(serial):
     IP's. This call can / should be used as a setup call before proceeding
     into coffee making process.
 
-    returns: 200 if flask connection was recieved but without the correct
-    serial number or in computer mode, else 201
+    returns: 400 if flask connection was recieved but without the correct
+    serial number or in computer mode, else 200
     """
     post_data = {'utc': int(time.time()),
                  'request': 'Connected',
                  'type': _settings,
                  'serial number': _serial}
     if(_settings == "computer" or serial != _serial):
-        return jsonify(post_data), 200
+        return jsonify(post_data), 400
     else:
-        return jsonify(post_data), 201
+        return jsonify(post_data), 200
 
 
-@app.route('/coffee/<serial>', methods=['GET'])
+@app.route('/coffee/<serial>', methods=['POST'])
 def make_me_a_coffee(serial):
     """
     make_me_a_coffee: Method to be used to initiate coffee making procedure.
     Payload without the correct serial number will be discarded
 
-    returns: 201 if flask connection was recieved without the correct serial
-    number or in computer mode, else 201
+    returns: 400 if flask connection was recieved without the correct serial
+    number or in computer mode, else 200
+    
+    content contains all the data being sent over
     """
-    print(request.json)
-    if(_settings != "computer" or serial != _serial):
+    if(request.is_json):
+        content = request.get_json()
+    if(_settings == "computer" or serial != _serial):
         post_data = {'utc': int(time.time()),
                      'request': 'Make me a Coffee',
                      'type': _settings,
                      'serial number': _serial}
-        return jsonify(post_data), 201
+        return jsonify(post_data), 400
     else:
         post_data = {'utc': int(time.time()),
                      'request': 'Make me a Coffee',
