@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -185,8 +186,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
 
                             }
                             else{
-                                Toast.makeText(mContext, "SN cannot be empty", Toast.LENGTH_SHORT).show();
-                            }
+                                Toast toast = Toast.makeText(mContext, "SN cannot be empty...", Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();                            }
                             imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
                         }
                     });
@@ -234,7 +236,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
-     *
+     * Create all the items in the recyclerView based on the raspberry PI's on the LAN found by WifiRunner scan
      * @return
      */
     public List<WifiSelectItem> generateItems(){
@@ -249,7 +251,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
-     *
+     * Allow/Disallow use of connect button when an item is selected.
      * @param selectableItem
      */
     @Override
@@ -269,7 +271,17 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
+     * Messages received from WifiRunner:
      *
+     * CONNECTED: Happen from successful connection to requested device.
+     *
+     * UNKNOWN: UNDEFINED
+     *
+     * NO_WIFI: Warns user to be connected to wifi and kicks them to main screen.
+     *
+     * WAITING_FOR_USER: Waiting for user input
+     *
+     * WAITING_FOR_RESPONSE: Waiting for connection response on selected device
      */
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -282,7 +294,10 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     case CONNECTED:{
                         //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
-                        intent.putExtra("selection", true);
+                        brewIntent.putExtra("selection", true);
+                        Log.i("DeviceSelection", "Starting brewActivity with IP: " + deviceSelected.getiP() + " and macAddress: " + deviceSelected.getsN());
+                        brewIntent.putExtra("address", deviceSelected.getiP());
+                        brewIntent.putExtra("sN", deviceSelected.getsN());
                         mSearchProgress.setVisibility(View.INVISIBLE);
                         startActivity(brewIntent);
                     break;
@@ -339,18 +354,28 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 }
                 makeWifiAdapter();
             }
-            else if(intent.hasExtra("Failure")){
-                for(Device d: mDeviceIds){
-                    if(d.getMacAddress().equals(deviceSelected.getMacAddress())){
-                        Log.i("DeviceSelection", "FAILURE!");
+            else if(intent.hasExtra("Failure") || intent.hasExtra("badRequest")) {
+                String previousSN = "";
+                for (Device d : mDeviceIds) {
+                    if (d.getMacAddress().equals(deviceSelected.getMacAddress())) {
+                        previousSN = d.getsN();
                         d.setsN("");
                         deviceSelected = d;
                     }
                 }
+                String message = "";
+                if(intent.hasExtra("Failure")) message = "Failure to get response from " + deviceSelected.getMacAddress() + "...";
+                else if(!previousSN.isEmpty()) message = "SN " + previousSN + " for device " + deviceSelected.getMacAddress() + " is not correct...";
+                Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         }
     };
 
+    /**
+     * creates new recyclerview of raspberryPI devices on network.
+     */
     private void makeWifiAdapter(){
         List<WifiSelectItem> selectableItems = generateItems();
         adapter = new WifiAdapter(this, selectableItems, false);
@@ -382,11 +407,10 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     }
 
     /**
-     *
+     * Go back to main screen
      */
     @Override
     public void onBackPressed(){
-        //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra("selection", true);
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
@@ -394,11 +418,11 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         finish();
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
         sendIntent("status");
-        intent.putExtra("status",mConnectStatus.name());
-        intent.setAction("com.android.activity.WIFI_DATA_OUT");
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
+    /**
+     * @param bundle
+     */
     @Override
     public void onSaveInstanceState(Bundle bundle){
     }

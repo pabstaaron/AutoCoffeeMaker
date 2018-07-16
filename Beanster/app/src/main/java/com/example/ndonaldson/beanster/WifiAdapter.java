@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * RecyclerView that holds WifiSelectItems in WifiViewHolders
  * Created by ndonaldson on 5/21/18.
  */
 
@@ -27,8 +28,10 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
         this.isMultiSelectionEnabled = isMultiSelectionEnabled;
 
         mValues = new ArrayList<>();
+        boolean ltGray = true;
         for (WifiSelectItem item : items) {
-            mValues.add(new SelectableWifi(item, false));
+            mValues.add(new SelectableWifi(item, false, ltGray ? Color.LTGRAY : Color.DKGRAY));
+            ltGray = false;
         }
     }
 
@@ -59,7 +62,9 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
         }
 
         holder.mItem = selectableItem;
-        holder.setChecked(holder.mItem.isSelected());
+        if(!holder.mItem.isSelected()){
+            holder.setColor(selectableItem.getColor());
+        }
     }
 
     @Override
@@ -103,9 +108,5 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
             notifyDataSetChanged();
         }
         listener.onItemSelected(item);
-    }
-
-    public void addItem(WifiSelectItem item){
-        mValues.add(new SelectableWifi(item, false));
     }
 }

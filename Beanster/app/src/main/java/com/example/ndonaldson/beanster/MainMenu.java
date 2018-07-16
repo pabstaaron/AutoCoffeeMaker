@@ -28,7 +28,12 @@ import android.widget.ViewFlipper;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 /**
+ * This class starts the WifiRunner, which scans the network and either:
+ * A) Connects to previous device with successful connection
+ * B) Waits for user input to proceed
  *
+ * Also displays current connection state and requires LAN connection
+ * to proceed.
  */
 public class MainMenu extends AppCompatActivity {
 
@@ -41,6 +46,8 @@ public class MainMenu extends AppCompatActivity {
     private ViewFlipper viewFlipper;
     private ImageButton wifiStatus;
     private Context mContext;
+    private String deviceIP;
+    private String deviceSn;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -51,6 +58,8 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
+        deviceIP = "";
+        deviceSn = "";
         mContext = this;
         try {
             viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundView);
@@ -150,76 +159,97 @@ public class MainMenu extends AppCompatActivity {
     }
 
     /**
+     * Messages received from WifiRunner:
      *
+     * CONNECTED: Happen from successful connection to previous device with successful communication.
+     *
+     * UNKNOWN: UNDEFINED
+     *
+     * NO_WIFI: Warns user to be connected to wifi and prevents further process.
+     *
+     * WAITING_FOR_USER: Unsuccessful reconnection to previous device with communication. Wait for user input.
+     *
+     * CONNECT_TO_LAST: Trying to connect to last device, display proper indications.
+     *
+     * SEARCHING: Scanning network on bootup, refreshes device's /proc/net/arp by pinging all devices on LAN
      */
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
-            if(!intent.hasExtra("status")) return;
-            String status = intent.getStringExtra("status");
-            Log.d("MainMenu", "wifiStatusReceiver got message: " + status);
-            connectStatus = WifiRunner.ConnectStatus.valueOf(status);
-            switch(connectStatus){
-                case CONNECTED:{
-                    Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
-                    startActivity(brewIntent);
-                    finish();
-                    break;
-                }
-                case UNKNOWN:{
-                    //Default state....don't know what to do with it.
-                    break;
-                }
-                case NO_WIFI:{
-                    connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
-                    connectButton.setTextColor(Color.rgb(204, 204, 204));
-                    connectButton.setEnabled(false);
-                    cradle.setVisibility(View.INVISIBLE);
-                    wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
-                    circle.setVisibility(View.INVISIBLE);
-                    connectingText.setVisibility(View.INVISIBLE);
-                    Toast toast = Toast.makeText(context, "Application requires wireless connection", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                    break;
-                }
-                case WAITING_FOR_USER:{
-                    connectButton.setEnabled(true);
-                    connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
-                    connectButton.setTextColor(Color.rgb(255, 239, 204));
-                    wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
-                    cradle.setVisibility(View.INVISIBLE);
-                    circle.setVisibility(View.INVISIBLE);
-                    connectingText.setVisibility(View.INVISIBLE);
-                    break;
-                }
+            if(intent.hasExtra("status")) {
+                String status = intent.getStringExtra("status");
+                Log.d("MainMenu", "wifiStatusReceiver got message: " + status);
+                connectStatus = WifiRunner.ConnectStatus.valueOf(status);
+                switch (connectStatus) {
+                    case CONNECTED: {
+                        Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
+                        brewIntent.putExtra("address", deviceIP);
+                        brewIntent.putExtra("sN", deviceSn);
+                        startActivity(brewIntent);
+                        finish();
+                        break;
+                    }
+                    case UNKNOWN: {
+                        //Default state....don't know what to do with it.
+                        break;
+                    }
+                    case NO_WIFI: {
+                        connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        connectButton.setTextColor(Color.rgb(204, 204, 204));
+                        connectButton.setEnabled(false);
+                        cradle.setVisibility(View.INVISIBLE);
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
+                        circle.setVisibility(View.INVISIBLE);
+                        connectingText.setVisibility(View.INVISIBLE);
+                        Toast toast = Toast.makeText(context, "Application requires wireless connection...", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                        break;
+                    }
+                    case WAITING_FOR_USER: {
+                        connectButton.setEnabled(true);
+                        connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        connectButton.setTextColor(Color.rgb(255, 239, 204));
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                        cradle.setVisibility(View.INVISIBLE);
+                        circle.setVisibility(View.INVISIBLE);
+                        connectingText.setVisibility(View.INVISIBLE);
+                        break;
+                    }
 
-                case CONNECT_TO_LAST:{
-                    connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
-                    connectButton.setTextColor(Color.rgb(204, 204, 204));
-                    connectButton.setEnabled(false);
-                    cradle.setVisibility(View.VISIBLE);
-                    circle.setVisibility(View.VISIBLE);
-                    connectingText.setVisibility(View.VISIBLE);
-                    wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
-                    connectingText.setText("Trying to connect....");
-                    cradle.start();
-                    break;
-                }
+                    case CONNECT_TO_LAST: {
+                        connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        connectButton.setTextColor(Color.rgb(204, 204, 204));
+                        connectButton.setEnabled(false);
+                        cradle.setVisibility(View.VISIBLE);
+                        circle.setVisibility(View.VISIBLE);
+                        connectingText.setVisibility(View.VISIBLE);
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                        connectingText.setText("Trying to connect....");
+                        cradle.start();
+                        break;
+                    }
 
-                case SEARCHING:{
-                    connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
-                    connectButton.setTextColor(Color.rgb(204, 204, 204));
-                    connectButton.setEnabled(false);
-                    cradle.setVisibility(View.VISIBLE);
-                    circle.setVisibility(View.VISIBLE);
-                    connectingText.setVisibility(View.VISIBLE);
-                    connectingText.setText("Scanning network....");
-                    wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
-                    cradle.start();
-                    break;
+                    case SEARCHING: {
+                        connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        connectButton.setTextColor(Color.rgb(204, 204, 204));
+                        connectButton.setEnabled(false);
+                        cradle.setVisibility(View.VISIBLE);
+                        circle.setVisibility(View.VISIBLE);
+                        connectingText.setVisibility(View.VISIBLE);
+                        connectingText.setText("Scanning network....");
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                        cradle.start();
+                        break;
+                    }
                 }
+            }
+
+            else if(intent.hasExtra("lastDevice")){
+                Device d = intent.getParcelableExtra("lastDevice");
+                deviceIP = d.getiP();
+                deviceSn = d.getsN();
             }
         }
     };
@@ -237,7 +267,7 @@ public class MainMenu extends AppCompatActivity {
     }
 
     /**
-     *
+     * Closes application
      */
     @Override
     public void onBackPressed(){
@@ -245,7 +275,7 @@ public class MainMenu extends AppCompatActivity {
     }
 
     /**
-     *
+     * Keep track of image we are currently on
      * @param bundle
      */
     @Override

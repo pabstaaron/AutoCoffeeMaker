@@ -6,9 +6,9 @@ import android.os.Parcelable;
 import java.io.Serializable;
 
 /**
+ * This class holds all the network information on a raspBerry PI device on the LAN
  * Created by ndonaldson on 6/13/18.
  */
-
 public class Device implements Parcelable, Serializable{
 
     private String macAddress;
@@ -16,6 +16,13 @@ public class Device implements Parcelable, Serializable{
     private String sN;
     private String iP;
 
+    /**
+     * Constructor
+     * @param macAddress
+     * @param hostName
+     * @param sN
+     * @param iP
+     */
     public Device(String macAddress, String hostName, String sN, String iP){
         this.macAddress = macAddress;
         this.hostName = hostName;
@@ -23,6 +30,9 @@ public class Device implements Parcelable, Serializable{
         this.iP = iP;
     }
 
+    /**
+     * Make device out of parcel.
+    */
     protected Device(Parcel in) {
         macAddress = in.readString();
         hostName = in.readString();
@@ -30,6 +40,9 @@ public class Device implements Parcelable, Serializable{
         iP = in.readString();
     }
 
+    /**
+     * Turns device into a parcelable
+     */
     public static final Creator<Device> CREATOR = new Creator<Device>() {
         @Override
         public Device createFromParcel(Parcel in) {
@@ -77,6 +90,10 @@ public class Device implements Parcelable, Serializable{
         return 0;
     }
 
+    /**
+     * @param dest
+     * @param flags
+     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(macAddress);
@@ -85,6 +102,9 @@ public class Device implements Parcelable, Serializable{
         dest.writeString(iP);
     }
 
+    /**
+     * @param in
+     */
     public void readFromParcel(Parcel in){
         macAddress = in.readString();
         hostName = in.readString();

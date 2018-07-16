@@ -7,11 +7,65 @@
     tools:context="com.example.ndonaldson.beanster.CoffeeBrew">
 
     <TextView
-        android:id="@+id/toBeContinued"
+        android:id="@+id/inDevelopment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="In development....."
         android:textSize="20dp"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <CheckBox
+        android:id="@+id/checkBoxTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SendBoolean"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTest"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <SeekBar
+        android:id="@+id/seekBar2Test"
+        android:layout_width="398dp"
+        android:layout_height="22dp"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTest" />
+
+    <EditText
+        android:id="@+id/editTextTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Text to Send"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/inDevelopment"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Integer to Send"
+        android:layout_marginTop="7dp"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxTest"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <Button
+        android:id="@+id/buttonTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar2Test"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

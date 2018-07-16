@@ -1,11 +1,15 @@
 package com.example.ndonaldson.beanster;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckedTextView;
 
 /**
+ * The display for each card in the recyclerview
  * Created by ndonaldson on 5/21/18.
  */
 
@@ -18,6 +22,11 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
     OnItemSelectedListener itemSelectedListener;
 
 
+    /**
+     * Sets onClickListener for the card.
+     * @param view
+     * @param listener
+     */
     public WifiViewHolder(View view, OnItemSelectedListener listener) {
         super(view);
         itemSelectedListener = listener;
@@ -39,16 +48,40 @@ public class WifiViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
+    /**
+     * Sets color scheme and selection of card
+     * @param value
+     */
     public void setChecked(boolean value) {
-        if (value) {
-            textView.setBackgroundColor(Color.LTGRAY);
-        } else {
-            textView.setBackground(null);
+
+        int color = -1;
+        Drawable background = textView.getBackground();
+        if (background instanceof ColorDrawable)
+            color = ((ColorDrawable) background).getColor();
+        if(color == Color.LTGRAY) {
+            textView.setBackgroundColor(Color.DKGRAY);
+            Log.i("WifiViewHolder", "Changing to DKGRAY!");
         }
+        else if(color == Color.DKGRAY) {
+            textView.setBackgroundColor(Color.LTGRAY);
+            Log.i("WifiViewHolder", "Changing to LTGRAY!");
+        }
+        else {
+            textView.setBackgroundColor(Color.LTGRAY);
+            Log.i("WifiViewHolder", "Changing to DEFAULT LTGRAY!");
+        }
+
         mItem.setSelected(value);
         textView.setChecked(value);
     }
 
+    public void setColor(int color){
+        textView.setBackgroundColor(color);
+    }
+
+    /**
+     * Used in DeviceSelection to decide what to do when selecting item.
+     */
     public interface OnItemSelectedListener {
 
         void onItemSelected(SelectableWifi item);

@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
@@ -64,8 +65,10 @@ public class    WifiRunner implements Runnable {
 
 
     /**
+     * CONSTRUCTOR
+     * Retreive list of devices saved on this device so we can have a cache of passwords for each device as well as other info.
+     * Also get current LAN information
      * @param context
-     * Constructor for WifiRunner
      */
     public WifiRunner(Context context){
     try {
@@ -120,9 +123,11 @@ public class    WifiRunner implements Runnable {
     }
 
     /**
-     * Check wifi connection every second to make sure that we are still connected.
-     * If no connection kick out to main screen.
-     * Keep checking response from raspberry PI.
+     * - This checks to see if we are STILL connected to a device or wifi.
+     * - If not connected to wifi, it kicks user to main screen and waits for wifi connection.
+     * - If not connected to a device, it kicks the user to the device selection activity if they have gotten to that point,
+     * otherwise it waits for user input on main screen.
+     * - Tries to connect to a device once receiving broadcast from other activities.
      */
     @Override
     public void run() {
@@ -148,6 +153,9 @@ public class    WifiRunner implements Runnable {
                         sendIntent("failure");
                     }
                     if (responseCode != HttpURLConnection.HTTP_OK) {
+                        if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                            sendIntent("badRequest");
+                        }
                         connectStatus = ConnectStatus.WAITING_FOR_USER;
                         sendIntent("status");
                     }
@@ -170,9 +178,9 @@ public class    WifiRunner implements Runnable {
                 }
                 else if (connectStatus == ConnectStatus.WAITING_FOR_RESPONSE || connectStatus == ConnectStatus.CONNECT_TO_LAST) {
                     Log.i("WifiRunner", "WAITING FOR RESPONSE!");
-                    url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
-                    client = (HttpURLConnection) url.openConnection();
                     if (lastDevice != null && !lastDevice.getiP().isEmpty()) {
+                        url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
+                        client = (HttpURLConnection) url.openConnection();
                         client.setRequestMethod("GET");
                         client.setConnectTimeout(1000);
 
@@ -188,23 +196,32 @@ public class    WifiRunner implements Runnable {
                         }
                         Log.i("WifiRunner", "responseCode:" + responseCode);
                         if (responseCode != HttpURLConnection.HTTP_OK) {
+                            if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                               if(connectStatus != ConnectStatus.CONNECT_TO_LAST) sendIntent("badRequest");
+                            }
                             Log.i("WifiRunner", "Failed to connect");
                             connectStatus = ConnectStatus.WAITING_FOR_USER;
                             lastDevice = null;
                             sendIntent("status");
-                        } else {
+                        }
+                        else {
                             Log.i("WifiRunner", "Connected");
                             boolean exists = false;
+                            boolean update = false;
                             if(savedDevices != null) {
                                 for (Device d : savedDevices) {
                                     if (d.getMacAddress().equals(lastDevice.getMacAddress()))
+                                        if(d.getsN() != lastDevice.getsN()) {
+                                            d.setsN(lastDevice.getsN());
+                                            update = true;
+                                        }
                                         exists = true;
                                 }
                             }
 
-                            if(!exists) {
+                            if(!exists || update) {
                                 if (savedDevices == null) savedDevices = new ArrayList<>();
-                                savedDevices.add(lastDevice);
+                                if(!update) savedDevices.add(lastDevice);
                                 try {
                                     File file = new File(DEVICES_LOCATION);
                                     FileOutputStream fos = new FileOutputStream(file);
@@ -220,6 +237,7 @@ public class    WifiRunner implements Runnable {
 
                             }
                             connectStatus = ConnectStatus.CONNECTED;
+                            sendIntent("lastDevice");
                             sendIntent("status");
                         }
                     } else {
@@ -264,7 +282,8 @@ public class    WifiRunner implements Runnable {
 
 
     /**
-     * Send out connection status change to any app with proper receiver
+     * Send out connection status change, deviceId's, failures to connect, or bad requests
+     * to other activities.
      * @param type
      */
     private void sendIntent(String type){
@@ -295,12 +314,20 @@ public class    WifiRunner implements Runnable {
                     Log.i("WifiRunner",e.getLocalizedMessage());
                 }
             }
+            else if(type.equals("lastDevice")){
+                intent.putExtra("lastDevice", (Parcelable) lastDevice);
+            }
             else if (type.equals("failure")){
                 intent.putExtra("Failure", "");
             }
+            else if (type.equals("badRequest")){
+                intent.putExtra("badRequest", "");
+            }
 
-        intent.setAction("com.android.activity.WIFI_DATA_OUT");
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        if(!intent.getExtras().isEmpty()) {
+            intent.setAction("com.android.activity.WIFI_DATA_OUT");
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        }
     }
 
     /**
@@ -353,6 +380,10 @@ public class    WifiRunner implements Runnable {
         }
     }
 
+    /**
+     * Ping all devices on LAN
+     * The reason for this is to refresh the /proc/net/arp/ table on the device.
+     */
     public void pingDevices(){
         try {
             NetworkInterface iFace = NetworkInterface
