@@ -83,7 +83,7 @@ public class CoffeeBrew extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RequestData data = new RequestData(textToSend.getText().toString(), sendBoolean.isChecked(), integerToSend.getProgress());
+                RequestData data = new RequestData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
                 new SendPost().execute(data);
         }
     });
@@ -95,10 +95,10 @@ public class CoffeeBrew extends AppCompatActivity {
      */
     @Override
     public void onBackPressed(){
-        sendIntent("status");
         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
         startActivity(deviceIntent);
         finish();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
     }
 
     /**
@@ -116,15 +116,45 @@ public class CoffeeBrew extends AppCompatActivity {
         }
     }
 
-    private class RequestData{
-        private String textToSend;
-        private boolean sendBoolean;
-        private int integerToSend;
 
-        public RequestData(String textToSend, boolean sendBoolean, int integerToSend){
-            this.textToSend = textToSend;
-            this.sendBoolean = sendBoolean;
-            this.integerToSend = integerToSend;
+    /**
+     • Brew water temperature; as a value in degress Farenheit.
+     • Frothing pressure; as a value in PSI.
+     • Brew water pressure, as a value in PSI.
+     • Amount of water to dispense through the brewer, as a value in ounces.
+     • Amount of milk dispensed through the frother, in ounces.
+     • Temprature for milk to reach in frothing cycle, as a value in degrees Fahrenheit.
+     • Amount of froth to produce; as a value from zero to 100.
+       A value of zero will cause the milk to simply be warmed up (steamed), while a higher value will produce more foam.
+     • What kind of syrup, along with how much; as two integer values. The first number will be a value between zero and four.
+       The second number will be the amount of syrup to dispense; in ounces.
+     • The amount of coffee to dispense; in kilograms.
+     */
+    private class RequestData{
+        private int waterTemp;
+        private int milkTemp;
+        private int waterPress;
+        private int frothPress;
+        private int waterDisp;
+        private int milkDisp;
+        private int frothDisp;
+        private int coffeeDisp;
+        private int syrupDisp;
+        private int syrup;
+
+
+        public RequestData(int waterTemp, int milkTemp, int waterPress, int frothPress, int waterDisp,
+                           int milkDisp, int frothDisp, int coffeeDisp, int syrupDisp, int syrup){
+            this.waterTemp = waterTemp;
+            this.milkTemp = milkTemp;
+            this.waterPress = waterPress;
+            this.frothPress = frothPress;
+            this.waterDisp = waterDisp;
+            this.milkDisp = milkDisp;
+            this.frothDisp = frothDisp;
+            this.coffeeDisp = coffeeDisp;
+            this.syrupDisp = syrupDisp;
+            this.syrup = syrup;
         }
     }
 
@@ -141,7 +171,6 @@ public class CoffeeBrew extends AppCompatActivity {
     }
 
     class SendPost extends AsyncTask {
-
         @Override
         protected Object doInBackground(Object[] params) {
             HttpClient httpClient = new DefaultHttpClient();
@@ -216,4 +245,9 @@ public class CoffeeBrew extends AppCompatActivity {
             }
         }
     };
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);    }
 }

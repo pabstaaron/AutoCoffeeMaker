@@ -58,6 +58,8 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
+                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
         deviceIP = "";
         deviceSn = "";
         mContext = this;
@@ -105,10 +107,9 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 sendIntent(WifiRunner.ConnectStatus.WAITING_FOR_USER.name(), "status");
-                Intent brewIntent = new Intent(getApplicationContext(), DeviceSelection.class);
-                brewIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
-                startActivity(brewIntent);
-                finish();
+                Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                deviceIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
+                startActivity(deviceIntent);
             }
         });
 
@@ -154,8 +155,6 @@ public class MainMenu extends AppCompatActivity {
                 }
             }, 1000);
         }
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
-                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
     }
 
     /**
@@ -270,8 +269,7 @@ public class MainMenu extends AppCompatActivity {
      * Closes application
      */
     @Override
-    public void onBackPressed(){
-        finishAndRemoveTask();
+    public void onBackPressed(){finishAndRemoveTask();
     }
 
     /**
@@ -281,5 +279,11 @@ public class MainMenu extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle bundle){
         bundle.putInt("flipper", viewFlipper.getDisplayedChild());
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
     }
 }
