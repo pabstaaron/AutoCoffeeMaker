@@ -266,7 +266,6 @@ public class    WifiRunner implements Runnable {
                 e.printStackTrace();
             }
             isRunning = false;
-            Log.i("WifiRunner", String.format("SAVED DEVICES SIZE: %d, DEVICES IN RANGE SIZE: %d", savedDevices.size(), devicesInRange.size()));
         }
     }
 
@@ -306,8 +305,6 @@ public class    WifiRunner implements Runnable {
                         for(Device d2: savedDevices){
                             if(d.getMacAddress().equals(d2.getMacAddress())){
                                 d.setsN(d2.getsN());
-                                d.setHostName(d2.getHostName());
-                                d.setiP(d2.getiP());
                             }
                         }
                     }
@@ -368,7 +365,7 @@ public class    WifiRunner implements Runnable {
                 String mac = s[3];
                 if (mac.startsWith("b8:27:eb")) {
                     devicesInRange.add(new Device(mac, "", "", ip));
-                    Log.i("WifiRunner", "Adding RaspberryPi: " + mac);
+                    Log.i("WifiRunner", "Adding RaspberryPi: " + mac + " with IP: " + ip);
                 }
             }
         }

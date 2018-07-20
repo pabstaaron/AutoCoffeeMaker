@@ -204,6 +204,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 }
             });
 
+            connectButton.setEnabled(false);
+
             devicesLabel = (TextView) findViewById(R.id.deviceLabel);
             devicesLabel.setText(Html.fromHtml(getString(R.string.devicesTitle)));
             connectText = (TextView) findViewById(R.id.connectText);
