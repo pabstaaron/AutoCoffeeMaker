@@ -31,6 +31,7 @@ dependencies {
     compile 'com.victor:lib:1.0.4'
     compile 'com.android.support.constraint:constraint-layout:1.1.0'
     compile 'com.victor:lib:1.0.4'
+    compile 'com.github.warkiz.widget:indicatorseekbar:2.0.9'
     testCompile 'junit:junit:4.12'
 }
 

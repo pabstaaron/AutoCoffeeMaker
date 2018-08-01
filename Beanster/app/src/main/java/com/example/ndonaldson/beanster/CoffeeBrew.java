@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Parcelable;
@@ -13,15 +14,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.SeekBar;
+import android.view.ViewGroup;
+import android.widget.*;
+import android.widget.SpinnerAdapter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.victor.loading.newton.NewtonCradleLoading;
+import com.warkiz.widget.IndicatorSeekBar;
+import com.warkiz.widget.OnSeekChangeListener;
+import com.warkiz.widget.SeekParams;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -55,6 +57,8 @@ public class CoffeeBrew extends AppCompatActivity {
     private Button sendButton;
     private String connectedIP;
     private String connectedSn;
+    private IndicatorSeekBar seekbar1;
+    private String[] syrups = {"A", "B"};
 
 
     @Override
@@ -63,10 +67,86 @@ public class CoffeeBrew extends AppCompatActivity {
         setContentView(R.layout.activity_coffee_brew);
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
 
-        textToSend = (EditText) findViewById(R.id.editTextTest);
-        sendBoolean = (CheckBox) findViewById(R.id.checkBoxTest);
-        integerToSend = (SeekBar) findViewById(R.id.seekBar2Test);
-        sendButton = (Button) findViewById(R.id.buttonTest);
+        Spinner mySpinner = (Spinner)findViewById(R.id.spinner);
+        mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups) {
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                return null;
+            }
+
+            @Override
+            public void registerDataSetObserver(DataSetObserver observer) {
+
+            }
+
+            @Override
+            public void unregisterDataSetObserver(DataSetObserver observer) {
+
+            }
+
+            @Override
+            public int getCount() {
+                return 0;
+            }
+
+            @Override
+            public String getItem(int position) {
+                return null;
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return 0;
+            }
+
+            @Override
+            public boolean hasStableIds() {
+                return false;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                return null;
+            }
+
+            @Override
+            public int getItemViewType(int position) {
+                return 0;
+            }
+
+            @Override
+            public int getViewTypeCount() {
+                return 1;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+        });
+        sendButton = (Button) findViewById(R.id.buttonBrew);
+
+        seekbar1 = (IndicatorSeekBar) this.findViewById(R.id.slider1);
+        seekbar1.setOnSeekChangeListener(new OnSeekChangeListener() {
+            @Override
+            public void onSeeking(SeekParams seekParams) {
+                Log.i("CoffeeBrew", "" + seekParams.progress);
+                Log.i("CoffeeBrew", "" + seekParams.progressFloat);
+                Log.i("CoffeeBrew", "" + seekParams.fromUser);
+                //when tick count > 0
+//                Log.i("CoffeeBrew", "" + seekParams.thumbPosition);
+//                Log.i("CoffeeBrew", seekParams.tickText);
+            }
+
+            @Override
+            public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
+            }
+        });
+
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
 
