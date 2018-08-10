@@ -1,64 +1,52 @@
 package com.example.ndonaldson.beanster;
 
-import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.DataSetObserver;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
-import android.widget.SpinnerAdapter;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.victor.loading.newton.NewtonCradleLoading;
 import com.warkiz.widget.IndicatorSeekBar;
+import com.warkiz.widget.IndicatorType;
 import com.warkiz.widget.OnSeekChangeListener;
 import com.warkiz.widget.SeekParams;
+import com.warkiz.widget.TickMarkType;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONObject;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 public class CoffeeBrew extends AppCompatActivity {
 
     private WifiRunner.ConnectStatus mConnectStatus;
-    private EditText textToSend;
-    private CheckBox sendBoolean;
-    private SeekBar integerToSend;
-    private Button sendButton;
+    private Button brewButton;
+    private Button disconnectButton;
+    private Button basicButton;
+    private Button advancedButton;
     private String connectedIP;
     private String connectedSn;
-    private IndicatorSeekBar seekbar1;
+    private IndicatorSeekBar tempSeekbar;
+    private IndicatorSeekBar pressSeekbar;
+    private IndicatorSeekBar dispSeekbar;
     private String[] syrups = {"A", "B"};
+    private String[] basicTexts = {"Fuck", "You", "Bro"};
 
 
     @Override
@@ -67,75 +55,73 @@ public class CoffeeBrew extends AppCompatActivity {
         setContentView(R.layout.activity_coffee_brew);
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
 
-        Spinner mySpinner = (Spinner)findViewById(R.id.spinner);
-        mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups) {
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                return null;
-            }
+        Spinner mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
+        mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups));
+        brewButton = (Button) findViewById(R.id.brewButton);
+        disconnectButton = (Button) findViewById(R.id.disconnectButton);
+        basicButton = (Button) findViewById(R.id.basicButton);
+        advancedButton = (Button) findViewById(R.id.advancedButton);
 
-            @Override
-            public void registerDataSetObserver(DataSetObserver observer) {
-
-            }
-
-            @Override
-            public void unregisterDataSetObserver(DataSetObserver observer) {
-
-            }
-
-            @Override
-            public int getCount() {
-                return 0;
-            }
-
-            @Override
-            public String getItem(int position) {
-                return null;
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return 0;
-            }
-
-            @Override
-            public boolean hasStableIds() {
-                return false;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                return null;
-            }
-
-            @Override
-            public int getItemViewType(int position) {
-                return 0;
-            }
-
-            @Override
-            public int getViewTypeCount() {
-                return 1;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-        });
-        sendButton = (Button) findViewById(R.id.buttonBrew);
-
-        seekbar1 = (IndicatorSeekBar) this.findViewById(R.id.slider1);
-        seekbar1.setOnSeekChangeListener(new OnSeekChangeListener() {
+        tempSeekbar = (IndicatorSeekBar) this.findViewById(R.id.tempSlider);
+//        tempSeekbar = IndicatorSeekBar
+//                .with(getApplicationContext())
+//                .max(3)
+//                .min(1)
+//                .progress(1)
+//                .tickCount(3)
+//                .showTickMarksType(TickMarkType.OVAL)
+//                .tickMarksColor(getResources().getColor(R.color.colorPrimary))
+//                .tickMarksSize(13)//dp
+//                .showTickTexts(true)
+//                .tickTextsColor(getResources().getColor(R.color.colorPrimary))
+//                .tickTextsSize(15)//sp
+//                .tickTextsTypeFace(Typeface.MONOSPACE)
+//                .showIndicatorType(IndicatorType.CIRCULAR_BUBBLE)
+//                .indicatorColor(Color.BLACK)
+//                .indicatorTextColor(Color.parseColor("#33b5e5"))
+//                .indicatorTextSize(13)//sp
+//                .thumbColor(Color.parseColor("#9f6934"))
+//                .thumbSize(20)
+//                .trackProgressColor(Color.parseColor("#9f6934"))
+//                .trackProgressSize(4)
+//                .trackBackgroundColor(Color.BLACK)
+//                .tickTextsArray(basicTexts)
+//                .trackBackgroundSize(2)
+//                .build();
+        tempSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
-                Log.i("CoffeeBrew", "" + seekParams.progress);
-                Log.i("CoffeeBrew", "" + seekParams.progressFloat);
-                Log.i("CoffeeBrew", "" + seekParams.fromUser);
-                //when tick count > 0
-//                Log.i("CoffeeBrew", "" + seekParams.thumbPosition);
-//                Log.i("CoffeeBrew", seekParams.tickText);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
+            }
+        });
+
+        pressSeekbar = (IndicatorSeekBar) this.findViewById(R.id.pressSlider);
+        pressSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
+            @Override
+            public void onSeeking(SeekParams seekParams) {
+            }
+
+            @Override
+            public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
+            }
+        });
+
+        dispSeekbar = (IndicatorSeekBar) this.findViewById(R.id.dispSlider);
+        dispSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
+            @Override
+            public void onSeeking(SeekParams seekParams) {
             }
 
             @Override
@@ -160,7 +146,7 @@ public class CoffeeBrew extends AppCompatActivity {
             connectedSn = getIntent().getStringExtra("sN");
         }
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
+        brewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 RequestData data = new RequestData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -329,5 +315,7 @@ public class CoffeeBrew extends AppCompatActivity {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);    }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
+    }
+
 }

@@ -4,12 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher" />
-
     <TextView
         android:id="@+id/syrup"
         android:layout_width="wrap_content"

@@ -16,6 +16,7 @@ public class MySpinnerAdapter extends ArrayAdapter<String> {
     private String[] Syrups;
     private Context context;
     private int textViewResourceId;
+    private int activePosition;
 
     public MySpinnerAdapter(Context context, int textViewResourceId,
                            String[] Syrups) {
@@ -33,6 +34,7 @@ public class MySpinnerAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        activePosition = position;
         return getCustomView(position, convertView, parent);
     }
 
@@ -42,7 +44,8 @@ public class MySpinnerAdapter extends ArrayAdapter<String> {
         TextView label=(TextView)row.findViewById(R.id.syrup);
         label.setText(Syrups[position]);
 
-        if(position == 0){
+
+        if(position == activePosition){
             label.setTextColor(0xFFF00000);
         }
 
