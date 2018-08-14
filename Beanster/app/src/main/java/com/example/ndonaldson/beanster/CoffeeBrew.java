@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.*;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -36,58 +37,251 @@ import java.net.URI;
 public class CoffeeBrew extends AppCompatActivity {
 
     private WifiRunner.ConnectStatus mConnectStatus;
+    //Main Buttons
     private Button brewButton;
     private Button disconnectButton;
     private Button basicButton;
     private Button advancedButton;
-    private String connectedIP;
-    private String connectedSn;
+
+    //BasicButtons
+    private Button amountSmallButton;
+    private Button amountMediumButton;
+    private Button amountLargeButton;
+    private Button strengthMildButton;
+    private Button strengthRegularButton;
+    private Button strengthStrongButton;
+    private Button frothFrothyButton;
+    private Button frothFrothierButton;
+    private Button frothFrothiestButton;
+
+    //AdvancedButtons
+    private Button waterButton;
+    private Button milkButton;
+    private Button frothButton;
+    private Button coffeeButton;
+    private Button syrupButton;
+
+    //Labels
+    private EditText label1;
+    private EditText label2;
+    private EditText label3;
+
+    //Seekbars
     private IndicatorSeekBar tempSeekbar;
     private IndicatorSeekBar pressSeekbar;
     private IndicatorSeekBar dispSeekbar;
-    private String[] syrups = {"A", "B"};
-    private String[] basicTexts = {"Fuck", "You", "Bro"};
 
+    //GridLayouts
+    private android.support.v7.widget.GridLayout basicGridLayout;
+
+    //Spinner
+    private Spinner mySpinner;
+    private String[] syrups = {"Syrup1", "Syrup2"};
+
+    //Data
+    private String connectedIP;
+    private String connectedSn;
+    private AdvancedState advancedState;
+    private BasicState basicState;
+    private RequestData requestData;
+    private ActiveState activeState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coffee_brew);
+
+        /**
+         * DATA SETUP
+         */
+        activeState = ActiveState.BASIC;
+        advancedState = new AdvancedState();
+        basicState = new BasicState();
+
+        requestData = new RequestData();
+
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
+        if(!getIntent().hasExtra("address") && !getIntent().hasExtra("sN")){
+            sendIntent("status");
+            Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+            startActivity(deviceIntent);
+        }
+        else{
+            connectedIP = getIntent().getStringExtra("address");
+            connectedSn = getIntent().getStringExtra("sN");
+        }
 
-        Spinner mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
-        mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups));
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
+                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
+
+        /**
+         * MAIN BUTTONS
+         */
         brewButton = (Button) findViewById(R.id.brewButton);
-        disconnectButton = (Button) findViewById(R.id.disconnectButton);
-        basicButton = (Button) findViewById(R.id.basicButton);
-        advancedButton = (Button) findViewById(R.id.advancedButton);
+        brewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RequestData data = new RequestData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+                new SendPost().execute(data);
+            }
+        });
 
+        disconnectButton = (Button) findViewById(R.id.disconnectButton);
+        disconnectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                startActivity(deviceIntent);
+                finish();
+            }
+        });
+
+        basicButton = (Button) findViewById(R.id.basicButton);
+        basicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make basicButtons visible and active, hide sliders, advancedButtons, and spinner
+            }
+        });
+
+        advancedButton = (Button) findViewById(R.id.advancedButton);
+        advancedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        /**
+         * BASIC BUTTONS
+         */
+        amountSmallButton = (Button) findViewById(R.id.basicAmountButton);
+        amountSmallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        amountMediumButton = (Button) findViewById(R.id.basicAmountButton);
+        amountMediumButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        amountLargeButton = (Button) findViewById(R.id.basicAmountButton);
+        amountLargeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        strengthMildButton = (Button) findViewById(R.id.basicStrengthButton);
+        strengthMildButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        strengthRegularButton = (Button) findViewById(R.id.basicStrengthButton2);
+        strengthRegularButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        strengthStrongButton = (Button) findViewById(R.id.basicStrengthButton3);
+        strengthStrongButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        frothFrothyButton = (Button) findViewById(R.id.basicFrothButton);
+        frothFrothyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        frothFrothierButton = (Button) findViewById(R.id.basicFrothButton2);
+        frothFrothierButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        frothFrothiestButton = (Button) findViewById(R.id.basicFrothButton3);
+        frothFrothiestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        /**
+         * ADVANCED BUTTONS
+         */
+        waterButton = (Button) findViewById(R.id.waterButton);
+        waterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        milkButton = (Button) findViewById(R.id.milkButton);
+        milkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        frothButton = (Button) findViewById(R.id.frothButton);
+        frothButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        coffeeButton = (Button) findViewById(R.id.coffeeButton);
+        coffeeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+        syrupButton = (Button) findViewById(R.id.syrupButton);
+        syrupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+            }
+        });
+
+
+        /**
+         * LABELS
+         */
+        label1 = (EditText) findViewById(R.id.label1);
+        label2 = (EditText) findViewById(R.id.label2);
+        label3 = (EditText) findViewById(R.id.label3);
+
+        /**
+         * SEEKBARS
+         */
         tempSeekbar = (IndicatorSeekBar) this.findViewById(R.id.tempSlider);
-//        tempSeekbar = IndicatorSeekBar
-//                .with(getApplicationContext())
-//                .max(3)
-//                .min(1)
-//                .progress(1)
-//                .tickCount(3)
-//                .showTickMarksType(TickMarkType.OVAL)
-//                .tickMarksColor(getResources().getColor(R.color.colorPrimary))
-//                .tickMarksSize(13)//dp
-//                .showTickTexts(true)
-//                .tickTextsColor(getResources().getColor(R.color.colorPrimary))
-//                .tickTextsSize(15)//sp
-//                .tickTextsTypeFace(Typeface.MONOSPACE)
-//                .showIndicatorType(IndicatorType.CIRCULAR_BUBBLE)
-//                .indicatorColor(Color.BLACK)
-//                .indicatorTextColor(Color.parseColor("#33b5e5"))
-//                .indicatorTextSize(13)//sp
-//                .thumbColor(Color.parseColor("#9f6934"))
-//                .thumbSize(20)
-//                .trackProgressColor(Color.parseColor("#9f6934"))
-//                .trackProgressSize(4)
-//                .trackBackgroundColor(Color.BLACK)
-//                .tickTextsArray(basicTexts)
-//                .trackBackgroundSize(2)
-//                .build();
         tempSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
@@ -133,27 +327,11 @@ public class CoffeeBrew extends AppCompatActivity {
             }
         });
 
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
-                new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
-
-        if(!getIntent().hasExtra("address") && !getIntent().hasExtra("sN")){
-            sendIntent("status");
-            Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
-            startActivity(deviceIntent);
-        }
-        else{
-            connectedIP = getIntent().getStringExtra("address");
-            connectedSn = getIntent().getStringExtra("sN");
-        }
-
-        brewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RequestData data = new RequestData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-                new SendPost().execute(data);
-        }
-    });
-
+        /**
+         * SPINNER
+         */
+        mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
+        mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups));
     }
 
     /**
@@ -208,6 +386,18 @@ public class CoffeeBrew extends AppCompatActivity {
         private int syrupDisp;
         private int syrup;
 
+        public RequestData(){
+            this.waterTemp = 70;
+            this.milkTemp = 70;
+            this.waterPress = 70;
+            this.frothPress = 70;
+            this.waterDisp = 70;
+            this.milkDisp = 70;
+            this.frothDisp = 70;
+            this.coffeeDisp = 70;
+            this.syrupDisp = 70;
+            this.syrup = 70;
+        }
 
         public RequestData(int waterTemp, int milkTemp, int waterPress, int frothPress, int waterDisp,
                            int milkDisp, int frothDisp, int coffeeDisp, int syrupDisp, int syrup){
@@ -221,6 +411,14 @@ public class CoffeeBrew extends AppCompatActivity {
             this.coffeeDisp = coffeeDisp;
             this.syrupDisp = syrupDisp;
             this.syrup = syrup;
+        }
+
+        public void setWithBasic(BasicState basicState){
+            
+        }
+
+        public void setWithAdvance(AdvancedState advancedState){
+
         }
     }
 
@@ -318,4 +516,109 @@ public class CoffeeBrew extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
     }
 
+
+    /**
+     * DATA STRUCTURES
+     */
+    private static class AdvancedState{
+
+        public ActiveSection activeSection;
+        public WaterState waterState;
+        public MilkState milkState;
+        public FrothState frothState;
+        public CoffeeState coffeeState;
+        public SyrupState syrupState;
+
+        public AdvancedState(){
+            activeSection = ActiveSection.WATER;
+            waterState = new WaterState();
+            milkState = new MilkState();
+            frothState = new FrothState();
+            coffeeState = new CoffeeState();
+            syrupState = new SyrupState();
+        }
+
+        public enum ActiveSection{
+            WATER,
+            MILK,
+            FROTH,
+            COFFEE,
+            SYRUP
+        }
+    }
+
+    private static class BasicState{
+        public int amount;
+        public int strength;
+        public int froth;
+
+        public BasicState(){
+            amount = 0;
+            strength = 0;
+            froth = 0;
+        }
+    }
+
+    private static class WaterState{
+        public int temp;
+        public int disp;
+        public int press;
+
+        public WaterState(){
+            temp = 70;
+            disp = 70;
+            press = 70;
+        }
+    }
+
+    private static class MilkState{
+        public int temp;
+        public int disp;
+        public int press;
+
+        public MilkState(){
+            temp = 70;
+            disp = 70;
+            press = 70;
+        }
+    }
+
+    private static class FrothState{
+        public int temp;
+        public int disp;
+        public int press;
+
+        public FrothState(){
+            temp = 70;
+            disp = 70;
+            press = 70;
+        }
+    }
+
+    private static class CoffeeState{
+        public int temp;
+        public int disp;
+        public int press;
+
+        public CoffeeState(){
+            temp = 70;
+            disp = 70;
+            press = 70;
+        }
+    }
+
+    private static class SyrupState{
+        public int type;
+        public int disp;
+
+        public SyrupState(){
+            disp = 70;
+            type = 0;
+        }
+    }
+
+    public enum ActiveState{
+        ADVANCED,
+        BASIC
+    }
 }

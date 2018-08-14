@@ -47,7 +47,7 @@ import static android.content.Context.WIFI_SERVICE;
  *@author Nathan Donaldson
  * This class keeps track of the state of communication with a device.
  */
-public class    WifiRunner implements Runnable {
+public class WifiRunner implements Runnable {
 
     private Device lastDevice;
     private ArrayList<Device> savedDevices;

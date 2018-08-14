@@ -9,45 +9,6 @@
     tools:layout_editor_absoluteY="25dp"
     tools:layout_editor_absoluteX="0dp">
 
-
-    <Button
-        android:id="@+id/brewButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/buttonstyle"
-        android:textColor="#ffefcc"
-        android:text="Brew"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/disconnectButton"
-        android:layout_marginTop="340dp"
-        android:layout_marginRight="40dp"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayout2" />
-    <Button
-        android:id="@+id/disconnectButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/buttonstyle"
-        android:textColor="#ffefcc"
-        android:text="Disconnect"
-        android:width="110dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginBottom="35dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/brewButton" />
-
-    <Spinner
-        android:id="@+id/syrupSpinner"
-        android:layout_width="333dp"
-        android:layout_height="71dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/indicatorLayout1"
-        android:layout_marginTop="46dp" />
-
-
-
     <GridLayout
         android:layout_width="947dp"
         android:layout_height="48dp"
@@ -303,4 +264,213 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.452" />
     </com.warkiz.widget.IndicatorStayLayout>
+
+    <GridLayout
+        android:layout_width="943dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="8dp"
+        android:columnCount="3"
+        android:rowCount="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gridLayout2"
+        android:layout_marginTop="55dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:id="@+id/gridLayoutAmount">
+        <Button
+            android:id="@+id/basicAmountButton"
+            android:text="Small"
+            android:textColor="#664400"
+            android:background="@drawable/gridbuttonselected"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <Button
+            android:id="@+id/basicAmountButton2"
+            android:text="Medium"
+            android:textColor="#ffefcc"
+            android:background="@drawable/gridbuttonunselected"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <Button
+            android:id="@+id/basicAmountButton3"
+            android:text="Large"
+            android:textColor="#ffefcc"
+            android:background="@drawable/gridbuttonunselected"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="943dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="8dp"
+        android:columnCount="3"
+        android:rowCount="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gridLayoutAmount"
+        android:layout_marginTop="55dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:id="@+id/gridLayoutStrength">
+        <Button
+            android:id="@+id/basicStrengthButton"
+            android:text="Mild"
+            android:textColor="#664400"
+            android:background="@drawable/gridbuttonselected"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <Button
+            android:id="@+id/basicStrengthButton2"
+            android:text="Regular"
+            android:textColor="#ffefcc"
+            android:background="@drawable/gridbuttonunselected"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <Button
+            android:id="@+id/basicStrengthButton3"
+            android:text="Strong"
+            android:textColor="#ffefcc"
+            android:background="@drawable/gridbuttonunselected"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+    </GridLayout>
+
+    <GridLayout
+        android:layout_width="943dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="8dp"
+        android:columnCount="3"
+        android:rowCount="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gridLayoutStrength"
+        android:layout_marginTop="55dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        android:id="@+id/gridLayoutFroth">
+        <Button
+            android:id="@+id/basicFrothButton"
+            android:text="Frothy"
+            android:textColor="#664400"
+            android:background="@drawable/gridbuttonselected"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <Button
+            android:id="@+id/basicFrothButton2"
+            android:text="Frothier"
+            android:textColor="#ffefcc"
+            android:background="@drawable/gridbuttonunselected"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+
+        <Button
+            android:id="@+id/basicFrothButton3"
+            android:text="Frothiest"
+            android:textColor="#ffefcc"
+            android:background="@drawable/gridbuttonunselected"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_gravity="fill_horizontal"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"/>
+    </GridLayout>
+
+    <Spinner
+        android:id="@+id/syrupSpinner"
+        android:layout_width="333dp"
+        android:layout_height="71dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/indicatorLayout1"
+        android:layout_marginTop="46dp" />
+
+    <Button
+        android:id="@+id/brewButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttonstyle"
+        android:textColor="#ffefcc"
+        android:text="Brew"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/disconnectButton"
+        android:layout_marginTop="340dp"
+        android:layout_marginRight="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout2" />
+    <Button
+        android:id="@+id/disconnectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buttonstyle"
+        android:textColor="#ffefcc"
+        android:text="Disconnect"
+        android:width="110dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginBottom="35dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/brewButton" />
+
+    <EditText
+        android:id="@+id/label1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gridLayout2"
+        app:layout_constraintBottom_toBottomOf="@id/indicatorLayout1"
+        android:text="Amount:"/>
+    <EditText
+        android:id="@+id/label2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label1"
+        app:layout_constraintBottom_toBottomOf="@id/indicatorLayout2"
+        android:text="Strength:"/>
+    <EditText
+        android:id="@+id/label3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label2"
+        app:layout_constraintBottom_toBottomOf="@id/indicatorLayout3"
+        android:text="Froth:"/>
+
 </android.support.constraint.ConstraintLayout>
