@@ -11,6 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.*;
+import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
@@ -33,10 +34,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CoffeeBrew extends AppCompatActivity {
 
     private WifiRunner.ConnectStatus mConnectStatus;
+
     //Main Buttons
     private Button brewButton;
     private Button disconnectButton;
@@ -85,6 +89,12 @@ public class CoffeeBrew extends AppCompatActivity {
     private BasicState basicState;
     private RequestData requestData;
     private ActiveState activeState;
+    private int prevDisp = 70;
+    private int prevPress = 70;
+    private int prevTemp = 70;
+    private int dispDiff = 70;
+    private int pressDiff = 70;
+    private int tempDiff = 70;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,8 +131,9 @@ public class CoffeeBrew extends AppCompatActivity {
         brewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RequestData data = new RequestData(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-                new SendPost().execute(data);
+                if(activeState == ActiveState.ADVANCED) requestData.setWithAdvance(advancedState);
+                else requestData.setWithBasic(basicState);
+                new SendPost().execute(requestData);
             }
         });
 
@@ -140,7 +151,9 @@ public class CoffeeBrew extends AppCompatActivity {
         basicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Make basicButtons visible and active, hide sliders, advancedButtons, and spinner
+                activeState = ActiveState.BASIC;
+                hideAdvanced();
+                showBasic();
             }
         });
 
@@ -148,7 +161,9 @@ public class CoffeeBrew extends AppCompatActivity {
         advancedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Make advancedButtons, sliders, or spinner visible, hide basicButtons and disable.
+                activeState = ActiveState.ADVANCED;
+                hideBasic();
+                showAdvanced();
             }
         });
 
@@ -332,6 +347,14 @@ public class CoffeeBrew extends AppCompatActivity {
          */
         mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
         mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups));
+
+        /**
+         * GRID LAYOUT
+         */
+        basicGridLayout = (GridLayout) findViewById(R.id.gridLayout2);
+        basicGridLayout.setVisibility(View.INVISIBLE);
+
+        hideAdvanced();
     }
 
     /**
@@ -414,7 +437,7 @@ public class CoffeeBrew extends AppCompatActivity {
         }
 
         public void setWithBasic(BasicState basicState){
-            
+
         }
 
         public void setWithAdvance(AdvancedState advancedState){
@@ -620,5 +643,302 @@ public class CoffeeBrew extends AppCompatActivity {
     public enum ActiveState{
         ADVANCED,
         BASIC
+    }
+
+    public void hideAdvanced(){
+
+        waterButton.setVisibility(View.INVISIBLE);
+        waterButton.setEnabled(false);
+
+        milkButton.setVisibility(View.INVISIBLE);
+        milkButton.setEnabled(false);
+
+        coffeeButton.setVisibility(View.INVISIBLE);
+        coffeeButton.setEnabled(false);
+
+        frothButton.setVisibility(View.INVISIBLE);
+        frothButton.setEnabled(false);
+
+        syrupButton.setVisibility(View.INVISIBLE);
+        syrupButton.setEnabled(false);
+
+        if(advancedState.activeSection == AdvancedState.ActiveSection.SYRUP) {
+            mySpinner.setVisibility(View.INVISIBLE);
+            mySpinner.setEnabled(false);
+
+            dispSeekbar.setVisibility(View.INVISIBLE);
+            dispSeekbar.setEnabled(false);
+        }
+        else {
+            tempSeekbar.setVisibility(View.INVISIBLE);
+            tempSeekbar.setEnabled(false);
+
+            dispSeekbar.setVisibility(View.INVISIBLE);
+            dispSeekbar.setEnabled(false);
+
+            pressSeekbar.setVisibility(View.INVISIBLE);
+            pressSeekbar.setEnabled(false);
+        }
+    }
+
+    public void showAdvanced(){
+
+        waterButton.setEnabled(true);
+        waterButton.setVisibility(View.VISIBLE);
+
+        milkButton.setEnabled(true);
+        milkButton.setVisibility(View.VISIBLE);
+
+        coffeeButton.setEnabled(true);
+        coffeeButton.setVisibility(View.VISIBLE);
+
+        frothButton.setEnabled(true);
+        frothButton.setVisibility(View.VISIBLE);
+
+        syrupButton.setEnabled(true);
+        syrupButton.setVisibility(View.VISIBLE);
+
+        if(advancedState.activeSection == AdvancedState.ActiveSection.SYRUP){
+            mySpinner.setEnabled(true);
+            mySpinner.setVisibility(View.VISIBLE);
+
+            dispSeekbar.setEnabled(true);
+            dispSeekbar.setVisibility(View.VISIBLE);
+        }
+        else{
+            tempSeekbar.setEnabled(true);
+            tempSeekbar.setVisibility(View.VISIBLE);
+
+            dispSeekbar.setEnabled(true);
+            dispSeekbar.setVisibility(View.VISIBLE);
+
+            pressSeekbar.setEnabled(true);
+            pressSeekbar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void playSliders(AdvancedState.ActiveSection prevState, AdvancedState.ActiveSection currState){
+
+        switch(prevState){
+            case WATER:{
+                prevDisp = advancedState.waterState.disp;
+                prevPress = advancedState.waterState.press;
+                prevTemp = advancedState.waterState.temp;
+            }
+            case MILK:{
+                prevDisp = advancedState.milkState.disp;
+                prevPress = advancedState.milkState.press;
+                prevTemp = advancedState.milkState.temp;
+            }
+            case COFFEE:{
+                prevDisp = advancedState.coffeeState.disp;
+                prevPress = advancedState.coffeeState.press;
+                prevTemp = advancedState.coffeeState.temp;
+            }
+            case SYRUP:{
+                prevDisp = advancedState.syrupState.disp;
+                prevPress = 70;
+                prevTemp = 70;
+            }
+            case FROTH:{
+                prevDisp = advancedState.frothState.disp;
+                prevPress = advancedState.frothState.press;
+                prevTemp = advancedState.frothState.temp;
+            }
+        }
+
+        switch(currState){
+            case WATER:{
+                dispDiff = prevDisp - advancedState.milkState.disp;
+                pressDiff = prevPress - advancedState.milkState.press;
+                tempDiff = prevTemp - advancedState.milkState.temp;
+            }
+            case MILK:{
+                dispDiff = prevDisp - advancedState.milkState.disp;
+                pressDiff = prevPress - advancedState.milkState.press;
+                tempDiff = prevTemp - advancedState.milkState.temp;
+            }
+            case COFFEE:{
+                dispDiff = prevDisp - advancedState.milkState.disp;
+                pressDiff = prevPress - advancedState.milkState.press;
+                tempDiff = prevTemp - advancedState.milkState.temp;
+            }
+            case SYRUP:{
+                dispDiff = prevDisp - advancedState.milkState.disp;
+            }
+            case FROTH:{
+                dispDiff = prevDisp - advancedState.milkState.disp;
+                pressDiff = prevPress - advancedState.milkState.press;
+                tempDiff = prevTemp - advancedState.milkState.temp;
+            }
+        }
+
+        if(advancedState.activeSection == AdvancedState.ActiveSection.SYRUP){
+            new Runnable() {
+                int diffDispOverTime = Math.abs(dispDiff)/1000;
+                @Override
+                public void run() {
+                    if(dispDiff < 0){
+                        long currentTime = System.currentTimeMillis();
+                        while(dispDiff < prevDisp){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                dispDiff = dispDiff + diffDispOverTime;
+                                dispSeekbar.setProgress(dispDiff);
+                            }
+                        }
+                    }
+                    else{
+                        long currentTime = System.currentTimeMillis();
+                        while(dispDiff > prevDisp){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                dispDiff = dispDiff - diffDispOverTime;
+                                dispSeekbar.setProgress(dispDiff);
+                            }
+                        }
+                    }
+                }
+            }.run();
+        }
+
+        else {
+            new Runnable() {
+                int diffDispOverTime = Math.abs(dispDiff)/1000;
+                @Override
+                public void run() {
+                    if(dispDiff < 0){
+                        long currentTime = System.currentTimeMillis();
+                        while(dispDiff < prevDisp){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                dispDiff = dispDiff + diffDispOverTime;
+                                dispSeekbar.setProgress(dispDiff);
+                            }
+                        }
+                    }
+                    else{
+                        long currentTime = System.currentTimeMillis();
+                        while(dispDiff > prevDisp){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                dispDiff = dispDiff - diffDispOverTime;
+                                dispSeekbar.setProgress(dispDiff);
+                            }
+                        }
+                    }
+                }
+            }.run();
+            new Runnable() {
+                int diffTempOverTime = Math.abs(tempDiff)/1000;
+                @Override
+                public void run() {
+                    if(tempDiff < 0){
+                        long currentTime = System.currentTimeMillis();
+                        while(tempDiff < prevTemp){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                tempDiff = tempDiff + diffTempOverTime;
+                                tempSeekbar.setProgress(tempDiff);
+                            }
+                        }
+                    }
+                    else{
+                        long currentTime = System.currentTimeMillis();
+                        while(tempDiff > prevTemp){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                tempDiff = tempDiff - diffTempOverTime;
+                                tempSeekbar.setProgress(tempDiff);
+                            }
+                        }
+                    }
+                }
+            }.run();
+            new Runnable() {
+                int diffPressOverTime = Math.abs(pressDiff)/1000;
+                @Override
+                public void run() {
+                    if(pressDiff < 0){
+                        long currentTime = System.currentTimeMillis();
+                        while(pressDiff < prevPress){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                pressDiff = pressDiff + diffPressOverTime;
+                                pressSeekbar.setProgress(pressDiff);
+                            }
+                        }
+                    }
+                    else{
+                        long currentTime = System.currentTimeMillis();
+                        while(pressDiff > prevPress){
+                            if(System.currentTimeMillis() > currentTime){
+                                currentTime = System.currentTimeMillis();
+                                pressDiff = pressDiff - diffPressOverTime;
+                                pressSeekbar.setProgress(pressDiff);
+                            }
+                        }
+                    }
+                }
+            }.run();
+        }
+    }
+
+    public void hideBasic(){
+        amountSmallButton.setVisibility(View.GONE);
+        amountSmallButton.setEnabled(false);
+
+        amountMediumButton.setVisibility(View.GONE);
+        amountMediumButton.setEnabled(false);
+
+        amountLargeButton.setVisibility(View.GONE);
+        amountLargeButton.setEnabled(false);
+
+        strengthMildButton.setVisibility(View.GONE);
+        strengthMildButton.setEnabled(false);
+
+        strengthRegularButton.setVisibility(View.GONE);
+        strengthRegularButton.setEnabled(false);
+
+        strengthStrongButton.setVisibility(View.GONE);
+        strengthStrongButton.setEnabled(false);
+
+        frothFrothyButton.setVisibility(View.GONE);
+        frothFrothyButton.setEnabled(false);
+
+        frothFrothierButton.setVisibility(View.GONE);
+        frothFrothierButton.setEnabled(false);
+
+        frothFrothiestButton.setVisibility(View.GONE);
+        frothFrothiestButton.setEnabled(false);
+    }
+
+    public void showBasic(){
+        amountSmallButton.setEnabled(true);
+        amountSmallButton.setVisibility(View.VISIBLE);
+
+        amountMediumButton.setEnabled(true);
+        amountMediumButton.setVisibility(View.VISIBLE);
+
+        amountLargeButton.setEnabled(true);
+        amountLargeButton.setVisibility(View.VISIBLE);
+
+        strengthMildButton.setEnabled(true);
+        strengthMildButton.setVisibility(View.VISIBLE);
+
+        strengthRegularButton.setEnabled(true);
+        strengthRegularButton.setVisibility(View.VISIBLE);
+
+        strengthStrongButton.setEnabled(true);
+        strengthStrongButton.setVisibility(View.VISIBLE);
+
+        frothFrothyButton.setEnabled(true);
+        frothFrothyButton.setVisibility(View.VISIBLE);
+
+        frothFrothierButton.setEnabled(true);
+        frothFrothierButton.setVisibility(View.VISIBLE);
+
+        frothFrothiestButton.setEnabled(true);
+        frothFrothiestButton.setVisibility(View.VISIBLE);
     }
 }
