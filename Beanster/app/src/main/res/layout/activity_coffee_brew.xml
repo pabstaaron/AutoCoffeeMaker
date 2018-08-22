@@ -380,7 +380,7 @@
         android:id="@+id/gridLayoutFroth">
         <Button
             android:id="@+id/basicFrothButton"
-            android:text="Frothy"
+            android:text="None"
             android:textColor="#664400"
             android:background="@drawable/gridbuttonselected"
             android:layout_row="0"
@@ -391,7 +391,7 @@
 
         <Button
             android:id="@+id/basicFrothButton2"
-            android:text="Frothier"
+            android:text="Frothy"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
             android:layout_row="0"
