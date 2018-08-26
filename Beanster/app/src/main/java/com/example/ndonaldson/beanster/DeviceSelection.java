@@ -204,6 +204,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 }
             });
 
+            connectButton.setEnabled(false);
+
             devicesLabel = (TextView) findViewById(R.id.deviceLabel);
             devicesLabel.setText(Html.fromHtml(getString(R.string.devicesTitle)));
             connectText = (TextView) findViewById(R.id.connectText);
@@ -227,7 +229,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             recyclerView.setLayoutManager(layoutManager);
 
             sendIntent("sendDevices");
-
         }
         catch(Exception e){
             e.printStackTrace();
@@ -295,9 +296,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("selection", true);
-                        Log.i("DeviceSelection", "Starting brewActivity with IP: " + deviceSelected.getiP() + " and macAddress: " + deviceSelected.getMacAddress());
+                        Log.i("DeviceSelection", "Starting brewActivity with IP: " + deviceSelected.getiP() + " and serialNumber: " + deviceSelected.getsN());
                         brewIntent.putExtra("address", deviceSelected.getiP());
-                        brewIntent.putExtra("macAddress", deviceSelected.getMacAddress());
+                        brewIntent.putExtra("sN", deviceSelected.getsN());
                         mSearchProgress.setVisibility(View.INVISIBLE);
                         startActivity(brewIntent);
                     break;
@@ -345,11 +346,12 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 }
             }
             else if(intent.hasExtra("deviceIds")){
+                Log.i("DeviceSelection", "DEVICEIDS INTENT SENT!");
                 ArrayList<Device> deviceIds;
                 deviceIds = intent.getParcelableArrayListExtra("deviceIds");
                 mDeviceIds.clear();
                 for (Device d: deviceIds) {
-                    Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.sN: %s", d.getMacAddress(), d.getsN()));
+                    Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.sN: %s, d.getIP: %s", d.getMacAddress(), d.getsN(), d.getiP()));
                     mDeviceIds.add(d);
                 }
                 makeWifiAdapter();
@@ -411,17 +413,14 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
      */
     @Override
     public void onBackPressed(){
-        //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra("selection", true);
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
         startActivity(intent);
         finish();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
         sendIntent("status");
-        intent.putExtra("status",mConnectStatus.name());
-        intent.setAction("com.android.activity.WIFI_DATA_OUT");
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
     /**
@@ -430,4 +429,11 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     @Override
     public void onSaveInstanceState(Bundle bundle){
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
+    }
+
 }

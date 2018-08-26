@@ -32,8 +32,12 @@
         <activity
             android:name=".DeviceSelection"
             android:screenOrientation="landscape"
-            android:theme="@style/myTheme" />
-        <activity android:name=".CoffeeBrew"></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".CoffeeBrew"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            />
     </application>
 
 </manifest>

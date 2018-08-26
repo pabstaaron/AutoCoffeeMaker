@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -46,11 +47,12 @@ import static android.content.Context.WIFI_SERVICE;
  *@author Nathan Donaldson
  * This class keeps track of the state of communication with a device.
  */
-public class    WifiRunner implements Runnable {
+public class WifiRunner implements Runnable {
 
     private Device lastDevice;
     private ArrayList<Device> savedDevices;
     private ArrayList<Device> devicesInRange;
+    private ArrayList<String[]> arpList;
     private ConnectStatus connectStatus = ConnectStatus.UNKNOWN;
     private HttpURLConnection client;
     private URL url;
@@ -72,6 +74,7 @@ public class    WifiRunner implements Runnable {
      */
     public WifiRunner(Context context){
     try {
+        arpList = new ArrayList<>();
         firstConnect = true;
         isRunning = false;
         this.context = context;
@@ -163,11 +166,11 @@ public class    WifiRunner implements Runnable {
                 }
                 else if (connectStatus == ConnectStatus.SEARCHING){
                     Log.i("WifiRunner", "SEARCHING!");
+                    createArpList();
                     pingDevices();
-                    createArpMap();
+                    findDevices();
                     if(firstConnect) {
                         connectStatus = ConnectStatus.CONNECT_TO_LAST;
-                        firstConnect = false;
                         sendIntent("status");
                     }
                     else {
@@ -224,7 +227,7 @@ public class    WifiRunner implements Runnable {
                                 if(!update) savedDevices.add(lastDevice);
                                 try {
                                     File file = new File(DEVICES_LOCATION);
-                                    FileOutputStream fos = new FileOutputStream(file);
+                                    FileOutputStream fos = new FileOutputStream(file, false);
                                     ObjectOutputStream os = new ObjectOutputStream(fos);
                                     os.writeObject(savedDevices);
                                     os.flush();
@@ -237,14 +240,14 @@ public class    WifiRunner implements Runnable {
 
                             }
                             connectStatus = ConnectStatus.CONNECTED;
-                            sendIntent("lastDevice");
+                            if(firstConnect) sendIntent("lastDevice");
                             sendIntent("status");
                         }
                     } else {
                         connectStatus = ConnectStatus.WAITING_FOR_USER;
                         sendIntent("status");
-
                     }
+                    firstConnect = false;
                     client.disconnect();
                 } else if (connectStatus == ConnectStatus.WAITING_FOR_USER) {
                     Log.i("WifiRunner", "WAITING FOR USER!");
@@ -262,7 +265,6 @@ public class    WifiRunner implements Runnable {
                 Log.i("WifiRunner", e.getLocalizedMessage());
                 e.printStackTrace();
             }
-
             isRunning = false;
         }
     }
@@ -303,8 +305,6 @@ public class    WifiRunner implements Runnable {
                         for(Device d2: savedDevices){
                             if(d.getMacAddress().equals(d2.getMacAddress())){
                                 d.setsN(d2.getsN());
-                                d.setHostName(d2.getHostName());
-                                d.setiP(d2.getiP());
                             }
                         }
                     }
@@ -356,27 +356,43 @@ public class    WifiRunner implements Runnable {
     /**
      * Extract and save ip and corresponding MAC address from arp table in HashMap
      */
-    public void createArpMap() throws IOException {
+    private void findDevices() throws IOException {
         devicesInRange.clear();
-        Map<String, String> checkMapARP = new HashMap<>();
-        BufferedReader localBufferdReader = new BufferedReader(new FileReader(new File("/proc/net/arp")));
-        String line;
 
-        while ((line = localBufferdReader.readLine()) != null) {
-            String[] ipmac = line.split("[ ]+");
-            for(String s: ipmac){
-                Log.i("WifiRunner", "ARP INFO! " + s + "\n");
-            }
-            if (!ipmac[0].matches("IP")) {
-                String ip = ipmac[0];
-                String mac = ipmac[3];
-                if (!checkMapARP.containsKey(mac) && mac.startsWith("b8:27:eb")) {
-                    checkMapARP.put(mac, ip);
+        for(String[] s: arpList) {
+            if (!s[0].matches("IP")) {
+                String ip = s[0];
+                String mac = s[3];
+                if (mac.startsWith("b8:27:eb")) {
                     devicesInRange.add(new Device(mac, "", "", ip));
-                    Log.i("WifiRunner", "Adding RaspberryPi: " + mac);
+                    Log.i("WifiRunner", "Adding RaspberryPi: " + mac + " with IP: " + ip);
                 }
-                Log.i("WifiRunner", "\n\n\n");
             }
+        }
+    }
+
+    private void createArpList() {
+        arpList.clear();
+
+        try {
+            BufferedReader localBufferdReader = new BufferedReader(new FileReader(new File("/proc/net/arp")));
+
+            String line;
+
+            while ((line = localBufferdReader.readLine()) != null) {
+                String[] ipmac = line.split("[ ]+");
+
+                for (String s : ipmac) {
+                    Log.i("WifiRunner", "ARP INFO! " + s + "\n");
+                }
+
+                Log.i("WifiRunner", "\n\n\n");
+                arpList.add(ipmac);
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+            Log.i("WifiRunner", e.getLocalizedMessage());
         }
     }
 
@@ -384,16 +400,33 @@ public class    WifiRunner implements Runnable {
      * Ping all devices on LAN
      * The reason for this is to refresh the /proc/net/arp/ table on the device.
      */
-    public void pingDevices(){
+    private void pingDevices(){
         try {
             NetworkInterface iFace = NetworkInterface
                     .getByInetAddress(InetAddress.getByName(myIP));
+            boolean foundIP = false;
 
             for (int i = 0; i <= 255; i++) {
-
                 // build the next IP address
                 String addr = myIP;
                 addr = addr.substring(0, addr.lastIndexOf('.') + 1) + i;
+
+
+                for(String[] s: arpList) {
+                    if (!s[0].matches("IP")) {
+                        String ip = s[0];
+                        if(ip.equals(addr)){
+                            foundIP = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(foundIP) {
+                    foundIP = false;
+                    continue;
+                }
+
                 InetAddress pingAddr = InetAddress.getByName(addr);
 
                 // 50ms Timeout for the "ping"
