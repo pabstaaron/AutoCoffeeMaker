@@ -4,12 +4,17 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
@@ -21,6 +26,8 @@ import android.util.Log;
 public class ThreadManager {
 
     private static final int MAX_POOL_SIZE = 16;
+    private static Context context;
+    private ScheduledFuture<?> future = null;
 
     /**
      * Exception handler for mThreadFactory
@@ -57,10 +64,10 @@ public class ThreadManager {
     private static final ScheduledThreadPoolExecutor mExecutor = new ScheduledThreadPoolExecutor(MAX_POOL_SIZE, mThreadFactory, mRejectionHandler);
 
     /**
-     * Empty constructor
+     * Constructor
      */
-    public ThreadManager(){
-
+    public ThreadManager(Context context){
+        this.context = context;
     }
 
 
@@ -69,7 +76,13 @@ public class ThreadManager {
      * @param runnable bits to run in the background
      */
     public void runInBackground(Runnable runnable, long timer) {
-        mExecutor.scheduleAtFixedRate(runnable, timer, timer, TimeUnit.MILLISECONDS);
+        if(future != null) future.cancel(true);
+        future = mExecutor.scheduleAtFixedRate(runnable, timer, timer, TimeUnit.MILLISECONDS);
+    }
+
+    public void clearThreads(){
+        future.cancel(true);
+        mExecutor.shutdownNow();
     }
 
 }

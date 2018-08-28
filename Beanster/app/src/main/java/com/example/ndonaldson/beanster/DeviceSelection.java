@@ -1,5 +1,7 @@
 package com.example.ndonaldson.beanster;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -55,6 +57,21 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//            @Override
+//            public void uncaughtException(Thread thread, Throwable ex) {
+//                Log.i("ThreadManager", ex.getLocalizedMessage());
+//                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+//                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+//                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+//                System.exit(0);
+//            }
+//        });
         try {
             mContext = this;
             deviceSelectedName = "";

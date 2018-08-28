@@ -2,6 +2,9 @@ package com.example.ndonaldson.beanster;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -58,6 +61,21 @@ public class main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//            @Override
+//            public void uncaughtException(Thread thread, Throwable ex) {
+//                Log.i("ThreadManager", ex.getLocalizedMessage());
+//                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+//                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+//                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+//                System.exit(0);
+//            }
+//        });
 
         connectButton = (Button) findViewById(R.id.connectButtonMain);
         connectButton.setVisibility(View.INVISIBLE);

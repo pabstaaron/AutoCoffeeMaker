@@ -1,5 +1,7 @@
 package com.example.ndonaldson.beanster;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -57,6 +59,22 @@ public class MainMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
+
+
+//            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//                @Override
+//                public void uncaughtException(Thread thread, Throwable ex) {
+//                    Log.i("ThreadManager", ex.getLocalizedMessage());
+//                    Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+//                    mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                            | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+//                    AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+//                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+//                    System.exit(0);
+//                }
+//            });
 
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
@@ -149,7 +167,7 @@ public class MainMenu extends AppCompatActivity {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    tm = new ThreadManager();
+                    tm = new ThreadManager(mContext);
                     wr = new WifiRunner(mContext);
                     tm.runInBackground(wr, 1000);
                 }
@@ -269,7 +287,10 @@ public class MainMenu extends AppCompatActivity {
      * Closes application
      */
     @Override
-    public void onBackPressed(){finishAndRemoveTask();
+    public void onBackPressed(){
+        tm.clearThreads();
+        int pid = android.os.Process.myPid();
+        android.os.Process.killProcess(pid);
     }
 
     /**

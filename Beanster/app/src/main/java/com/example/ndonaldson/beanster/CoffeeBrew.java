@@ -1,5 +1,7 @@
 package com.example.ndonaldson.beanster;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,11 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 
 import com.google.gson.Gson;
 import com.warkiz.widget.IndicatorSeekBar;
+import com.warkiz.widget.IndicatorStayLayout;
 import com.warkiz.widget.OnSeekChangeListener;
 import com.warkiz.widget.SeekParams;
 
@@ -71,6 +75,13 @@ public class CoffeeBrew extends AppCompatActivity {
 
     //GridLayouts
     private android.support.v7.widget.GridLayout basicGridLayout;
+    private android.support.v7.widget.GridLayout basicGridLayout2;
+
+    //IndicatorLayouts
+    private IndicatorStayLayout indicatorLayout1;
+    private IndicatorStayLayout indicatorLayout2;
+    private IndicatorStayLayout indicatorLayout3;
+
 
     //Spinner
     private Spinner mySpinner;
@@ -94,6 +105,21 @@ public class CoffeeBrew extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coffee_brew);
+
+//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//            @Override
+//            public void uncaughtException(Thread thread, Throwable ex) {
+//                Log.i("ThreadManager", ex.getLocalizedMessage());
+//                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+//                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+//                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+//                System.exit(0);
+//            }
+//        });
 
         /**
          * DATA SETUP
@@ -146,6 +172,10 @@ public class CoffeeBrew extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 activeState = ActiveState.BASIC;
+                basicButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                basicButton.setTextColor(Color.parseColor("#664400"));
+                advancedButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                advancedButton.setTextColor(Color.parseColor("#ffefcc"));
                 hideAdvanced();
                 showBasic();
             }
@@ -156,6 +186,10 @@ public class CoffeeBrew extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 activeState = ActiveState.ADVANCED;
+                advancedButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                advancedButton.setTextColor(Color.parseColor("#664400"));
+                basicButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                basicButton.setTextColor(Color.parseColor("#ffefcc"));
                 hideBasic();
                 showAdvanced();
             }
@@ -175,7 +209,7 @@ public class CoffeeBrew extends AppCompatActivity {
             }
         });
 
-        amountMediumButton = (Button) findViewById(R.id.basicAmountButton);
+        amountMediumButton = (Button) findViewById(R.id.basicAmountButton2);
         amountMediumButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,7 +220,7 @@ public class CoffeeBrew extends AppCompatActivity {
             }
         });
 
-        amountLargeButton = (Button) findViewById(R.id.basicAmountButton);
+        amountLargeButton = (Button) findViewById(R.id.basicAmountButton3);
         amountLargeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -390,18 +424,29 @@ public class CoffeeBrew extends AppCompatActivity {
          */
         mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
         mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups));
-        mySpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
                 advancedState.syrupState.type = position;
+
             }
+            public void onNothingSelected(AdapterView<?> arg0) { }
         });
 
         /**
          * GRID LAYOUT
          */
-        basicGridLayout = (GridLayout) findViewById(R.id.gridLayout2);
-        basicGridLayout.setVisibility(View.INVISIBLE);
+        basicGridLayout = (android.support.v7.widget.GridLayout) findViewById(R.id.gridLayout);
+        basicGridLayout2 = (android.support.v7.widget.GridLayout) findViewById(R.id.gridLayout2);
+        basicGridLayout2.setVisibility(View.INVISIBLE);
+
+        /**
+         * INDICATOR LAYOUTS
+         */
+        indicatorLayout1 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout1);
+        indicatorLayout2 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout2);
+        indicatorLayout3 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout3);
+
 
         hideAdvanced();
     }
@@ -476,37 +521,37 @@ public class CoffeeBrew extends AppCompatActivity {
         public void setWithBasic(BasicState basicState){
             switch (basicState.amount){
                 case FIRST:{
-
+                    break;
                 }
                 case SECOND:{
-
+                    break;
                 }
                 case THIRD:{
-
+                    break;
                 }
             }
 
             switch (basicState.froth){
                 case FIRST:{
-
+                    break;
                 }
                 case SECOND:{
-
+                    break;
                 }
                 case THIRD:{
-
+                    break;
                 }
             }
 
             switch (basicState.strength){
                 case FIRST:{
-
+                    break;
                 }
                 case SECOND:{
-
+                    break;
                 }
                 case THIRD:{
-
+                    break;
                 }
             }
         }
@@ -655,6 +700,12 @@ public class CoffeeBrew extends AppCompatActivity {
         public State strength;
         public State froth;
 
+        public BasicState(){
+            amount = State.FIRST;
+            strength = State.FIRST;
+            froth = State.FIRST;
+        }
+
         public enum State{
             FIRST,
             SECOND,
@@ -734,26 +785,35 @@ public class CoffeeBrew extends AppCompatActivity {
         syrupButton.setVisibility(View.INVISIBLE);
         syrupButton.setEnabled(false);
 
-        if(advancedState.activeSection == AdvancedState.ActiveSection.SYRUP) {
-            mySpinner.setVisibility(View.INVISIBLE);
-            mySpinner.setEnabled(false);
+        mySpinner.setVisibility(View.GONE);
+        mySpinner.setEnabled(false);
 
-            dispSeekbar.setVisibility(View.INVISIBLE);
-            dispSeekbar.setEnabled(false);
-        }
-        else {
-            tempSeekbar.setVisibility(View.INVISIBLE);
-            tempSeekbar.setEnabled(false);
+        dispSeekbar.setVisibility(View.INVISIBLE);
+        dispSeekbar.setEnabled(false);
 
-            dispSeekbar.setVisibility(View.INVISIBLE);
-            dispSeekbar.setEnabled(false);
+        tempSeekbar.setVisibility(View.INVISIBLE);
+        tempSeekbar.setEnabled(false);
 
-            pressSeekbar.setVisibility(View.INVISIBLE);
-            pressSeekbar.setEnabled(false);
-        }
+        dispSeekbar.setVisibility(View.INVISIBLE);
+        dispSeekbar.setEnabled(false);
+
+        pressSeekbar.setVisibility(View.INVISIBLE);
+        pressSeekbar.setEnabled(false);
+
+        indicatorLayout1.setVisibility(View.INVISIBLE);
+        indicatorLayout1.setEnabled(false);
+
+        indicatorLayout2.setVisibility(View.INVISIBLE);
+        indicatorLayout2.setEnabled(false);
+
+        indicatorLayout3.setVisibility(View.INVISIBLE);
+        indicatorLayout3.setEnabled(false);
     }
 
     public void showAdvanced(){
+
+        basicGridLayout2.setEnabled(true);
+        basicGridLayout2.setVisibility(View.VISIBLE);
 
         waterButton.setEnabled(true);
         waterButton.setVisibility(View.VISIBLE);
@@ -785,6 +845,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 label1.setText("Temperature(F):");
                 label2.setText("Pressure(PSI):");
                 label3.setText("Dispense(Oz):");
+                break;
             }
             case MILK:{
                 tempSeekbar.setEnabled(true);
@@ -796,6 +857,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 label1.setText("Temperature(F):");
                 label2.setText("");
                 label3.setText("Dispense(Oz):");
+                break;
             }
             case FROTH:{
                 dispSeekbar.setEnabled(true);
@@ -807,6 +869,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 label1.setText("");
                 label2.setText("Pressure(PSI):");
                 label3.setText("Dispense(Oz):");
+                break;
             }
             case SYRUP:{
                 mySpinner.setEnabled(true);
@@ -818,6 +881,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 label1.setText("Syrup:");
                 label2.setText("");
                 label3.setText("Dispense(Oz):");
+                break;
             }
             case COFFEE:{
                 dispSeekbar.setEnabled(true);
@@ -826,6 +890,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 label1.setText("");
                 label2.setText("");
                 label3.setText("Dispense(Oz):");
+                break;
             }
         }
     }
@@ -899,22 +964,27 @@ public class CoffeeBrew extends AppCompatActivity {
                 prevDisp = advancedState.waterState.disp;
                 prevPress = advancedState.waterState.press;
                 prevTemp = advancedState.waterState.temp;
+                break;
             }
             case MILK:{
                 prevDisp = advancedState.milkState.disp;
                 prevTemp = advancedState.milkState.temp;
+                break;
             }
             case COFFEE:{
                 prevDisp = advancedState.coffeeState.disp;
+                break;
             }
             case SYRUP:{
                 prevDisp = advancedState.syrupState.disp;
                 prevPress = 70;
                 prevTemp = 70;
+                break;
             }
             case FROTH:{
                 prevDisp = advancedState.frothState.disp;
                 prevPress = advancedState.frothState.press;
+                break;
             }
         }
 
@@ -922,21 +992,26 @@ public class CoffeeBrew extends AppCompatActivity {
             case WATER:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
                 tempDiff = prevTemp - advancedState.milkState.temp;
+                break;
             }
             case MILK:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
                 tempDiff = prevTemp - advancedState.milkState.temp;
+                break;
             }
             case COFFEE:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
                 tempDiff = prevTemp - advancedState.milkState.temp;
+                break;
             }
             case SYRUP:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
+                break;
             }
             case FROTH:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
                 tempDiff = prevTemp - advancedState.milkState.temp;
+                break;
             }
         }
 
@@ -1191,42 +1266,45 @@ public class CoffeeBrew extends AppCompatActivity {
                     amountSmallButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     amountSmallButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
-                else if(button.getId() != R.id.basicAmountButton2){
+                if(button.getId() != R.id.basicAmountButton2){
                     amountMediumButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     amountMediumButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
-                else{
+                if(button.getId() != R.id.basicAmountButton3){
                     amountLargeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     amountLargeButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
+                break;
             }
             case 1:{
                 if(button.getId() != R.id.basicStrengthButton){
                     strengthMildButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     strengthMildButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
-                else if(button.getId() != R.id.basicStrengthButton2){
+                if(button.getId() != R.id.basicStrengthButton2){
                     strengthRegularButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     strengthRegularButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
-                else{
+                if(button.getId() != R.id.basicStrengthButton3){
                     strengthStrongButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     strengthStrongButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
+                break;
             }
             case 2:{
                 if(button.getId() != R.id.basicFrothButton){
                     frothNoneButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     frothNoneButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
-                else if(button.getId() != R.id.basicFrothButton2){
+                if(button.getId() != R.id.basicFrothButton2){
                     frothFrothyButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     frothFrothyButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
-                else{
+                if(button.getId() != R.id.basicFrothButton3){
                     frothFrothiestButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                     frothFrothiestButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
+                break;
             }
         }
     }
@@ -1243,6 +1321,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 else{
                     advancedState.waterState.disp = val;
                 }
+                break;
             }
             case MILK:{
                 if(bar == 0){
@@ -1251,6 +1330,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 else{
                     advancedState.milkState.disp = val;
                 }
+                break;
             }
             case COFFEE:{
                 if(bar == 0){
@@ -1259,6 +1339,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 else{
                     advancedState.milkState.disp = val;
                 }
+                break;
             }
             case FROTH:{
                 if (bar == 1){
@@ -1267,9 +1348,11 @@ public class CoffeeBrew extends AppCompatActivity {
                 else{
                     advancedState.frothState.disp = val;
                 }
+                break;
             }
             case SYRUP:{
                     advancedState.waterState.disp = val;
+                break;
             }
         }
     }

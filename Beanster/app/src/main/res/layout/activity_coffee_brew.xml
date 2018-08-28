@@ -9,12 +9,12 @@
     tools:layout_editor_absoluteY="25dp"
     tools:layout_editor_absoluteX="0dp">
 
-    <GridLayout
+    <android.support.v7.widget.GridLayout
         android:layout_width="947dp"
         android:layout_height="48dp"
         android:layout_marginLeft="8dp"
-        android:columnCount="2"
-        android:rowCount="1"
+        app:columnCount="2"
+        app:rowCount="1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="6dp"
@@ -22,41 +22,39 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintHorizontal_bias="0.333"
         android:id="@+id/gridLayout">
         <Button
             android:id="@+id/advancedButton"
             android:text="Advanced"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_gravity="fill_horizontal"
-            android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_gravity="fill_horizontal"
+            app:layout_column="1"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
         <Button
             android:id="@+id/basicButton"
             android:text="Basic"
             android:textColor="#664400"
             android:background="@drawable/gridbuttonselected"
-            android:layout_row="0"
-            android:layout_gravity="fill_horizontal"
-            android:layout_column="0"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-    </GridLayout>
+            app:layout_row="0"
+            app:layout_gravity="fill_horizontal"
+            app:layout_column="0"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
+    </android.support.v7.widget.GridLayout>
 
-    <GridLayout
+    <android.support.v7.widget.GridLayout
         android:layout_width="947dp"
         android:layout_height="50dp"
         android:layout_marginLeft="8dp"
-        android:columnCount="5"
-        android:rowCount="1"
+        app:columnCount="5"
+        app:rowCount="1"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gridLayout"
-        app:layout_constraintHorizontal_bias="0.333"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:id="@+id/gridLayout2">
@@ -65,52 +63,52 @@
             android:text="Water"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="0"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_column="0"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
         <Button
             android:id="@+id/milkButton"
             android:text="Milk"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_column="1"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
         <Button
             android:id="@+id/frothButton"
             android:text="Froth"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="2"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_column="2"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
         <Button
             android:id="@+id/coffeeButton"
             android:text="Coffee"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="3"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_column="3"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
         <Button
             android:id="@+id/syrupButton"
             android:text="Syrup"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="4"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-    </GridLayout>
+            app:layout_row="0"
+            app:layout_column="4"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
+    </android.support.v7.widget.GridLayout>
 
     <com.warkiz.widget.IndicatorStayLayout
         android:id="@+id/indicatorLayout1"
@@ -265,12 +263,12 @@
             app:layout_constraintVertical_bias="0.452" />
     </com.warkiz.widget.IndicatorStayLayout>
 
-    <GridLayout
+    <android.support.v7.widget.GridLayout
         android:layout_width="943dp"
         android:layout_height="51dp"
         android:layout_marginLeft="8dp"
-        android:columnCount="3"
-        android:rowCount="1"
+        app:columnCount="3"
+        app:rowCount="1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/gridLayout2"
         android:layout_marginTop="55dp"
@@ -278,41 +276,40 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintHorizontal_bias="1.0"
         android:id="@+id/gridLayoutAmount">
         <Button
             android:id="@+id/basicAmountButton"
             android:text="Small"
             android:textColor="#664400"
             android:background="@drawable/gridbuttonselected"
-            android:layout_row="0"
-            android:layout_column="0"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_column="0"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
 
         <Button
             android:id="@+id/basicAmountButton2"
             android:text="Medium"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
+            app:layout_row="0"
+            app:layout_column="1"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
 
         <Button
             android:id="@+id/basicAmountButton3"
             android:text="Large"
             android:textColor="#ffefcc"
             android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="2"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-    </GridLayout>
+            app:layout_row="0"
+            app:layout_column="2"
+            app:layout_gravity="fill_horizontal"
+            app:layout_columnWeight="1"
+            app:layout_rowWeight="1"/>
+    </android.support.v7.widget.GridLayout>
 
     <GridLayout
         android:layout_width="943dp"
@@ -327,7 +324,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintHorizontal_bias="1.0"
         android:id="@+id/gridLayoutStrength">
         <Button
             android:id="@+id/basicStrengthButton"
@@ -376,7 +372,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintHorizontal_bias="1.0"
         android:id="@+id/gridLayoutFroth">
         <Button
             android:id="@+id/basicFrothButton"
@@ -450,8 +445,13 @@
 
     <EditText
         android:id="@+id/label1"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:editable="false"
+        android:inputType="none"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="43dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/gridLayout2"
         app:layout_constraintBottom_toBottomOf="@id/indicatorLayout1"
@@ -459,17 +459,27 @@
     <EditText
         android:id="@+id/label2"
         android:layout_width="wrap_content"
+        android:focusable="false"
+        android:editable="false"
+        android:inputType="none"
+        android:layout_marginBottom="80dp"
+        android:focusableInTouchMode="false"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label1"
+        app:layout_constraintTop_toBottomOf="@id/indicatorLayout1"
         app:layout_constraintBottom_toBottomOf="@id/indicatorLayout2"
         android:text="Strength:"/>
     <EditText
         android:id="@+id/label3"
         android:layout_width="wrap_content"
+        android:focusable="false"
+        android:layout_marginBottom="120dp"
+        android:editable="false"
+        android:inputType="none"
+        android:focusableInTouchMode="false"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label2"
+        app:layout_constraintTop_toBottomOf="@id/indicatorLayout2"
         app:layout_constraintBottom_toBottomOf="@id/indicatorLayout3"
         android:text="Froth:"/>
 
