@@ -48,12 +48,23 @@ def make_me_a_coffee(serial):
 
     returns: 400 if flask connection was recieved without the correct serial
     number or in computer mode, else 200
-    
+
     content contains all the data being sent over
     """
     if(request.is_json):
         content = request.get_json()
-    if(_settings == "computer" or serial != _serial):
+
+    if "pressure" not in content:
+        return _make_bad_data_return("pressure")
+    elif content["pressure"] < 0:
+        return _data_out_of_bounds("pressure")
+
+    if "temperature" not in content:
+        return _make_bad_data_return("temperature")
+    elif content["temperature"] < 0:
+        return _data_out_of_bounds("temperature")
+
+    if(serial != _serial):
         post_data = {'utc': int(time.time()),
                      'request': 'Make me a Coffee',
                      'type': _settings,
@@ -64,7 +75,15 @@ def make_me_a_coffee(serial):
                      'request': 'Make me a Coffee',
                      'type': _settings,
                      'serial number': _serial}
-        return jsonify(post_data), 200
+        return jsonify(post_data), 201
+
+
+def _make_bad_data_return(reason):
+    return jsonify({"results": "Body must include {}".format(reason)}), 400
+
+
+def _data_out_of_bounds(reason):
+    return jsonify({"results": "{} is not in the correct bounds".format(reason)}), 400
 
 
 if __name__ == '__main__':
