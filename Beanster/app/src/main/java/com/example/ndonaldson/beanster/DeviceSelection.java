@@ -58,25 +58,26 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-//            @Override
-//            public void uncaughtException(Thread thread, Throwable ex) {
-//                Log.i("ThreadManager", ex.getLocalizedMessage());
-//                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
-//                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-//                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
-//                System.exit(0);
-//            }
-//        });
         try {
             mContext = this;
             deviceSelectedName = "";
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_device_select);
+
+            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread thread, Throwable ex) {
+                    Log.i("DeviceSelection", ex.getLocalizedMessage());
+                    Intent mStartActivity = new Intent(mContext, main.class);
+                    mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    PendingIntent mPendingIntent = PendingIntent.getActivity(mContext, 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                    AlarmManager mgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+                    System.exit(0);
+                }
+            });
 
             try {
                 viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundView);
@@ -112,9 +113,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     intent.putExtra("selection", true);
                     intent.putExtra("flipper", viewFlipper.getDisplayedChild());
                     startActivity(intent);
-                    finish();
                     mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
                     sendIntent("status");
+                    finish();
                 }
             });
             searchButton = (Button) findViewById(R.id.searchDevices);
@@ -318,6 +319,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         brewIntent.putExtra("sN", deviceSelected.getsN());
                         mSearchProgress.setVisibility(View.INVISIBLE);
                         startActivity(brewIntent);
+                        finish();
                     break;
                     }
                     case WAITING_FOR_USER:{
@@ -434,10 +436,10 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         intent.putExtra("selection", true);
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
         startActivity(intent);
-        finish();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
         sendIntent("status");
+        finish();
     }
 
     /**

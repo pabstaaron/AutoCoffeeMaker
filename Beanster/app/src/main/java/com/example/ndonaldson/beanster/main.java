@@ -62,20 +62,21 @@ public class main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-//            @Override
-//            public void uncaughtException(Thread thread, Throwable ex) {
-//                Log.i("ThreadManager", ex.getLocalizedMessage());
-//                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
-//                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-//                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
-//                System.exit(0);
-//            }
-//        });
+
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                Log.i("Main", ex.getLocalizedMessage());
+                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+                System.exit(0);
+            }
+        });
 
         connectButton = (Button) findViewById(R.id.connectButtonMain);
         connectButton.setVisibility(View.INVISIBLE);
@@ -119,6 +120,7 @@ public class main extends AppCompatActivity {
     private void begin(){
         Intent intent = new Intent(this, MainMenu.class);
         startActivity(intent);
+        finish();
     }
 
     /**

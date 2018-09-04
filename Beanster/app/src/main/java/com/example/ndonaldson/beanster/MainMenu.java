@@ -60,27 +60,27 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-
-//            Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-//                @Override
-//                public void uncaughtException(Thread thread, Throwable ex) {
-//                    Log.i("ThreadManager", ex.getLocalizedMessage());
-//                    Intent mStartActivity = new Intent(getApplicationContext(), main.class);
-//                    mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                            | Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                            | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-//                    AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-//                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
-//                    System.exit(0);
-//                }
-//            });
-
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
         deviceIP = "";
         deviceSn = "";
         mContext = this;
+
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                Log.i("MainMenu", ex.getLocalizedMessage());
+                Intent mStartActivity = new Intent(mContext, main.class);
+                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                PendingIntent mPendingIntent = PendingIntent.getActivity(mContext, 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+                System.exit(0);
+            }
+        });
+
         try {
             viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundView);
             fade_in = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
@@ -128,6 +128,7 @@ public class MainMenu extends AppCompatActivity {
                 Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                 deviceIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
                 startActivity(deviceIntent);
+                finish();
             }
         });
 

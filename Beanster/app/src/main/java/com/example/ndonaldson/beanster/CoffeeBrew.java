@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -106,20 +107,20 @@ public class CoffeeBrew extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coffee_brew);
 
-//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-//            @Override
-//            public void uncaughtException(Thread thread, Throwable ex) {
-//                Log.i("ThreadManager", ex.getLocalizedMessage());
-//                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
-//                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-//                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-//                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
-//                System.exit(0);
-//            }
-//        });
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                Log.i("CoffeeBrew", ex.getLocalizedMessage());
+                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+                System.exit(0);
+            }
+        });
 
         /**
          * DATA SETUP
@@ -135,6 +136,7 @@ public class CoffeeBrew extends AppCompatActivity {
             sendIntent("status");
             Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
             startActivity(deviceIntent);
+            finish();
         }
         else{
             connectedIP = getIntent().getStringExtra("address");
@@ -372,10 +374,13 @@ public class CoffeeBrew extends AppCompatActivity {
          * SEEKBARS
          */
         tempSeekbar = (IndicatorSeekBar) this.findViewById(R.id.tempSlider);
+        tempSeekbar.setIndicatorTextFormat("${PROGRESS} " + (char) 0x00B0 + "F");
         tempSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
-                setSeekBarValue(advancedState.activeSection, seekParams.progress, 0);
+                if(seekParams.progress % 1 == 0) {
+                    tempSeekbar.setIndicatorTextFormat("${PROGRESS} " + (char) 0x00B0 + "F");
+                }
             }
 
             @Override
@@ -384,14 +389,18 @@ public class CoffeeBrew extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
+                setSeekBarValue(advancedState.activeSection, seekBar.getProgress(), 0);
             }
         });
 
         pressSeekbar = (IndicatorSeekBar) this.findViewById(R.id.pressSlider);
+        pressSeekbar.setIndicatorTextFormat("${PROGRESS} psi");
         pressSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
-                setSeekBarValue(advancedState.activeSection, seekParams.progress, 1);
+                if(seekParams.progress % 1 == 0) {
+                    pressSeekbar.setIndicatorTextFormat("${PROGRESS} psi");
+                }
             }
 
             @Override
@@ -400,14 +409,18 @@ public class CoffeeBrew extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
+                setSeekBarValue(advancedState.activeSection, seekBar.getProgress(), 1);
             }
         });
 
         dispSeekbar = (IndicatorSeekBar) this.findViewById(R.id.dispSlider);
+        dispSeekbar.setIndicatorTextFormat("${PROGRESS} oz");
         dispSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
-                setSeekBarValue(advancedState.activeSection, seekParams.progress, 2);
+                if(seekParams.progress % 1 == 0) {
+                    dispSeekbar.setIndicatorTextFormat("${PROGRESS} oz");
+                }
             }
 
             @Override
@@ -416,6 +429,7 @@ public class CoffeeBrew extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
+                setSeekBarValue(advancedState.activeSection, seekBar.getProgress(), 2);
             }
         });
 
@@ -423,7 +437,9 @@ public class CoffeeBrew extends AppCompatActivity {
          * SPINNER
          */
         mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
-        mySpinner.setAdapter(new MySpinnerAdapter(getApplicationContext(), R.layout.row, syrups));
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, syrups);
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
+        mySpinner.setAdapter(spinnerAdapter);
         mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
@@ -801,13 +817,10 @@ public class CoffeeBrew extends AppCompatActivity {
         pressSeekbar.setEnabled(false);
 
         indicatorLayout1.setVisibility(View.INVISIBLE);
-        indicatorLayout1.setEnabled(false);
 
         indicatorLayout2.setVisibility(View.INVISIBLE);
-        indicatorLayout2.setEnabled(false);
 
         indicatorLayout3.setVisibility(View.INVISIBLE);
-        indicatorLayout3.setEnabled(false);
     }
 
     public void showAdvanced(){
@@ -830,66 +843,186 @@ public class CoffeeBrew extends AppCompatActivity {
         syrupButton.setEnabled(true);
         syrupButton.setVisibility(View.VISIBLE);
 
+        indicatorLayout1.setVisibility(View.VISIBLE);
+        indicatorLayout2.setVisibility(View.VISIBLE);
+        indicatorLayout3.setVisibility(View.VISIBLE);
+
 
         switch(advancedState.activeSection){
             case WATER:{
+                waterButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                waterButton.setTextColor(Color.parseColor("#664400"));
+
+                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                indicatorLayout1.setVisibility(View.VISIBLE);
+                indicatorLayout1.setEnabled(true);
                 tempSeekbar.setEnabled(true);
                 tempSeekbar.setVisibility(View.VISIBLE);
 
+                indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
+                indicatorLayout2.setEnabled(true);
                 pressSeekbar.setEnabled(true);
                 pressSeekbar.setVisibility(View.VISIBLE);
 
-                label1.setText("Temperature(F):");
-                label2.setText("Pressure(PSI):");
-                label3.setText("Dispense(Oz):");
+                label1.setText("Temperature(" + (char) 0x00B0 + "F):");
+                label2.setText("Pressure(psi):");
+                label3.setText("Dispense(oz):");
                 break;
             }
             case MILK:{
+                milkButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                milkButton.setTextColor(Color.parseColor("#664400"));
+
+                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                indicatorLayout1.setVisibility(View.VISIBLE);
+                indicatorLayout1.setEnabled(true);
                 tempSeekbar.setEnabled(true);
                 tempSeekbar.setVisibility(View.VISIBLE);
 
+                indicatorLayout2.setEnabled(false);
+                pressSeekbar.setVisibility(View.VISIBLE);
+                pressSeekbar.setEnabled(false);
+
+                indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
-                label1.setText("Temperature(F):");
+                label1.setText("Temperature(" + (char) 0x00B0 + "F):");
                 label2.setText("");
-                label3.setText("Dispense(Oz):");
+                label3.setText("Dispense(oz):");
                 break;
             }
             case FROTH:{
+                frothButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                frothButton.setTextColor(Color.parseColor("#664400"));
+
+                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
+                indicatorLayout1.setVisibility(View.VISIBLE);
+                indicatorLayout1.setEnabled(false);
+                tempSeekbar.setVisibility(View.VISIBLE);
+                tempSeekbar.setEnabled(false);
+
+                indicatorLayout2.setEnabled(true);
                 pressSeekbar.setEnabled(true);
                 pressSeekbar.setVisibility(View.VISIBLE);
 
                 label1.setText("");
-                label2.setText("Pressure(PSI):");
-                label3.setText("Dispense(Oz):");
+                label2.setText("Pressure(psi):");
+                label3.setText("Dispense(oz):");
                 break;
             }
             case SYRUP:{
+                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                syrupButton.setTextColor(Color.parseColor("#664400"));
+
+                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setTextColor(Color.parseColor("#ffefcc"));
+
                 mySpinner.setEnabled(true);
                 mySpinner.setVisibility(View.VISIBLE);
 
+                indicatorLayout1.setVisibility(View.INVISIBLE);
+                indicatorLayout1.setEnabled(false);
+                tempSeekbar.setVisibility(View.INVISIBLE);
+                tempSeekbar.setEnabled(false);
+
+                indicatorLayout2.setEnabled(false);
+                pressSeekbar.setVisibility(View.VISIBLE);
+                pressSeekbar.setEnabled(false);
+
+                indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
                 label1.setText("Syrup:");
                 label2.setText("");
-                label3.setText("Dispense(Oz):");
+                label3.setText("Dispense(oz):");
                 break;
             }
             case COFFEE:{
+                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                coffeeButton.setTextColor(Color.parseColor("#664400"));
+
+                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setTextColor(Color.parseColor("#ffefcc"));
+
+                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
+
+
+                indicatorLayout1.setVisibility(View.VISIBLE);
+                indicatorLayout1.setEnabled(false);
+                tempSeekbar.setVisibility(View.VISIBLE);
+                tempSeekbar.setEnabled(false);
+
+                indicatorLayout2.setEnabled(false);
+                pressSeekbar.setVisibility(View.VISIBLE);
+                pressSeekbar.setEnabled(false);
+
+                indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
+                indicatorLayout1.setEnabled(false);
+
                 label1.setText("");
                 label2.setText("");
-                label3.setText("Dispense(Oz):");
+                label3.setText("Dispense(oz):");
                 break;
             }
         }
@@ -957,7 +1090,10 @@ public class CoffeeBrew extends AppCompatActivity {
         label3.setText("Froth:");
     }
 
-    public void playSliders(AdvancedState.ActiveSection prevState, AdvancedState.ActiveSection currState){
+    public void playSliders(final AdvancedState.ActiveSection prevState, AdvancedState.ActiveSection currState){
+
+        Log.i("CoffeeBrew", "prevState: " + prevState.name());
+        Log.i("CoffeeBrew", "currentState: " + currState.name());
 
         switch(prevState){
             case WATER:{
@@ -969,10 +1105,13 @@ public class CoffeeBrew extends AppCompatActivity {
             case MILK:{
                 prevDisp = advancedState.milkState.disp;
                 prevTemp = advancedState.milkState.temp;
+                prevPress = 70;
                 break;
             }
             case COFFEE:{
                 prevDisp = advancedState.coffeeState.disp;
+                prevPress = 70;
+                prevTemp = 70;
                 break;
             }
             case SYRUP:{
@@ -984,146 +1123,175 @@ public class CoffeeBrew extends AppCompatActivity {
             case FROTH:{
                 prevDisp = advancedState.frothState.disp;
                 prevPress = advancedState.frothState.press;
+                prevTemp = 70;
                 break;
             }
         }
 
         switch(currState){
             case WATER:{
-                dispDiff = prevDisp - advancedState.milkState.disp;
-                tempDiff = prevTemp - advancedState.milkState.temp;
+                dispDiff = prevDisp - advancedState.waterState.disp;
+                tempDiff = prevTemp - advancedState.waterState.temp;
+                pressDiff = prevPress - advancedState.waterState.press;
                 break;
             }
             case MILK:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
                 tempDiff = prevTemp - advancedState.milkState.temp;
+                pressDiff = prevTemp;
                 break;
             }
             case COFFEE:{
-                dispDiff = prevDisp - advancedState.milkState.disp;
-                tempDiff = prevTemp - advancedState.milkState.temp;
+                dispDiff = prevDisp - advancedState.coffeeState.disp;
+                tempDiff = prevTemp;
+                pressDiff = prevPress;
                 break;
             }
             case SYRUP:{
-                dispDiff = prevDisp - advancedState.milkState.disp;
+                dispDiff = prevDisp - advancedState.syrupState.disp;
+                tempDiff = prevTemp;
+                pressDiff = prevPress;
                 break;
             }
             case FROTH:{
-                dispDiff = prevDisp - advancedState.milkState.disp;
-                tempDiff = prevTemp - advancedState.milkState.temp;
+                dispDiff = prevDisp - advancedState.frothState.disp;
+                pressDiff = prevPress - advancedState.frothState.press;
+                tempDiff = prevTemp;
                 break;
             }
         }
 
-        if(advancedState.activeSection == AdvancedState.ActiveSection.SYRUP){
-            new Runnable() {
+        if(currState != AdvancedState.ActiveSection.SYRUP) {
+            new Thread(new Runnable() {
                 float diffDispOverTime = Math.abs(dispDiff)/1000;
                 @Override
                 public void run() {
                     if(dispDiff < 0){
+                        float desiredValue = prevDisp + Math.abs(dispDiff);
+                        float actualValue = prevDisp;
                         long currentTime = System.currentTimeMillis();
-                        while(dispDiff < prevDisp){
+                        while(actualValue < desiredValue){
                             if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                dispDiff = dispDiff + diffDispOverTime;
-                                dispSeekbar.setProgress(dispDiff);
+                            currentTime = System.currentTimeMillis();
+                            actualValue = actualValue + diffDispOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dispSeekbar.setProgress(finalActualValue);
+                                    }
+                                });
                             }
                         }
                     }
                     else{
+                        float desiredValue = prevDisp - dispDiff;
+                        float actualValue = prevDisp;
                         long currentTime = System.currentTimeMillis();
-                        while(dispDiff > prevDisp){
+                        while(actualValue > desiredValue){
                             if(System.currentTimeMillis() > currentTime){
                                 currentTime = System.currentTimeMillis();
-                                dispDiff = dispDiff - diffDispOverTime;
-                                dispSeekbar.setProgress(dispDiff);
+                                actualValue = actualValue - diffDispOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dispSeekbar.setProgress(finalActualValue);
+                                    }
+                                });
                             }
                         }
                     }
                 }
-            }.run();
+            }).start();
         }
 
-        else {
-            new Runnable() {
-                float diffDispOverTime = Math.abs(dispDiff)/1000;
-                @Override
-                public void run() {
-                    if(dispDiff < 0){
-                        long currentTime = System.currentTimeMillis();
-                        while(dispDiff < prevDisp){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                dispDiff = dispDiff + diffDispOverTime;
-                                dispSeekbar.setProgress(dispDiff);
-                            }
-                        }
-                    }
-                    else{
-                        long currentTime = System.currentTimeMillis();
-                        while(dispDiff > prevDisp){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                dispDiff = dispDiff - diffDispOverTime;
-                                dispSeekbar.setProgress(dispDiff);
-                            }
+        new Thread(new Runnable() {
+            float diffTempOverTime = Math.abs(tempDiff)/1000;
+            @Override
+            public void run() {
+                if(tempDiff < 0){
+                    float desiredValue = prevTemp + Math.abs(tempDiff);
+                    float actualValue = prevTemp;
+                    long currentTime = System.currentTimeMillis();
+                    while(actualValue < desiredValue){
+                        if(System.currentTimeMillis() > currentTime){
+                            currentTime = System.currentTimeMillis();
+                            actualValue = actualValue + diffTempOverTime;
+                            final float finalActualValue = actualValue;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tempSeekbar.setProgress(finalActualValue);
+                                }
+                            });
                         }
                     }
                 }
-            }.run();
-            new Runnable() {
-                float diffTempOverTime = Math.abs(tempDiff)/1000;
-                @Override
-                public void run() {
-                    if(tempDiff < 0){
-                        long currentTime = System.currentTimeMillis();
-                        while(tempDiff < prevTemp){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                tempDiff = tempDiff + diffTempOverTime;
-                                tempSeekbar.setProgress(tempDiff);
-                            }
-                        }
-                    }
-                    else{
-                        long currentTime = System.currentTimeMillis();
-                        while(tempDiff > prevTemp){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                tempDiff = tempDiff - diffTempOverTime;
-                                tempSeekbar.setProgress(tempDiff);
-                            }
+                else{
+                    float desiredValue = prevTemp - tempDiff;
+                    float actualValue = prevTemp;
+                    long currentTime = System.currentTimeMillis();
+                    while(actualValue > desiredValue){
+                        if(System.currentTimeMillis() > currentTime){
+                            currentTime = System.currentTimeMillis();
+                            actualValue = actualValue - diffTempOverTime;
+                            final float finalActualValue = actualValue;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tempSeekbar.setProgress((int) finalActualValue);
+                                }
+                            });
                         }
                     }
                 }
-            }.run();
-            new Runnable() {
-                float diffPressOverTime = Math.abs(pressDiff)/1000;
-                @Override
-                public void run() {
-                    if(pressDiff < 0){
-                        long currentTime = System.currentTimeMillis();
-                        while(pressDiff < prevPress){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                pressDiff = pressDiff + diffPressOverTime;
-                                pressSeekbar.setProgress(pressDiff);
-                            }
-                        }
-                    }
-                    else{
-                        long currentTime = System.currentTimeMillis();
-                        while(pressDiff > prevPress){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                pressDiff = pressDiff - diffPressOverTime;
-                                pressSeekbar.setProgress(pressDiff);
-                            }
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            float diffPressOverTime = Math.abs(pressDiff)/1000;
+            @Override
+            public void run() {
+                if(pressDiff < 0){
+                    float desiredValue = prevTemp + Math.abs(pressDiff);
+                    float actualValue = prevTemp;
+                    long currentTime = System.currentTimeMillis();
+                    while(actualValue < desiredValue){
+                        if(System.currentTimeMillis() > currentTime){
+                            currentTime = System.currentTimeMillis();
+                            actualValue = actualValue + diffPressOverTime;
+                            final float finalActualValue = actualValue;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pressSeekbar.setProgress((int) finalActualValue);
+                                }
+                            });
                         }
                     }
                 }
-            }.run();
-        }
+                else{
+                    float desiredValue = prevTemp - pressDiff;
+                    float actualValue = prevTemp;
+                    long currentTime = System.currentTimeMillis();
+                    while(actualValue > desiredValue){
+                        if(System.currentTimeMillis() > currentTime){
+                            currentTime = System.currentTimeMillis();
+                            actualValue = actualValue - diffPressOverTime;
+                            final float finalActualValue = actualValue;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pressSeekbar.setProgress((int) finalActualValue);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }).start();
+
     }
 
     private void selectAdvancedButton(AdvancedState.ActiveSection state){
@@ -1146,12 +1314,21 @@ public class CoffeeBrew extends AppCompatActivity {
             mySpinner.setVisibility(View.INVISIBLE);
 
             label1.setText("");
-            label2.setText("Pressure(PSI):");
+            label2.setText("Pressure(psi):");
             label3.setText("Dispense(Oz):");
 
+            tempSeekbar.setVisibility(View.VISIBLE);
             tempSeekbar.setEnabled(false);
+            indicatorLayout1.setVisibility(View.VISIBLE);
+            indicatorLayout1.setEnabled(false);
+
+            pressSeekbar.setVisibility(View.VISIBLE);
             pressSeekbar.setEnabled(true);
+            indicatorLayout2.setEnabled(true);
+
+            dispSeekbar.setVisibility(View.VISIBLE);
             dispSeekbar.setEnabled(true);
+            indicatorLayout3.setEnabled(true);
         }
 
         if(state == AdvancedState.ActiveSection.WATER) {
@@ -1172,12 +1349,21 @@ public class CoffeeBrew extends AppCompatActivity {
             mySpinner.setVisibility(View.INVISIBLE);
 
             tempSeekbar.setEnabled(true);
-            dispSeekbar.setEnabled(true);
-            pressSeekbar.setEnabled(true);
+            tempSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout1.setVisibility(View.VISIBLE);
+            indicatorLayout1.setEnabled(true);
 
-            label1.setText("Temperature(F):");
-            label2.setText("Pressure(PSI):");
-            label3.setText("Dispense(Oz):");
+            dispSeekbar.setEnabled(true);
+            dispSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout3.setEnabled(true);
+
+            pressSeekbar.setEnabled(true);
+            pressSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout2.setEnabled(true);
+
+            label1.setText("Temperature(" + (char) 0x00B0 + "F):");
+            label2.setText("Pressure(psi):");
+            label3.setText("Dispense(oz):");
         }
 
         if(state == AdvancedState.ActiveSection.MILK) {
@@ -1198,12 +1384,21 @@ public class CoffeeBrew extends AppCompatActivity {
             mySpinner.setVisibility(View.INVISIBLE);
 
             tempSeekbar.setEnabled(true);
-            dispSeekbar.setEnabled(true);
-            pressSeekbar.setEnabled(false);
+            tempSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout1.setVisibility(View.VISIBLE);
+            indicatorLayout1.setEnabled(true);
 
-            label1.setText("Temperature(F):");
+            dispSeekbar.setEnabled(true);
+            dispSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout3.setEnabled(true);
+
+            pressSeekbar.setEnabled(false);
+            pressSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout2.setEnabled(false);
+
+            label1.setText("Temperature(" + (char) 0x00B0 + "F):");
             label2.setText("");
-            label3.setText("Dispense(Oz):");
+            label3.setText("Dispense(oz):");
         }
 
         if(state == AdvancedState.ActiveSection.COFFEE) {
@@ -1223,13 +1418,22 @@ public class CoffeeBrew extends AppCompatActivity {
             mySpinner.setEnabled(false);
             mySpinner.setVisibility(View.INVISIBLE);
 
+            tempSeekbar.setVisibility(View.VISIBLE);
             tempSeekbar.setEnabled(false);
+            indicatorLayout1.setVisibility(View.VISIBLE);
+            indicatorLayout1.setEnabled(false);
+
+            dispSeekbar.setVisibility(View.VISIBLE);
             dispSeekbar.setEnabled(true);
+            indicatorLayout3.setEnabled(true);
+
+            pressSeekbar.setVisibility(View.VISIBLE);
             pressSeekbar.setEnabled(false);
+            indicatorLayout2.setEnabled(false);
 
             label1.setText("");
             label2.setText("");
-            label3.setText("Dispense(Oz):");
+            label3.setText("Dispense(oz):");
         }
 
         if(state == AdvancedState.ActiveSection.SYRUP) {
@@ -1249,13 +1453,22 @@ public class CoffeeBrew extends AppCompatActivity {
             mySpinner.setEnabled(true);
             mySpinner.setVisibility(View.VISIBLE);
 
+            tempSeekbar.setVisibility(View.INVISIBLE);
             tempSeekbar.setEnabled(false);
+            indicatorLayout1.setVisibility(View.INVISIBLE);
+            indicatorLayout1.setEnabled(false);
+
             dispSeekbar.setEnabled(true);
+            dispSeekbar.setVisibility(View.VISIBLE);
+            indicatorLayout3.setEnabled(true);
+
+            pressSeekbar.setVisibility(View.VISIBLE);
             pressSeekbar.setEnabled(false);
+            indicatorLayout2.setEnabled(false);
 
             label1.setText("Syrup:");
             label2.setText("");
-            label3.setText("Dispense(Oz):");
+            label3.setText("Dispense(oz):");
         }
     }
 
@@ -1310,7 +1523,7 @@ public class CoffeeBrew extends AppCompatActivity {
     }
 
     private void setSeekBarValue(AdvancedState.ActiveSection state, int val, int bar){
-        switch(advancedState.activeSection){
+        switch(state){
             case WATER:{
                 if(bar == 0){
                     advancedState.waterState.temp = val;
@@ -1333,12 +1546,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 break;
             }
             case COFFEE:{
-                if(bar == 0){
-                    advancedState.milkState.temp = val;
-                }
-                else{
-                    advancedState.milkState.disp = val;
-                }
+                advancedState.coffeeState.disp = val;
                 break;
             }
             case FROTH:{
