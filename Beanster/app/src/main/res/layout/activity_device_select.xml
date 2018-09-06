@@ -152,6 +152,22 @@
             android:layout_alignParentTop="true"
             android:layout_alignStart="@+id/selection_list"
             android:layout_alignEnd="@+id/selection_list" />
+        <ProgressBar
+            android:id="@+id/wifiStatusBack2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:indeterminateDrawable="@drawable/wifibackground"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/wifiStatus2"
+            android:layout_marginStart="12dp"
+            android:layout_alignParentStart="true" />
+        <ImageButton
+            android:id="@+id/wifiStatus2"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="12dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
 </RelativeLayout>
     <ImageView
         android:layout_width="90dp"

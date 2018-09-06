@@ -89,8 +89,7 @@ public class CoffeeBrew extends AppCompatActivity {
     private String[] syrups = {"Syrup1", "Syrup2"};
 
     //Data
-    private String connectedIP;
-    private String connectedSn;
+    private String connectedPassword;
     private AdvancedState advancedState;
     private BasicState basicState;
     private RequestData requestData;
@@ -132,15 +131,14 @@ public class CoffeeBrew extends AppCompatActivity {
         requestData = new RequestData();
 
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
-        if(!getIntent().hasExtra("address") && !getIntent().hasExtra("sN")){
+        if(!getIntent().hasExtra("passWord")){
             sendIntent("status");
             Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
             startActivity(deviceIntent);
             finish();
         }
         else{
-            connectedIP = getIntent().getStringExtra("address");
-            connectedSn = getIntent().getStringExtra("sN");
+            connectedPassword = getIntent().getStringExtra("passWord");
         }
 
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
@@ -606,7 +604,7 @@ public class CoffeeBrew extends AppCompatActivity {
             RequestData data = (RequestData) params[0];
             String result = "";
             try {
-                HttpPost request = new HttpPost(new URI("http://" + connectedIP + ":5000/coffee/" + connectedSn));
+                HttpPost request = new HttpPost(new URI("http://192.168.5.1:5000/coffee/" + connectedPassword));
                 Log.i("Brew", "URI: " + request.getURI());
                 String json = new Gson().toJson(data);
                 Log.i("Brew", "JSON to send: " + json);
@@ -663,7 +661,7 @@ public class CoffeeBrew extends AppCompatActivity {
                         break;
                     }
                     case NO_WIFI: {
-                        Intent deviceIntent = new Intent(getApplicationContext(), MainMenu.class);
+                        Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                         intent.putExtra("noWifi", true);
                         startActivity(deviceIntent);
                         finish();

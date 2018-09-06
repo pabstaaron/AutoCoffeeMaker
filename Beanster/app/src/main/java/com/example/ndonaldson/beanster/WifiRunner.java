@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
@@ -39,6 +40,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -92,7 +94,7 @@ public class WifiRunner implements Runnable {
                 savedDevices = (ArrayList<Device>) is.readObject();
                 if (savedDevices != null || !savedDevices.isEmpty()) {
                     lastDevice = savedDevices.get(savedDevices.size() - 1);
-                    Log.i("WifiRunner", "lastDevice is: " + lastDevice.getMacAddress() + " with sN: " + lastDevice.getsN());
+                    Log.i("WifiRunner", "lastDevice is: " + lastDevice.getMacAddress() + " with passWord: " + lastDevice.getPassWord());
                 }
                 is.close();
                 fis.close();
@@ -144,6 +146,7 @@ public class WifiRunner implements Runnable {
                 try {
                     if (!mWifi.isConnected() && connectStatus != ConnectStatus.NO_WIFI) {
                         connectStatus = ConnectStatus.NO_WIFI;
+                        wifiManager.disconnect();
                         sendIntent("status");
                     } else if (connectStatus == ConnectStatus.CONNECTED) {
                         Log.i("WifiRunner", "CONNECTED!");
@@ -168,8 +171,6 @@ public class WifiRunner implements Runnable {
                         client.disconnect();
                     } else if (connectStatus == ConnectStatus.SEARCHING) {
                         Log.i("WifiRunner", "SEARCHING!");
-                        createArpList();
-                        pingDevices();
                         findDevices();
                         if (firstConnect) {
                             connectStatus = ConnectStatus.CONNECT_TO_LAST;
@@ -180,9 +181,10 @@ public class WifiRunner implements Runnable {
                             sendIntent("status");
                         }
                     } else if (connectStatus == ConnectStatus.WAITING_FOR_RESPONSE || connectStatus == ConnectStatus.CONNECT_TO_LAST) {
+                        connectToWifi();
                         Log.i("WifiRunner", "WAITING FOR RESPONSE!");
-                        if (lastDevice != null && !lastDevice.getiP().isEmpty()) {
-                            url = new URL("http://" + lastDevice.getiP() + ":5000/connected/" + lastDevice.getsN());
+                        if (lastDevice != null) {
+                            url = new URL("http://192.168.5.1:5000/connected/");
                             client = (HttpURLConnection) url.openConnection();
                             client.setRequestMethod("GET");
                             client.setConnectTimeout(1000);
@@ -214,8 +216,8 @@ public class WifiRunner implements Runnable {
                                 if (savedDevices != null) {
                                     for (Device d : savedDevices) {
                                         if (d.getMacAddress().equals(lastDevice.getMacAddress()))
-                                            if (d.getsN() != lastDevice.getsN()) {
-                                                d.setsN(lastDevice.getsN());
+                                            if (d.getPassWord() != lastDevice.getPassWord()) {
+                                                d.setPassWord(lastDevice.getPassWord());
                                                 update = true;
                                             }
                                         exists = true;
@@ -244,6 +246,7 @@ public class WifiRunner implements Runnable {
                                 sendIntent("status");
                             }
                         } else {
+                            wifiManager.disconnect();
                             connectStatus = ConnectStatus.WAITING_FOR_USER;
                             sendIntent("status");
                         }
@@ -269,6 +272,7 @@ public class WifiRunner implements Runnable {
         }
         catch(Exception e){
             Log.i("WifiRunner", "WifiRunner Crashed");
+            wifiManager.disconnect();
             connectStatus = ConnectStatus.NO_WIFI;
             sendIntent("status");
         }
@@ -309,7 +313,7 @@ public class WifiRunner implements Runnable {
                     for(Device d: devicesInRange){
                         for(Device d2: savedDevices){
                             if(d.getMacAddress().equals(d2.getMacAddress())){
-                                d.setsN(d2.getsN());
+                                d.setPassWord(d2.getPassWord());
                             }
                         }
                     }
@@ -364,83 +368,35 @@ public class WifiRunner implements Runnable {
     private void findDevices() throws IOException {
         devicesInRange.clear();
 
-        for(String[] s: arpList) {
-            if (!s[0].matches("IP")) {
-                String ip = s[0];
-                String mac = s[3];
-                if (mac.startsWith("b8:27:eb")) {
-                    devicesInRange.add(new Device(mac, "", "", ip));
-                    Log.i("WifiRunner", "Adding RaspberryPi: " + mac + " with IP: " + ip);
-                }
+        List<WifiConfiguration> networks = wifiManager.getConfiguredNetworks();
+
+        for(WifiConfiguration n : networks){
+            if(n.BSSID.startsWith("b8:27:eb")){
+                devicesInRange.add(new Device(n.BSSID, n.SSID, ""));
+                Log.i("WifiRunner", "Adding RaspberryPi mac: " + n.BSSID + " with hostName: " + n.SSID);
             }
         }
     }
 
-    private void createArpList() {
-        arpList.clear();
+    private void connectToWifi(){
 
-        try {
-            BufferedReader localBufferdReader = new BufferedReader(new FileReader(new File("/proc/net/arp")));
+        String networkSSID = lastDevice.getHostName();
+        String networkPass = lastDevice.getPassWord();
 
-            String line;
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + networkSSID + "\"";
+        conf.preSharedKey = networkPass;
+        wifiManager.addNetwork(conf);
 
-            while ((line = localBufferdReader.readLine()) != null) {
-                String[] ipmac = line.split("[ ]+");
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for( WifiConfiguration i : list ) {
+            if(i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
 
-                for (String s : ipmac) {
-                    Log.i("WifiRunner", "ARP INFO! " + s + "\n");
-                }
-
-                Log.i("WifiRunner", "\n\n\n");
-                arpList.add(ipmac);
+                break;
             }
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-            Log.i("WifiRunner", e.getLocalizedMessage());
-        }
-    }
-
-    /**
-     * Ping all devices on LAN
-     * The reason for this is to refresh the /proc/net/arp/ table on the device.
-     */
-    private void pingDevices(){
-        try {
-            NetworkInterface iFace = NetworkInterface
-                    .getByInetAddress(InetAddress.getByName(myIP));
-            boolean foundIP = false;
-
-            for (int i = 0; i <= 255; i++) {
-                // build the next IP address
-                String addr = myIP;
-                addr = addr.substring(0, addr.lastIndexOf('.') + 1) + i;
-
-
-                for(String[] s: arpList) {
-                    if (!s[0].matches("IP")) {
-                        String ip = s[0];
-                        if(ip.equals(addr)){
-                            foundIP = true;
-                            break;
-                        }
-                    }
-                }
-
-                if(foundIP) {
-                    foundIP = false;
-                    continue;
-                }
-
-                InetAddress pingAddr = InetAddress.getByName(addr);
-
-                // 50ms Timeout for the "ping"
-                if (pingAddr.isReachable(iFace, 200, 50)) {
-                    Log.i("WifiRunner", "PINGING: " + pingAddr.getHostAddress());
-                }
-            }
-        } catch (UnknownHostException ex) {
-        } catch (IOException ex) {
         }
     }
 }

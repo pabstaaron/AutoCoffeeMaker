@@ -126,10 +126,7 @@
                 android:layout_height="60dp"
                 android:indeterminateDrawable="@drawable/wifibackground"
                 android:layout_alignParentTop="true"
-                android:layout_alignStart="@+id/wifiStatus" /> "
-                android:layout_marginStart="12dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignStart="@+id/wifiStatus" />
             <ImageButton
                 android:id="@+id/wifiStatus"
                 android:layout_width="60dp"

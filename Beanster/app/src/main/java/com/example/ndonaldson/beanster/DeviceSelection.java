@@ -8,7 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +58,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     private TextView devicesLabel;
     private RecyclerView recyclerView;
     private WifiAdapter adapter;
+    private ImageView wifiStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,8 +148,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 public void onClick(View v) {
 
                     for(Device d : mDeviceIds){
-                        Log.i("DeviceSelection", "d.MacAddress: " + d.getMacAddress() + ", d.sN: " + d.getsN() + ", deviceSelectedName: " + deviceSelectedName);
-                        if(d.getMacAddress().equals(deviceSelectedName) && !d.getsN().isEmpty()){
+                        Log.i("DeviceSelection", "d.MacAddress: " + d.getMacAddress() + ", d.password: " + d.getPassWord() + ", deviceSelectedName: " + deviceSelectedName);
+                        if(d.getHostName().equals(deviceSelectedName) && !d.getPassWord().isEmpty()){
                             progressBack.setVisibility(View.VISIBLE);
                             mLoadingProgress.setVisibility(View.VISIBLE);
                             connectText.setVisibility(View.VISIBLE);
@@ -178,11 +183,11 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             dialog.dismiss();
-                            String deviceSn = edittext.getText().toString();
-                            if (!deviceSn.isEmpty()){
+                            String devicePassword = edittext.getText().toString();
+                            if (!devicePassword.isEmpty()){
                                 for(Device d : mDeviceIds){
-                                    if(deviceSelectedName.equals(d.getMacAddress())){
-                                        d.setsN(deviceSn);
+                                    if(deviceSelectedName.equals(d.getHostName())){
+                                        d.setPassWord(devicePassword);
                                         deviceSelected = d;
                                     }
                                 }
@@ -246,6 +251,21 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             recyclerView = (RecyclerView) this.findViewById(R.id.selection_list);
             recyclerView.setLayoutManager(layoutManager);
 
+            wifiStatus = (ImageView) findViewById(R.id.wifiStatus);
+
+            if(getIntent() != null && getIntent().hasExtra("noWifi")){
+                wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
+            }
+
+            else wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+
+//            wifiStatus.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+//                }
+//            });
+
             sendIntent("sendDevices");
         }
         catch(Exception e){
@@ -263,7 +283,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         List<WifiSelectItem> selectableItems = new ArrayList<>();
         selectableItems.clear();
         for(Device d: mDeviceIds){
-            selectableItems.add(new WifiSelectItem(d.getMacAddress()));
+            selectableItems.add(new WifiSelectItem(d.getHostName()));
         }
 
         return selectableItems;
@@ -314,9 +334,9 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("selection", true);
-                        Log.i("DeviceSelection", "Starting brewActivity with IP: " + deviceSelected.getiP() + " and serialNumber: " + deviceSelected.getsN());
-                        brewIntent.putExtra("address", deviceSelected.getiP());
-                        brewIntent.putExtra("sN", deviceSelected.getsN());
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                        Log.i("DeviceSelection", "Starting brewActivity with macAddress " + deviceSelected.getMacAddress() + ", password: " + deviceSelected.getPassWord() + ", and hostName: " + deviceSelected.getHostName());
+                        brewIntent.putExtra("passWord", deviceSelected.getPassWord());
                         mSearchProgress.setVisibility(View.INVISIBLE);
                         startActivity(brewIntent);
                         finish();
@@ -356,11 +376,15 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         break;
                     }
                     case NO_WIFI:{
-                        intent = new Intent(getApplicationContext(), MainMenu.class);
-                        intent.putExtra("noWifi", true);
-                        intent.putExtra("flipper", viewFlipper.getDisplayedChild());
-                        startActivity(intent);
-                        finish();
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
+                        Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+//                        intent = new Intent(getApplicationContext(), MainMenu.class);
+//                        intent.putExtra("noWifi", true);
+//                        intent.putExtra("flipper", viewFlipper.getDisplayedChild());
+//                        startActivity(intent);
+//                        finish();
                     }
                 }
             }
@@ -370,23 +394,23 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 deviceIds = intent.getParcelableArrayListExtra("deviceIds");
                 mDeviceIds.clear();
                 for (Device d: deviceIds) {
-                    Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.sN: %s, d.getIP: %s", d.getMacAddress(), d.getsN(), d.getiP()));
+                    Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.password: %s, d.hostName: %s", d.getMacAddress(), d.getPassWord(), d.getHostName()));
                     mDeviceIds.add(d);
                 }
                 makeWifiAdapter();
             }
             else if(intent.hasExtra("Failure") || intent.hasExtra("badRequest")) {
-                String previousSN = "";
+                String previousPassword = "";
                 for (Device d : mDeviceIds) {
                     if (d.getMacAddress().equals(deviceSelected.getMacAddress())) {
-                        previousSN = d.getsN();
-                        d.setsN("");
+                        previousPassword = d.getPassWord();
+                        d.setPassWord("");
                         deviceSelected = d;
                     }
                 }
                 String message = "";
-                if(intent.hasExtra("Failure")) message = "Failure to get response from " + deviceSelected.getMacAddress() + "...";
-                else if(!previousSN.isEmpty()) message = "SN " + previousSN + " for device " + deviceSelected.getMacAddress() + " is not correct...";
+                if(intent.hasExtra("Failure")) message = "Failure to get response from " + deviceSelected.getHostName() + "...";
+                else if(!previousPassword.isEmpty()) message = "password " + previousPassword + " for device " + deviceSelected.getMacAddress() + " is not correct...";
                 Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
