@@ -58,7 +58,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     private TextView devicesLabel;
     private RecyclerView recyclerView;
     private WifiAdapter adapter;
-    private ImageView wifiStatus;
+    private ImageButton wifiStatus;
+    private Boolean isConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +118,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                     intent.putExtra("selection", true);
                     intent.putExtra("flipper", viewFlipper.getDisplayedChild());
+                    intent.putExtra("conneced", isConnected);
                     startActivity(intent);
                     mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
                     sendIntent("status");
@@ -251,20 +253,15 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             recyclerView = (RecyclerView) this.findViewById(R.id.selection_list);
             recyclerView.setLayoutManager(layoutManager);
 
-            wifiStatus = (ImageView) findViewById(R.id.wifiStatus);
+            wifiStatus = (ImageButton) findViewById(R.id.wifiStatus2);
 
-            if(getIntent() != null && getIntent().hasExtra("noWifi")){
-                wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
+
+            if(getIntent() != null && getIntent().hasExtra("connected")){
+                if((Boolean) getIntent().getExtras().get("connected")) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+            } else{
+                wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
             }
-
-            else wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
-
-//            wifiStatus.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-//                }
-//            });
 
             sendIntent("sendDevices");
         }

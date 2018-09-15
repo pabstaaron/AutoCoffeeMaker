@@ -51,6 +51,7 @@ public class MainMenu extends AppCompatActivity {
     private String deviceHostName;
     private String devicePassword;
     private String deviceMacAddress;
+    private Boolean isConnected;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -116,44 +117,34 @@ public class MainMenu extends AppCompatActivity {
         connectingText = (TextView) findViewById(R.id.connectText);
         wifiStatus = (ImageButton) findViewById(R.id.wifiStatus);
 
-//        wifiStatus.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-//            }
-//        });
-
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 sendIntent(WifiRunner.ConnectStatus.WAITING_FOR_USER.name(), "status");
                 Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                 deviceIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
+                deviceIntent.putExtra("connected", isConnected);
                 startActivity(deviceIntent);
                 finish();
             }
         });
 
+        if(getIntent() != null && getIntent().hasExtra("connected")){
+            if((Boolean) getIntent().getExtras().get("connected")) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+            wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+        } else{
+            wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+        }
+
         if(getIntent() != null && getIntent().hasExtra("selection")){
             connectButton.setEnabled(true);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
             connectButton.setTextColor(Color.rgb(255, 239, 204));
-            wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
             cradle.setVisibility(View.INVISIBLE);
             circle.setVisibility(View.INVISIBLE);
             connectingText.setVisibility(View.INVISIBLE);
         }
 
-        else if(getIntent() != null && getIntent().hasExtra("noWifi")){
-            connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
-            connectButton.setTextColor(Color.rgb(255, 239, 204));
-            connectButton.setEnabled(true);
-            wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
-            cradle.setVisibility(View.INVISIBLE);
-            circle.setVisibility(View.INVISIBLE);
-            connectingText.setVisibility(View.INVISIBLE);
-            connectStatus = WifiRunner.ConnectStatus.NO_WIFI;
-        }
 
         else {
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
@@ -204,6 +195,7 @@ public class MainMenu extends AppCompatActivity {
                 switch (connectStatus) {
                     case CONNECTED: {
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                        isConnected = true;
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("passWord", devicePassword);
                         startActivity(brewIntent);
@@ -216,22 +208,22 @@ public class MainMenu extends AppCompatActivity {
                     }
                     case NO_WIFI: {
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
+                        isConnected = false;
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
-                        //Toast toast = Toast.makeText(context, "Application requires wireless connection...", Toast.LENGTH_SHORT);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        toast.show();
+                        Toast toast = Toast.makeText(context, "Can't connect to previous device...", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
                         break;
                     }
                     case WAITING_FOR_USER: {
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
-                        //wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
@@ -245,7 +237,6 @@ public class MainMenu extends AppCompatActivity {
                         cradle.setVisibility(View.VISIBLE);
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
-                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
                         connectingText.setText("Trying to connect....");
                         cradle.start();
                         break;
@@ -259,7 +250,6 @@ public class MainMenu extends AppCompatActivity {
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
                         connectingText.setText("Scanning network....");
-                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
                         cradle.start();
                         break;
                     }

@@ -1,48 +1,40 @@
 package com.example.ndonaldson.beanster;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
+import android.net.Uri;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
 
 import static android.content.Context.WIFI_SERVICE;
 
@@ -56,7 +48,6 @@ public class WifiRunner implements Runnable {
     private Device lastDevice;
     private ArrayList<Device> savedDevices;
     private ArrayList<Device> devicesInRange;
-    private ArrayList<String[]> arpList;
     private ConnectStatus connectStatus = ConnectStatus.UNKNOWN;
     private HttpURLConnection client;
     private URL url;
@@ -66,6 +57,8 @@ public class WifiRunner implements Runnable {
     private NetworkInfo mWifi;
     private boolean isRunning;
     private boolean firstConnect;
+    private boolean needsScan;
+    private boolean isScanning;
     private String myIP;
     private static final String  DEVICES_LOCATION = Environment.getExternalStorageDirectory().getAbsolutePath() + "/deviceIds.txt";
 
@@ -79,8 +72,10 @@ public class WifiRunner implements Runnable {
     public WifiRunner(final Context context){
 
     try {
-        arpList = new ArrayList<>();
+
         firstConnect = true;
+        needsScan = true;
+        isScanning = false;
         isRunning = false;
         this.context = context;
         try {
@@ -107,17 +102,16 @@ public class WifiRunner implements Runnable {
         devicesInRange = new ArrayList<>();
         mConnManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         mWifi = mConnManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if(!mWifi.isConnected()){
-            connectStatus = ConnectStatus.NO_WIFI;
-            sendIntent("status");
-        }
-        else{
-            wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
-            myIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
-            Log.i("WifiRunner", "My IP Address is: " + myIP);
-            connectStatus = ConnectStatus.SEARCHING;
-            sendIntent("status");
-        }
+        wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
+        WifiScanReceiver dirka = new WifiScanReceiver();
+        context.registerReceiver(dirka,
+                new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+        myIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
+        Log.i("WifiRunner", "My IP Address is: " + myIP);
+        connectStatus = ConnectStatus.SEARCHING;
+        sendIntent("status");
+
 
         LocalBroadcastManager.getInstance(context).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_IN"));
@@ -141,14 +135,9 @@ public class WifiRunner implements Runnable {
     public void run() {
         try {
             if (!isRunning) {
-                mWifi = mConnManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 isRunning = true;
                 try {
-                    if (!mWifi.isConnected() && connectStatus != ConnectStatus.NO_WIFI) {
-                        connectStatus = ConnectStatus.NO_WIFI;
-                        wifiManager.disconnect();
-                        sendIntent("status");
-                    } else if (connectStatus == ConnectStatus.CONNECTED) {
+                    if (connectStatus == ConnectStatus.CONNECTED) {
                         Log.i("WifiRunner", "CONNECTED!");
                         client = (HttpURLConnection) url.openConnection();
                         client.setRequestMethod("GET");
@@ -165,37 +154,54 @@ public class WifiRunner implements Runnable {
                             if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                                 sendIntent("badRequest");
                             }
+                            connectStatus = ConnectStatus.NO_WIFI;
+                            sendIntent("status");
                             connectStatus = ConnectStatus.WAITING_FOR_USER;
                             sendIntent("status");
                         }
                         client.disconnect();
                     } else if (connectStatus == ConnectStatus.SEARCHING) {
                         Log.i("WifiRunner", "SEARCHING!");
-                        findDevices();
-                        if (firstConnect) {
-                            connectStatus = ConnectStatus.CONNECT_TO_LAST;
-                            sendIntent("status");
-                        } else {
-                            connectStatus = ConnectStatus.WAITING_FOR_USER;
-                            sendIntent("data");
-                            sendIntent("status");
+                        if(needsScan && !isScanning) {
+                            if(!wifiManager.isWifiEnabled()){
+                                wifiManager.setWifiEnabled(true);
+                            }
+                            Log.i("WifiRunner", "Starting Scan!");
+                            Log.i("WifiRunner", "Scan result: " + wifiManager.startScan());
+                        } else if(!isScanning && !needsScan){
+                            if (firstConnect) {
+                                Log.i("WifiRunner", "CONNECT_TO_LAST");
+                                connectStatus = ConnectStatus.CONNECT_TO_LAST;
+                                sendIntent("status");
+                            } else if (!firstConnect) {
+                                connectStatus = ConnectStatus.WAITING_FOR_USER;
+                                sendIntent("data");
+                                sendIntent("status");
+                            }
                         }
                     } else if (connectStatus == ConnectStatus.WAITING_FOR_RESPONSE || connectStatus == ConnectStatus.CONNECT_TO_LAST) {
                         connectToWifi();
-                        Log.i("WifiRunner", "WAITING FOR RESPONSE!");
-                        if (lastDevice != null) {
-                            url = new URL("http://192.168.5.1:5000/connected/");
+                        if (lastDevice != null &&
+                                (connectStatus != ConnectStatus.WAITING_FOR_RESPONSE || connectStatus != ConnectStatus.CONNECT_TO_LAST)) {
+                            Log.i("WifiRunner", "WAITING FOR RESPONSE!");
+                            url = new URL("http://192.168.5.1:5000/connected/" + lastDevice.getPassWord());
                             client = (HttpURLConnection) url.openConnection();
                             client.setRequestMethod("GET");
-                            client.setConnectTimeout(1000);
+                            client.setConnectTimeout(10000);
+                            client.setReadTimeout(10000);
 
                             Log.i("WifiRunner", client.getURL().toString());
                             int responseCode = 404;
                             try {
                                 responseCode = client.getResponseCode();
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                StringWriter writer = new StringWriter();
+                                PrintWriter printWriter = new PrintWriter( writer );
+                                e.printStackTrace( printWriter );
+                                printWriter.flush();
+                                String stackTrace = writer.toString();
                                 Log.i("WifiRunner", e.getLocalizedMessage());
+                                Log.i("WifiRunner", stackTrace);
                                 sendIntent("failure");
                                 lastDevice = null;
                             }
@@ -206,6 +212,8 @@ public class WifiRunner implements Runnable {
                                         sendIntent("badRequest");
                                 }
                                 Log.i("WifiRunner", "Failed to connect");
+                                connectStatus = ConnectStatus.NO_WIFI;
+                                sendIntent("status");
                                 connectStatus = ConnectStatus.WAITING_FOR_USER;
                                 lastDevice = null;
                                 sendIntent("status");
@@ -244,24 +252,18 @@ public class WifiRunner implements Runnable {
                                 connectStatus = ConnectStatus.CONNECTED;
                                 if (firstConnect) sendIntent("lastDevice");
                                 sendIntent("status");
+                                connectStatus = ConnectStatus.WAITING_FOR_USER;
+                                sendIntent("status");
                             }
-                        } else {
-                            wifiManager.disconnect();
+                        } else if((connectStatus != ConnectStatus.WAITING_FOR_RESPONSE || connectStatus != ConnectStatus.CONNECT_TO_LAST)){
+                            //wifiManager.disconnect();
                             connectStatus = ConnectStatus.WAITING_FOR_USER;
                             sendIntent("status");
                         }
                         firstConnect = false;
-                        client.disconnect();
+                        if(client != null)client.disconnect();
                     } else if (connectStatus == ConnectStatus.WAITING_FOR_USER) {
                         Log.i("WifiRunner", "WAITING FOR USER!");
-                    } else if (connectStatus == ConnectStatus.NO_WIFI) {
-                        Log.i("WifiRunner", "NO WIFI!");
-                        if (mWifi.isConnected()) {
-                            wifiManager = (WifiManager) context.getSystemService(WIFI_SERVICE);
-                            myIP = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
-                            connectStatus = ConnectStatus.SEARCHING;
-                            sendIntent("status");
-                        }
                     }
                 } catch (Exception e) {
                     Log.i("WifiRunner", e.getLocalizedMessage());
@@ -272,8 +274,10 @@ public class WifiRunner implements Runnable {
         }
         catch(Exception e){
             Log.i("WifiRunner", "WifiRunner Crashed");
-            wifiManager.disconnect();
+            //wifiManager.disconnect();
             connectStatus = ConnectStatus.NO_WIFI;
+            sendIntent("status");
+            connectStatus = ConnectStatus.WAITING_FOR_USER;
             sendIntent("status");
         }
     }
@@ -311,9 +315,11 @@ public class WifiRunner implements Runnable {
             else if (type.equals("data") || type.equals("sendDevices")){
                 try{
                     for(Device d: devicesInRange){
-                        for(Device d2: savedDevices){
-                            if(d.getMacAddress().equals(d2.getMacAddress())){
-                                d.setPassWord(d2.getPassWord());
+                        if(savedDevices != null) {
+                            for (Device d2 : savedDevices) {
+                                if (d.getMacAddress().equals(d2.getMacAddress())) {
+                                    d.setPassWord(d2.getPassWord());
+                                }
                             }
                         }
                     }
@@ -349,6 +355,10 @@ public class WifiRunner implements Runnable {
                 String status = intent.getStringExtra("status");
                 Log.d("WifiRunner", "wifiStatusReceiver got status message: " + status);
                 connectStatus = ConnectStatus.valueOf(status);
+                if(connectStatus == ConnectStatus.SEARCHING){
+                    needsScan = true;
+                    isScanning = false;
+                }
             }
             else if(intent.hasExtra("deviceID")){
                 Device device = intent.getParcelableExtra("deviceID");
@@ -363,40 +373,82 @@ public class WifiRunner implements Runnable {
     };
 
     /**
-     * Extract and save ip and corresponding MAC address from arp table in HashMap
+     * Connect to a specific network
      */
-    private void findDevices() throws IOException {
-        devicesInRange.clear();
-
-        List<WifiConfiguration> networks = wifiManager.getConfiguredNetworks();
-
-        for(WifiConfiguration n : networks){
-            if(n.BSSID.startsWith("b8:27:eb")){
-                devicesInRange.add(new Device(n.BSSID, n.SSID, ""));
-                Log.i("WifiRunner", "Adding RaspberryPi mac: " + n.BSSID + " with hostName: " + n.SSID);
-            }
-        }
-    }
-
     private void connectToWifi(){
 
+        if(lastDevice == null){
+            Log.i("WifiRunner", "LastDevice is null");
+            connectStatus = ConnectStatus.WAITING_FOR_USER;
+            sendIntent("status");
+            return;
+        }
         String networkSSID = lastDevice.getHostName();
         String networkPass = lastDevice.getPassWord();
+        Boolean exists = false;
 
-        WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = "\"" + networkSSID + "\"";
-        conf.preSharedKey = networkPass;
-        wifiManager.addNetwork(conf);
+        Log.i("WifiRunner", "connectToWifi: hostName: " + lastDevice.getHostName() + ", password: " + lastDevice.getPassWord());
 
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
         for( WifiConfiguration i : list ) {
             if(i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                Log.i("WifiRunner", "In configured networks!!  " + i.SSID);
                 wifiManager.disconnect();
                 wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-
+                try {
+                    Thread.sleep(5000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                exists = true;
                 break;
             }
         }
+
+        if(!exists) {
+            WifiConfiguration wc = new WifiConfiguration();
+            wc.SSID = "\"" + networkSSID + "\"";
+            wc.preSharedKey = "\"" + networkPass + "\"";
+            wc.hiddenSSID = true;
+            wc.status = WifiConfiguration.Status.ENABLED;
+            wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+            wc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_EAP);
+            wc.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+            wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            wc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            wc.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            wc.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+
+
+            int res = wifiManager.addNetwork(wc);
+
+            wifiManager.disconnect();
+            Log.i("WifiRunner", "add Network returned " + res);
+            boolean b = wifiManager.enableNetwork(res, true);
+            Log.i("WifiRunner", "enableNetwork returned " + b);
+        }
     }
+
+    public class WifiScanReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context c, Intent intent) {
+            if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+                devicesInRange.clear();
+
+                List<ScanResult> scanResults = wifiManager.getScanResults();
+
+                for(ScanResult s : scanResults){
+                    Log.i("WifiRunner", s.toString());
+                    if(s.BSSID != null && s.BSSID.startsWith("b8:27:eb")){
+                        devicesInRange.add(new Device(s.BSSID, s.SSID, ""));
+                        Log.i("WifiRunner", "Adding RaspberryPi mac: " + s.BSSID + " with hostName: " + s.SSID);
+                    }
+                }
+                needsScan = false;
+                isScanning = false;
+            }
+        }
+    };
 }

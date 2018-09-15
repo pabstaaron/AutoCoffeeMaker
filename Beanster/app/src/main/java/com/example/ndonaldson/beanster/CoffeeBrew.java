@@ -42,7 +42,7 @@ public class CoffeeBrew extends AppCompatActivity {
 
     //Main Buttons
     private Button brewButton;
-    private Button disconnectButton;
+    private Button backButton;
     private Button basicButton;
     private Button advancedButton;
 
@@ -157,11 +157,12 @@ public class CoffeeBrew extends AppCompatActivity {
             }
         });
 
-        disconnectButton = (Button) findViewById(R.id.disconnectButton);
-        disconnectButton.setOnClickListener(new View.OnClickListener() {
+        backButton = (Button) findViewById(R.id.backButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                deviceIntent.putExtra("connected", true);
                 startActivity(deviceIntent);
                 finish();
             }
@@ -461,7 +462,6 @@ public class CoffeeBrew extends AppCompatActivity {
         indicatorLayout2 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout2);
         indicatorLayout3 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout3);
 
-
         hideAdvanced();
     }
 
@@ -662,7 +662,7 @@ public class CoffeeBrew extends AppCompatActivity {
                     }
                     case NO_WIFI: {
                         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
-                        intent.putExtra("noWifi", true);
+                        intent.putExtra("connected", false);
                         startActivity(deviceIntent);
                         finish();
                         break;
