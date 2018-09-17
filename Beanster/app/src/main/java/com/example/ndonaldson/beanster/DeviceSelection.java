@@ -60,6 +60,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     private WifiAdapter adapter;
     private ImageButton wifiStatus;
     private Boolean isConnected;
+    private Boolean closingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         try {
             mContext = this;
             deviceSelectedName = "";
+            closingActivity = false;
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_device_select);
 
@@ -118,7 +120,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                     intent.putExtra("selection", true);
                     intent.putExtra("flipper", viewFlipper.getDisplayedChild());
-                    intent.putExtra("conneced", isConnected);
+                    intent.putExtra("connected", isConnected);
                     startActivity(intent);
                     mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
                     sendIntent("status");
@@ -257,9 +259,11 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
 
 
             if(getIntent() != null && getIntent().hasExtra("connected")){
-                if((Boolean) getIntent().getExtras().get("connected")) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
-                wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+                isConnected = (Boolean) getIntent().getExtras().get("connected");
+                if(isConnected) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                else wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
             } else{
+                isConnected = false;
                 wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
             }
 
@@ -331,15 +335,18 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("selection", true);
-                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
                         Log.i("DeviceSelection", "Starting brewActivity with macAddress " + deviceSelected.getMacAddress() + ", password: " + deviceSelected.getPassWord() + ", and hostName: " + deviceSelected.getHostName());
                         brewIntent.putExtra("passWord", deviceSelected.getPassWord());
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
                         mSearchProgress.setVisibility(View.INVISIBLE);
+                        isConnected = true;
+                        closingActivity = true;
                         startActivity(brewIntent);
                         finish();
                     break;
                     }
                     case WAITING_FOR_USER:{
+                        if(closingActivity) break;
                         progressBack = (ProgressBar) findViewById(R.id.progressBar);
                         progressBack.setVisibility(View.INVISIBLE);
                         mLoadingProgress = (NewtonCradleLoading) findViewById(R.id.progressLoading);
@@ -456,6 +463,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra("selection", true);
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
+        intent.putExtra("connected", isConnected);
         startActivity(intent);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;

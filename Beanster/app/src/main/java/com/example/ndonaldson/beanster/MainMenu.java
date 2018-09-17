@@ -52,6 +52,7 @@ public class MainMenu extends AppCompatActivity {
     private String devicePassword;
     private String deviceMacAddress;
     private Boolean isConnected;
+    private Boolean closingActivity;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -68,6 +69,7 @@ public class MainMenu extends AppCompatActivity {
         deviceMacAddress = "";
         deviceHostName = "";
         mContext = this;
+        closingActivity = false;
 
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
@@ -129,10 +131,13 @@ public class MainMenu extends AppCompatActivity {
             }
         });
 
+
         if(getIntent() != null && getIntent().hasExtra("connected")){
-            if((Boolean) getIntent().getExtras().get("connected")) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
-            wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+            isConnected = (Boolean) getIntent().getExtras().get("connected");
+            if(isConnected) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+            else wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
         } else{
+            isConnected = false;
             wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
         }
 
@@ -198,6 +203,7 @@ public class MainMenu extends AppCompatActivity {
                         isConnected = true;
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("passWord", devicePassword);
+                        closingActivity = true;
                         startActivity(brewIntent);
                         finish();
                         break;
@@ -221,6 +227,7 @@ public class MainMenu extends AppCompatActivity {
                         break;
                     }
                     case WAITING_FOR_USER: {
+                        if(closingActivity) break;
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));

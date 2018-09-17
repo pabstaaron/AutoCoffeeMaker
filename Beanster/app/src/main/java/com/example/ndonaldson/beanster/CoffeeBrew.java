@@ -471,6 +471,7 @@ public class CoffeeBrew extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+        deviceIntent.putExtra("connected", true);
         startActivity(deviceIntent);
         finish();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
