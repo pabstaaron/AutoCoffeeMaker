@@ -406,14 +406,14 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             else if(intent.hasExtra("Failure") || intent.hasExtra("badRequest")) {
                 String previousPassword = "";
                 for (Device d : mDeviceIds) {
-                    if (d.getMacAddress().equals(deviceSelected.getMacAddress())) {
+                    if (deviceSelected != null && d.getMacAddress().equals(deviceSelected.getMacAddress())) {
                         previousPassword = d.getPassWord();
                         d.setPassWord("");
                         deviceSelected = d;
                     }
                 }
                 String message = "";
-                if(intent.hasExtra("Failure")) message = "Failure to get response from " + deviceSelected.getHostName() + "...";
+                if(intent.hasExtra("Failure")) message = "Failure to get response from  device...";
                 else if(!previousPassword.isEmpty()) message = "password " + previousPassword + " for device " + deviceSelected.getMacAddress() + " is not correct...";
                 Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
