@@ -47,12 +47,14 @@ public class main extends AppCompatActivity {
     private static final int INTERNET_CODE = 3;
     private static final int ACCESS_NETWORK_STATE_CODE = 4;
     private static final int ACCESS_WIFI_STATE_CODE = 5;
+    private static final int CHANGE_WIFI_STATE_CODE = 6;
 
     private static final String REQUEST_WRITE_EXTERNAL_STORAGE= Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String REQUEST_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     private static final String REQUEST_INTERNET = Manifest.permission.INTERNET;
     private static final String REQUEST_ACCESS_NETWORK_STATE = Manifest.permission.ACCESS_NETWORK_STATE;
     private static final String REQUEST_ACCESS_WIFI_STATE = Manifest.permission.ACCESS_WIFI_STATE;
+    private static final String REQUEST_CHANGE_WIFI_STATE = Manifest.permission.CHANGE_WIFI_STATE;
 
     private NewtonCradleLoading cradle;
 
@@ -211,6 +213,17 @@ public class main extends AppCompatActivity {
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_ACCESS_WIFI_STATE, ACCESS_WIFI_STATE_CODE, this);
         }
+        else checkChangeWifi();
+    }
+
+    /**
+     * Check wifi state permissions
+     */
+    private void checkChangeWifi(){
+        Log.i("Main", "Request_Access_Wifi_State: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_CHANGE_WIFI_STATE));
+        if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(REQUEST_CHANGE_WIFI_STATE, CHANGE_WIFI_STATE_CODE, this);
+        }
         else begin();
     }
 
@@ -246,6 +259,10 @@ public class main extends AppCompatActivity {
                     alertBuilder.setTitle("Wifi state access permission necessary");
                     alertBuilder.setMessage("Permission needed to connect with device");
                 }
+                else if (permission.equals(REQUEST_CHANGE_WIFI_STATE)){
+                    alertBuilder.setTitle("Wifi change access permission necessary");
+                    alertBuilder.setMessage("Permission needed to connect with device");
+                }
                 else{
                     Log.i("Main", "Unexpected Permission Request");
                     error();
@@ -263,23 +280,12 @@ public class main extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch (permission){
-                        case REQUEST_WRITE_EXTERNAL_STORAGE:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_READ_EXTERNAL_STORAGE:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_INTERNET:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_ACCESS_NETWORK_STATE:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_ACCESS_WIFI_STATE:{
+                        case REQUEST_WRITE_EXTERNAL_STORAGE:
+                        case REQUEST_READ_EXTERNAL_STORAGE:
+                        case REQUEST_INTERNET:
+                        case REQUEST_ACCESS_NETWORK_STATE:
+                        case REQUEST_ACCESS_WIFI_STATE:
+                        case REQUEST_CHANGE_WIFI_STATE:{
                             checkYourPriveledge();
                             break;
                         }
@@ -328,13 +334,21 @@ public class main extends AppCompatActivity {
             }
             case ACCESS_NETWORK_STATE_CODE: {
                 if (result == PackageManager.PERMISSION_GRANTED) {
-                    begin();
+                    checkWifiState();
                 } else {
                      checkYourPriveledge();
                 }
                 break;
             }
             case ACCESS_WIFI_STATE_CODE: {
+                if (result == PackageManager.PERMISSION_GRANTED) {
+                    checkChangeWifi();
+                } else {
+                    checkYourPriveledge();
+                }
+                break;
+            }
+            case CHANGE_WIFI_STATE_CODE: {
                 if (result == PackageManager.PERMISSION_GRANTED) {
                     begin();
                 } else {

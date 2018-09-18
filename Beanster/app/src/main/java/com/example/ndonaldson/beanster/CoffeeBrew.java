@@ -42,7 +42,7 @@ public class CoffeeBrew extends AppCompatActivity {
 
     //Main Buttons
     private Button brewButton;
-    private Button disconnectButton;
+    private Button backButton;
     private Button basicButton;
     private Button advancedButton;
 
@@ -89,8 +89,7 @@ public class CoffeeBrew extends AppCompatActivity {
     private String[] syrups = {"Syrup1", "Syrup2"};
 
     //Data
-    private String connectedIP;
-    private String connectedSn;
+    private String connectedPassword;
     private AdvancedState advancedState;
     private BasicState basicState;
     private RequestData requestData;
@@ -132,15 +131,14 @@ public class CoffeeBrew extends AppCompatActivity {
         requestData = new RequestData();
 
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
-        if(!getIntent().hasExtra("address") && !getIntent().hasExtra("sN")){
+        if(!getIntent().hasExtra("passWord")){
             sendIntent("status");
             Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
             startActivity(deviceIntent);
             finish();
         }
         else{
-            connectedIP = getIntent().getStringExtra("address");
-            connectedSn = getIntent().getStringExtra("sN");
+            connectedPassword = getIntent().getStringExtra("passWord");
         }
 
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
@@ -159,11 +157,12 @@ public class CoffeeBrew extends AppCompatActivity {
             }
         });
 
-        disconnectButton = (Button) findViewById(R.id.disconnectButton);
-        disconnectButton.setOnClickListener(new View.OnClickListener() {
+        backButton = (Button) findViewById(R.id.backButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                deviceIntent.putExtra("connected", true);
                 startActivity(deviceIntent);
                 finish();
             }
@@ -463,7 +462,6 @@ public class CoffeeBrew extends AppCompatActivity {
         indicatorLayout2 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout2);
         indicatorLayout3 = (IndicatorStayLayout) findViewById(R.id.indicatorLayout3);
 
-
         hideAdvanced();
     }
 
@@ -473,6 +471,7 @@ public class CoffeeBrew extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+        deviceIntent.putExtra("connected", true);
         startActivity(deviceIntent);
         finish();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
@@ -606,7 +605,7 @@ public class CoffeeBrew extends AppCompatActivity {
             RequestData data = (RequestData) params[0];
             String result = "";
             try {
-                HttpPost request = new HttpPost(new URI("http://" + connectedIP + ":5000/coffee/" + connectedSn));
+                HttpPost request = new HttpPost(new URI("http://192.168.5.1:5000/coffee/" + connectedPassword));
                 Log.i("Brew", "URI: " + request.getURI());
                 String json = new Gson().toJson(data);
                 Log.i("Brew", "JSON to send: " + json);
@@ -663,8 +662,8 @@ public class CoffeeBrew extends AppCompatActivity {
                         break;
                     }
                     case NO_WIFI: {
-                        Intent deviceIntent = new Intent(getApplicationContext(), MainMenu.class);
-                        intent.putExtra("noWifi", true);
+                        Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
+                        intent.putExtra("connected", false);
                         startActivity(deviceIntent);
                         finish();
                         break;

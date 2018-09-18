@@ -13,21 +13,18 @@ public class Device implements Parcelable, Serializable{
 
     private String macAddress;
     private String hostName;
-    private String sN;
-    private String iP;
+    private String passWord;
 
     /**
      * Constructor
      * @param macAddress
      * @param hostName
-     * @param sN
-     * @param iP
+     * @param passWord
      */
-    public Device(String macAddress, String hostName, String sN, String iP){
+    public Device(String macAddress, String hostName, String passWord){
         this.macAddress = macAddress;
         this.hostName = hostName;
-        this.sN = sN;
-        this.iP = iP;
+        this.passWord = passWord;
     }
 
     /**
@@ -36,8 +33,7 @@ public class Device implements Parcelable, Serializable{
     protected Device(Parcel in) {
         macAddress = in.readString();
         hostName = in.readString();
-        sN = in.readString();
-        iP = in.readString();
+        passWord = in.readString();
     }
 
     /**
@@ -63,12 +59,8 @@ public class Device implements Parcelable, Serializable{
         this.hostName = hostName;
     }
 
-    public void setsN(String sN){
-        this.sN = sN;
-    }
-
-    public void setiP(String iP){
-        this.iP = iP;
+    public void setPassWord(String passWord){
+        this.passWord = passWord;
     }
 
     public String getHostName() {
@@ -79,11 +71,10 @@ public class Device implements Parcelable, Serializable{
         return macAddress;
     }
 
-    public String getsN() {
-        return sN;
+    public String getPassWord() {
+        return passWord;
     }
 
-    public String getiP() { return iP;}
 
     @Override
     public int describeContents() {
@@ -98,8 +89,7 @@ public class Device implements Parcelable, Serializable{
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(macAddress);
         dest.writeString(hostName);
-        dest.writeString(sN);
-        dest.writeString(iP);
+        dest.writeString(passWord);
     }
 
     /**
@@ -108,7 +98,6 @@ public class Device implements Parcelable, Serializable{
     public void readFromParcel(Parcel in){
         macAddress = in.readString();
         hostName = in.readString();
-        sN = in.readString();
-        iP = in.readString();
+        passWord = in.readString();
     }
 }

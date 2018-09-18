@@ -48,8 +48,11 @@ public class MainMenu extends AppCompatActivity {
     private ViewFlipper viewFlipper;
     private ImageButton wifiStatus;
     private Context mContext;
-    private String deviceIP;
-    private String deviceSn;
+    private String deviceHostName;
+    private String devicePassword;
+    private String deviceMacAddress;
+    private Boolean isConnected;
+    private Boolean closingActivity;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -62,9 +65,11 @@ public class MainMenu extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(wifiStatusReceiver,
                 new IntentFilter("com.android.activity.WIFI_DATA_OUT"));
-        deviceIP = "";
-        deviceSn = "";
+        devicePassword = "";
+        deviceMacAddress = "";
+        deviceHostName = "";
         mContext = this;
+        closingActivity = false;
 
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
@@ -114,44 +119,37 @@ public class MainMenu extends AppCompatActivity {
         connectingText = (TextView) findViewById(R.id.connectText);
         wifiStatus = (ImageButton) findViewById(R.id.wifiStatus);
 
-        wifiStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-            }
-        });
-
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 sendIntent(WifiRunner.ConnectStatus.WAITING_FOR_USER.name(), "status");
                 Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                 deviceIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
+                deviceIntent.putExtra("connected", isConnected);
                 startActivity(deviceIntent);
                 finish();
             }
         });
 
+
+        if(getIntent() != null && getIntent().hasExtra("connected")){
+            isConnected = (Boolean) getIntent().getExtras().get("connected");
+            if(isConnected) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+            else wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+        } else{
+            isConnected = false;
+            wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
+        }
+
         if(getIntent() != null && getIntent().hasExtra("selection")){
             connectButton.setEnabled(true);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
             connectButton.setTextColor(Color.rgb(255, 239, 204));
-            wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
             cradle.setVisibility(View.INVISIBLE);
             circle.setVisibility(View.INVISIBLE);
             connectingText.setVisibility(View.INVISIBLE);
         }
 
-        else if(getIntent() != null && getIntent().hasExtra("noWifi")){
-            connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
-            connectButton.setTextColor(Color.rgb(204, 204, 204));
-            connectButton.setEnabled(false);
-            wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
-            cradle.setVisibility(View.INVISIBLE);
-            circle.setVisibility(View.INVISIBLE);
-            connectingText.setVisibility(View.INVISIBLE);
-            connectStatus = WifiRunner.ConnectStatus.NO_WIFI;
-        }
 
         else {
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
@@ -201,9 +199,11 @@ public class MainMenu extends AppCompatActivity {
                 connectStatus = WifiRunner.ConnectStatus.valueOf(status);
                 switch (connectStatus) {
                     case CONNECTED: {
+                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
+                        isConnected = true;
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
-                        brewIntent.putExtra("address", deviceIP);
-                        brewIntent.putExtra("sN", deviceSn);
+                        brewIntent.putExtra("passWord", devicePassword);
+                        closingActivity = true;
                         startActivity(brewIntent);
                         finish();
                         break;
@@ -213,23 +213,24 @@ public class MainMenu extends AppCompatActivity {
                         break;
                     }
                     case NO_WIFI: {
-                        connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
-                        connectButton.setTextColor(Color.rgb(204, 204, 204));
-                        connectButton.setEnabled(false);
-                        cradle.setVisibility(View.INVISIBLE);
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
+                        isConnected = false;
+                        connectButton.setEnabled(true);
+                        connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        connectButton.setTextColor(Color.rgb(255, 239, 204));
+                        cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
-                        Toast toast = Toast.makeText(context, "Application requires wireless connection...", Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText(context, "Can't connect to previous device...", Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                         break;
                     }
                     case WAITING_FOR_USER: {
+                        if(closingActivity) break;
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
-                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
@@ -243,7 +244,6 @@ public class MainMenu extends AppCompatActivity {
                         cradle.setVisibility(View.VISIBLE);
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
-                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
                         connectingText.setText("Trying to connect....");
                         cradle.start();
                         break;
@@ -257,7 +257,6 @@ public class MainMenu extends AppCompatActivity {
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
                         connectingText.setText("Scanning network....");
-                        wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
                         cradle.start();
                         break;
                     }
@@ -266,8 +265,9 @@ public class MainMenu extends AppCompatActivity {
 
             else if(intent.hasExtra("lastDevice")){
                 Device d = intent.getParcelableExtra("lastDevice");
-                deviceIP = d.getiP();
-                deviceSn = d.getsN();
+                deviceHostName = d.getHostName();
+                deviceMacAddress = d.getMacAddress();
+                devicePassword = d.getPassWord();
             }
         }
     };
