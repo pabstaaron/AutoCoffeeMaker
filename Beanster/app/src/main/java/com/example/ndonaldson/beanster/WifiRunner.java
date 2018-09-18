@@ -278,13 +278,7 @@ public class WifiRunner implements Runnable {
                             }
                         }
                         else{
-//                            isConnected = false;
-//                            wifiManager.disconnect();
                             Log.i("WifiRunner", "NOT CONNECTED!");
-//                            connectStatus = ConnectStatus.NO_WIFI;
-//                            sendIntent("status");
-//                            connectStatus = ConnectStatus.WAITING_FOR_USER;
-//                            sendIntent("status");
                         }
                     }
                     else{

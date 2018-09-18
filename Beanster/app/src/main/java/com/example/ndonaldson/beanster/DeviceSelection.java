@@ -384,11 +384,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
-//                        intent = new Intent(getApplicationContext(), MainMenu.class);
-//                        intent.putExtra("noWifi", true);
-//                        intent.putExtra("flipper", viewFlipper.getDisplayedChild());
-//                        startActivity(intent);
-//                        finish();
                     }
                 }
             }
