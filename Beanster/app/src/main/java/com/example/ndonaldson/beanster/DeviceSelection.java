@@ -8,9 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Parcelable;
-import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +27,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,9 +58,12 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     private ImageButton wifiStatus;
     private Boolean isConnected;
     private Boolean closingActivity;
+    private Boolean leavingBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Log.i("BRUH", "creatingDeviceSelection");
 
         try {
             mContext = this;
@@ -116,15 +116,12 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             cancelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+                    leavingBack = true;
                     Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                     intent.putExtra("selection", true);
                     intent.putExtra("flipper", viewFlipper.getDisplayedChild());
                     intent.putExtra("connected", isConnected);
                     startActivity(intent);
-                    mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
-                    sendIntent("status");
-                    finish();
                 }
             });
             searchButton = (Button) findViewById(R.id.searchDevices);
@@ -332,7 +329,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 mConnectStatus = WifiRunner.ConnectStatus.valueOf(status);
                 switch(mConnectStatus){
                     case CONNECTED:{
-                        //overridePendingTransition(R.anim.slide_out, R.anim.slide_in);
                         Intent brewIntent = new Intent(getApplicationContext(), CoffeeBrew.class);
                         brewIntent.putExtra("selection", true);
                         Log.i("DeviceSelection", "Starting brewActivity with macAddress " + deviceSelected.getMacAddress() + ", password: " + deviceSelected.getPassWord() + ", and hostName: " + deviceSelected.getHostName());
@@ -342,7 +338,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         isConnected = true;
                         closingActivity = true;
                         startActivity(brewIntent);
-                        finish();
                     break;
                     }
                     case WAITING_FOR_USER:{
@@ -455,15 +450,13 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
      */
     @Override
     public void onBackPressed(){
+        leavingBack = true;
         Intent intent = new Intent(getApplicationContext(), MainMenu.class);
         intent.putExtra("selection", true);
         intent.putExtra("flipper", viewFlipper.getDisplayedChild());
         intent.putExtra("connected", isConnected);
         startActivity(intent);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
-        mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
-        sendIntent("status");
-        finish();
     }
 
     /**
@@ -479,4 +472,14 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
     }
 
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        onStartNewActivity();
+    }
+
+    protected void onStartNewActivity() {
+        if(leavingBack) overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        else overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
 }

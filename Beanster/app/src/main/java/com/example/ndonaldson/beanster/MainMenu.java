@@ -8,10 +8,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -21,7 +21,6 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +69,7 @@ public class MainMenu extends AppCompatActivity {
         deviceHostName = "";
         mContext = this;
         closingActivity = false;
+        connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
 
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
@@ -118,6 +118,7 @@ public class MainMenu extends AppCompatActivity {
         circle = (ProgressBar) findViewById(R.id.progressBar);
         connectingText = (TextView) findViewById(R.id.connectText);
         wifiStatus = (ImageButton) findViewById(R.id.wifiStatus);
+        getWindow().setExitTransition(new Slide());
 
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -127,7 +128,6 @@ public class MainMenu extends AppCompatActivity {
                 deviceIntent.putExtra("flipper",viewFlipper.getDisplayedChild());
                 deviceIntent.putExtra("connected", isConnected);
                 startActivity(deviceIntent);
-                finish();
             }
         });
 
@@ -205,7 +205,6 @@ public class MainMenu extends AppCompatActivity {
                         brewIntent.putExtra("passWord", devicePassword);
                         closingActivity = true;
                         startActivity(brewIntent);
-                        finish();
                         break;
                     }
                     case UNKNOWN: {
@@ -307,5 +306,15 @@ public class MainMenu extends AppCompatActivity {
     public void onDestroy(){
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        onStartNewActivity();
+    }
+
+    protected void onStartNewActivity() {
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 }
