@@ -7,14 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayout;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 
@@ -34,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 
 public class CoffeeBrew extends AppCompatActivity {
@@ -100,6 +99,7 @@ public class CoffeeBrew extends AppCompatActivity {
     private float dispDiff = 70;
     private float pressDiff = 70;
     private float tempDiff = 70;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +124,7 @@ public class CoffeeBrew extends AppCompatActivity {
         /**
          * DATA SETUP
          */
+        mContext = getApplicationContext();
         activeState = ActiveState.BASIC;
         advancedState = new AdvancedState();
         basicState = new BasicState();
@@ -614,12 +615,22 @@ public class CoffeeBrew extends AppCompatActivity {
                 request.addHeader("Accept","application/json");
                 request.addHeader("content-type", "application/json");
                 HttpResponse response = httpClient.execute(request);
-                inputStream = response.getEntity().getContent();
-                if(inputStream != null)
-                    result = convertInputStreamToString(inputStream);
-                else
-                    result = "You Lose";
-                Log.i("Brew", "Received " + result);
+                int responseCode = response.getStatusLine().getStatusCode();
+                Toast toast = new Toast(mContext);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                if(responseCode == HttpURLConnection.HTTP_OK){
+                    toast.setText("Your drink is being brewed...");
+                } else if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                    toast.setText("There was a problem brewing your drink...");
+                }
+                else if(responseCode == HttpURLConnection.HTTP_NOT_FOUND){
+                    toast.setText("There was a problem brewing your drink...");
+                }
+                else if(responseCode == HttpURLConnection.HTTP_CREATED){
+                    toast.setText("A drink is currently being brewed...");
+                }
+                toast.show();
             }catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Brew", e.getLocalizedMessage());
@@ -651,12 +662,7 @@ public class CoffeeBrew extends AppCompatActivity {
                 String status = intent.getStringExtra("status");
                 mConnectStatus = WifiRunner.ConnectStatus.valueOf(status);
                 switch (mConnectStatus) {
-                    case WAITING_FOR_USER: {
-                        Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
-                        startActivity(deviceIntent);
-                        finish();
-                        break;
-                    }
+                    case WAITING_FOR_USER:
                     case UNKNOWN: {
                         //Default state....don't know what to do with it.
                         break;
@@ -1562,5 +1568,15 @@ public class CoffeeBrew extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        onStartNewActivity();
+    }
+
+    protected void onStartNewActivity() {
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
     }
 }
