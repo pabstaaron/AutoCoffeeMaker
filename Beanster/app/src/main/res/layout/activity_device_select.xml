@@ -181,4 +181,15 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="24dp" />
+
+    <Button
+        android:id="@+id/loginButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ffefcc"
+        android:width="130dp"
+        android:background="@drawable/buttonstyle"
+        android:text="Sign In"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

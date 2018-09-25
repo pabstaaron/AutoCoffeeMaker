@@ -40,6 +40,7 @@ public class MainMenu extends AppCompatActivity {
 
     private WifiRunner.ConnectStatus connectStatus;
     private Button connectButton;
+    private Button loginButton;
     private TextView connectingText;
     private NewtonCradleLoading cradle;
     private ProgressBar circle;
@@ -113,13 +114,13 @@ public class MainMenu extends AppCompatActivity {
             Log.i("MainMenu", e.getLocalizedMessage());
         }
 
-        connectButton = (Button) findViewById(R.id.connectButton);
         cradle = (NewtonCradleLoading) findViewById(R.id.newton_cradle_loading);
         circle = (ProgressBar) findViewById(R.id.progressBar);
         connectingText = (TextView) findViewById(R.id.connectText);
         wifiStatus = (ImageButton) findViewById(R.id.wifiStatus);
         getWindow().setExitTransition(new Slide());
 
+        connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -131,6 +132,18 @@ public class MainMenu extends AppCompatActivity {
             }
         });
 
+        loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!loginButton.getText().equals("Login")){
+                    //TODO: Open fragment for login and return data to save to shared preferences. We will use db in fragment or here to grab data.
+                }
+                else{
+                    //TODO: Ask user if they want to change user. Follow steps above or cancel
+                }
+            }
+        });
 
         if(getIntent() != null && getIntent().hasExtra("connected")){
             isConnected = (Boolean) getIntent().getExtras().get("connected");

@@ -43,6 +43,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     private ArrayList<Device> mDeviceIds;
     private Button cancelButton;
     private Button connectButton;
+    private Button loginButton;
     private Button searchButton;
     private TextView connectText;
     private NewtonCradleLoading mLoadingProgress, mSearchProgress;
@@ -227,8 +228,20 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     alert.show();
                 }
             });
-
             connectButton.setEnabled(false);
+
+            loginButton = (Button) findViewById(R.id.loginButton2);
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!loginButton.getText().equals("Login")){
+                        //TODO: Open fragment for login and return data to save to shared preferences. We will use db in fragment or here to grab data.
+                    }
+                    else{
+                        //TODO: Ask user if they want to change user. Follow steps above or cancel
+                    }
+                }
+            });
 
             devicesLabel = (TextView) findViewById(R.id.deviceLabel);
             devicesLabel.setText(Html.fromHtml(getString(R.string.devicesTitle)));

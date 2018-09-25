@@ -44,6 +44,7 @@ public class CoffeeBrew extends AppCompatActivity {
     private Button backButton;
     private Button basicButton;
     private Button advancedButton;
+    private Button loginButton;
 
     //BasicButtons
     private Button amountSmallButton;
@@ -194,6 +195,19 @@ public class CoffeeBrew extends AppCompatActivity {
                 basicButton.setTextColor(Color.parseColor("#ffefcc"));
                 hideBasic();
                 showAdvanced();
+            }
+        });
+
+        loginButton = (Button) findViewById(R.id.loginButton3);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!loginButton.getText().equals("Login")){
+                    //TODO: Open fragment for login and return data to save to shared preferences. We will use db in fragment or here to grab data.
+                }
+                else{
+                    //TODO: Ask user if they want to change user. Follow steps above or cancel
+                }
             }
         });
 
@@ -619,15 +633,15 @@ public class CoffeeBrew extends AppCompatActivity {
                 Toast toast = new Toast(mContext);
                 toast.setDuration(Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);
-                if(responseCode == HttpURLConnection.HTTP_OK){
+                if(responseCode == HttpURLConnection.HTTP_CREATED){
                     toast.setText("Your drink is being brewed...");
-                } else if(responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                } else if(responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR){
                     toast.setText("There was a problem brewing your drink...");
                 }
-                else if(responseCode == HttpURLConnection.HTTP_NOT_FOUND){
-                    toast.setText("There was a problem brewing your drink...");
+                else if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
+                    toast.setText("Data sent corrupted...");
                 }
-                else if(responseCode == HttpURLConnection.HTTP_CREATED){
+                else if(responseCode == HttpURLConnection.HTTP_CONFLICT){
                     toast.setText("A drink is currently being brewed...");
                 }
                 toast.show();
