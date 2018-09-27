@@ -8,6 +8,7 @@
     tools:context="com.example.ndonaldson.beanster.MainMenu">
 
     <RelativeLayout
+        android:stateListAnimator="@null"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -163,5 +164,12 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="24dp" />
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+        </FrameLayout>
     </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,7 +39,7 @@ import com.victor.loading.newton.NewtonCradleLoading;
  * Also displays current connection state and requires LAN connection
  * to proceed.
  */
-public class MainMenu extends AppCompatActivity {
+public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener {
 
     private WifiRunner.ConnectStatus connectStatus;
     private Button connectButton;
@@ -53,6 +56,7 @@ public class MainMenu extends AppCompatActivity {
     private String deviceMacAddress;
     private Boolean isConnected;
     private Boolean closingActivity;
+    private FrameLayout fragmentContainer;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -70,6 +74,7 @@ public class MainMenu extends AppCompatActivity {
         deviceHostName = "";
         mContext = this;
         closingActivity = false;
+        fragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer);
         connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
 
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -137,7 +142,7 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!loginButton.getText().equals("Login")){
-                    //TODO: Open fragment for login and return data to save to shared preferences. We will use db in fragment or here to grab data.
+                    openFragment();
                 }
                 else{
                     //TODO: Ask user if they want to change user. Follow steps above or cancel
@@ -329,5 +334,21 @@ public class MainMenu extends AppCompatActivity {
 
     protected void onStartNewActivity() {
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
+
+    private void openFragment(){
+        LoginFragment fragment = LoginFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_from_top, R.anim.slide_to_top, R.anim.slide_from_top, R.anim.slide_to_top);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.add(R.id.fragmentContainer, fragment, "LOGIN_FRAGMENT").commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(String sendBackUsername) {
+        if(sendBackUsername.isEmpty()) return;
+        loginButton.setText(sendBackUsername);
+        onBackPressed();
     }
 }

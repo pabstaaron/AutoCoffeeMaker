@@ -8,7 +8,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/fragmentUserName"
         android:layout_marginTop="124dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
@@ -20,10 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="57dp"
-        android:layout_below="@+id/editText"
+        android:layout_below="@+id/fragmentUserName"
         android:layout_alignParentStart="true"
         android:hint="Password"
-        android:id="@+id/editText2"
+        android:id="@+id/fragmentPassword"
         android:layout_marginStart="100dp"
         android:layout_marginEnd="100dp"/>
 
@@ -33,7 +33,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="32dp"
-        android:layout_below="@+id/editText2">
+        android:layout_below="@+id/fragmentPassword">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -42,6 +42,7 @@
             android:layout_weight="1">
 
             <Button
+                android:id="@+id/fragmentCancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -56,6 +57,7 @@
             android:layout_weight="1">
 
             <Button
+                android:id="@+id/fragmentLoginButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Login"
@@ -65,10 +67,10 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_weight="1">
 
             <Button
+                android:id="@+id/fragmentCreateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -76,6 +78,5 @@
                 android:layout_gravity="left"/>
         </LinearLayout>
     </LinearLayout>
-
 
 </RelativeLayout>
