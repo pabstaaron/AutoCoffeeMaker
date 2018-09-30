@@ -493,6 +493,10 @@
 <pin name="P$62" x="25.4" y="12.7" length="middle" rot="R270"/>
 <pin name="P$63" x="20.32" y="12.7" length="middle" rot="R270"/>
 <pin name="P$64" x="15.24" y="12.7" length="middle" rot="R270"/>
+<wire x1="5.08" y1="7.62" x2="5.08" y2="-83.82" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-83.82" x2="101.6" y2="-83.82" width="0.254" layer="94"/>
+<wire x1="101.6" y1="-83.82" x2="101.6" y2="7.62" width="0.254" layer="94"/>
+<wire x1="101.6" y1="7.62" x2="5.08" y2="7.62" width="0.254" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
