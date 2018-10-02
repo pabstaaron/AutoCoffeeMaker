@@ -2,6 +2,9 @@ package com.example.ndonaldson.beanster;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -44,12 +47,14 @@ public class main extends AppCompatActivity {
     private static final int INTERNET_CODE = 3;
     private static final int ACCESS_NETWORK_STATE_CODE = 4;
     private static final int ACCESS_WIFI_STATE_CODE = 5;
+    private static final int CHANGE_WIFI_STATE_CODE = 6;
 
     private static final String REQUEST_WRITE_EXTERNAL_STORAGE= Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String REQUEST_READ_EXTERNAL_STORAGE = Manifest.permission.READ_EXTERNAL_STORAGE;
     private static final String REQUEST_INTERNET = Manifest.permission.INTERNET;
     private static final String REQUEST_ACCESS_NETWORK_STATE = Manifest.permission.ACCESS_NETWORK_STATE;
     private static final String REQUEST_ACCESS_WIFI_STATE = Manifest.permission.ACCESS_WIFI_STATE;
+    private static final String REQUEST_CHANGE_WIFI_STATE = Manifest.permission.CHANGE_WIFI_STATE;
 
     private NewtonCradleLoading cradle;
 
@@ -58,6 +63,22 @@ public class main extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                Log.i("Main", ex.getLocalizedMessage());
+                Intent mStartActivity = new Intent(getApplicationContext(), main.class);
+                mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+                System.exit(0);
+            }
+        });
 
         connectButton = (Button) findViewById(R.id.connectButtonMain);
         connectButton.setVisibility(View.INVISIBLE);
@@ -101,6 +122,7 @@ public class main extends AppCompatActivity {
     private void begin(){
         Intent intent = new Intent(this, MainMenu.class);
         startActivity(intent);
+        finish();
     }
 
     /**
@@ -191,6 +213,17 @@ public class main extends AppCompatActivity {
         if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
             requestPermission(REQUEST_ACCESS_WIFI_STATE, ACCESS_WIFI_STATE_CODE, this);
         }
+        else checkChangeWifi();
+    }
+
+    /**
+     * Check wifi state permissions
+     */
+    private void checkChangeWifi(){
+        Log.i("Main", "Request_Access_Wifi_State: " + this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_CHANGE_WIFI_STATE));
+        if(this.getApplicationContext().checkCallingOrSelfPermission(REQUEST_CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(REQUEST_CHANGE_WIFI_STATE, CHANGE_WIFI_STATE_CODE, this);
+        }
         else begin();
     }
 
@@ -226,6 +259,10 @@ public class main extends AppCompatActivity {
                     alertBuilder.setTitle("Wifi state access permission necessary");
                     alertBuilder.setMessage("Permission needed to connect with device");
                 }
+                else if (permission.equals(REQUEST_CHANGE_WIFI_STATE)){
+                    alertBuilder.setTitle("Wifi change access permission necessary");
+                    alertBuilder.setMessage("Permission needed to connect with device");
+                }
                 else{
                     Log.i("Main", "Unexpected Permission Request");
                     error();
@@ -243,23 +280,12 @@ public class main extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     switch (permission){
-                        case REQUEST_WRITE_EXTERNAL_STORAGE:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_READ_EXTERNAL_STORAGE:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_INTERNET:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_ACCESS_NETWORK_STATE:{
-                            checkYourPriveledge();
-                            break;
-                        }
-                        case REQUEST_ACCESS_WIFI_STATE:{
+                        case REQUEST_WRITE_EXTERNAL_STORAGE:
+                        case REQUEST_READ_EXTERNAL_STORAGE:
+                        case REQUEST_INTERNET:
+                        case REQUEST_ACCESS_NETWORK_STATE:
+                        case REQUEST_ACCESS_WIFI_STATE:
+                        case REQUEST_CHANGE_WIFI_STATE:{
                             checkYourPriveledge();
                             break;
                         }
@@ -308,13 +334,21 @@ public class main extends AppCompatActivity {
             }
             case ACCESS_NETWORK_STATE_CODE: {
                 if (result == PackageManager.PERMISSION_GRANTED) {
-                    begin();
+                    checkWifiState();
                 } else {
                      checkYourPriveledge();
                 }
                 break;
             }
             case ACCESS_WIFI_STATE_CODE: {
+                if (result == PackageManager.PERMISSION_GRANTED) {
+                    checkChangeWifi();
+                } else {
+                    checkYourPriveledge();
+                }
+                break;
+            }
+            case CHANGE_WIFI_STATE_CODE: {
                 if (result == PackageManager.PERMISSION_GRANTED) {
                     begin();
                 } else {
