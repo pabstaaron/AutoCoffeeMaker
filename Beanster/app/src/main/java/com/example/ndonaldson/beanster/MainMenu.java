@@ -4,13 +4,16 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.Slide;
@@ -29,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.google.gson.Gson;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 /**
@@ -141,14 +145,50 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!loginButton.getText().equals("Login")){
-                    openFragment();
+                if(!loginButton.getText().equals("Login")) {
+
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setCancelable(false);
+                    builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                            Gson gson = new Gson();
+                            UserData emptyUser = new UserData();
+                            String json = gson.toJson(emptyUser);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("currentUser", json).apply();
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                            builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    openFragment();
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }).show();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    }).show();
                 }
                 else{
-                    //TODO: Ask user if they want to change user. Follow steps above or cancel
+                    openFragment();
                 }
             }
         });
+
+        if(getIntent().hasExtra("user")){
+            loginButton.setText(getIntent().getExtras().getString("user"));
+        }
 
         if(getIntent() != null && getIntent().hasExtra("connected")){
             isConnected = (Boolean) getIntent().getExtras().get("connected");

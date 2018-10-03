@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import java.util.HashMap;
+
 public class ClearCacheActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
@@ -19,7 +21,7 @@ public class ClearCacheActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clear_cache);
 
-        sharedPreferences = getSharedPreferences("pref", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
         this.setFinishOnTouchOutside(false);
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this.getApplicationContext());
@@ -45,7 +47,13 @@ public class ClearCacheActivity extends AppCompatActivity {
         if(clear){
             sharedPreferences.edit().clear().commit();
         } else{
-            //TODO: Clear all data in sharedPreferences but the user data.
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            for(String s : sharedPreferences.getAll().keySet()){
+                if(s.equals("currentUser") || s.equals("userData")) continue;
+                else{
+                    editor.remove(s).commit();
+                }
+            }
         }
     }
 

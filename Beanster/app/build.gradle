@@ -35,6 +35,7 @@ dependencies {
     compile 'com.github.warkiz.widget:indicatorseekbar:2.0.9'
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.android.support:design:22.2.1'
+    compile 'com.google.code.gson:gson:2.7'
     testCompile 'junit:junit:4.12'
 }
 
