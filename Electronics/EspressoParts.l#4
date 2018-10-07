@@ -429,70 +429,70 @@
 <text x="2.54" y="50.8" size="6.4516" layer="95">RPI3</text>
 </symbol>
 <symbol name="STM32F072RBT6">
-<pin name="P$1" x="0" y="0" length="middle"/>
-<pin name="P$2" x="0" y="-5.08" length="middle"/>
-<pin name="P$3" x="0" y="-10.16" length="middle"/>
-<pin name="P$4" x="0" y="-15.24" length="middle"/>
-<pin name="P$5" x="0" y="-20.32" length="middle"/>
-<pin name="P$6" x="0" y="-25.4" length="middle"/>
-<pin name="P$7" x="0" y="-30.48" length="middle"/>
-<pin name="P$8" x="0" y="-35.56" length="middle"/>
-<pin name="P$9" x="0" y="-40.64" length="middle"/>
-<pin name="P$10" x="0" y="-45.72" length="middle"/>
-<pin name="P$11" x="0" y="-50.8" length="middle"/>
-<pin name="P$12" x="0" y="-55.88" length="middle"/>
-<pin name="P$13" x="0" y="-60.96" length="middle"/>
-<pin name="P$14" x="0" y="-66.04" length="middle"/>
-<pin name="P$15" x="0" y="-71.12" length="middle"/>
-<pin name="P$16" x="0" y="-76.2" length="middle"/>
-<pin name="P$17" x="15.24" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$18" x="20.32" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$19" x="25.4" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$20" x="30.48" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$21" x="35.56" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$22" x="40.64" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$23" x="45.72" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$24" x="50.8" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$25" x="55.88" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$26" x="60.96" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$27" x="66.04" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$28" x="71.12" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$29" x="76.2" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$30" x="81.28" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$31" x="86.36" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$32" x="91.44" y="-88.9" length="middle" rot="R90"/>
-<pin name="P$33" x="106.68" y="-76.2" length="middle" rot="R180"/>
-<pin name="P$34" x="106.68" y="-71.12" length="middle" rot="R180"/>
-<pin name="P$35" x="106.68" y="-66.04" length="middle" rot="R180"/>
-<pin name="P$36" x="106.68" y="-60.96" length="middle" rot="R180"/>
-<pin name="P$37" x="106.68" y="-55.88" length="middle" rot="R180"/>
-<pin name="P$38" x="106.68" y="-50.8" length="middle" rot="R180"/>
-<pin name="P$39" x="106.68" y="-45.72" length="middle" rot="R180"/>
-<pin name="P$40" x="106.68" y="-40.64" length="middle" rot="R180"/>
-<pin name="P$41" x="106.68" y="-35.56" length="middle" rot="R180"/>
-<pin name="P$42" x="106.68" y="-30.48" length="middle" rot="R180"/>
-<pin name="P$43" x="106.68" y="-25.4" length="middle" rot="R180"/>
-<pin name="P$44" x="106.68" y="-20.32" length="middle" rot="R180"/>
-<pin name="P$45" x="106.68" y="-15.24" length="middle" rot="R180"/>
-<pin name="P$46" x="106.68" y="-10.16" length="middle" rot="R180"/>
-<pin name="P$47" x="106.68" y="-5.08" length="middle" rot="R180"/>
-<pin name="P$48" x="106.68" y="0" length="middle" rot="R180"/>
-<pin name="P$49" x="91.44" y="12.7" length="middle" rot="R270"/>
-<pin name="P$50" x="86.36" y="12.7" length="middle" rot="R270"/>
-<pin name="P$51" x="81.28" y="12.7" length="middle" rot="R270"/>
-<pin name="P$52" x="76.2" y="12.7" length="middle" rot="R270"/>
-<pin name="P$53" x="71.12" y="12.7" length="middle" rot="R270"/>
-<pin name="P$54" x="66.04" y="12.7" length="middle" rot="R270"/>
-<pin name="P$55" x="60.96" y="12.7" length="middle" rot="R270"/>
-<pin name="P$56" x="55.88" y="12.7" length="middle" rot="R270"/>
-<pin name="P$57" x="50.8" y="12.7" length="middle" rot="R270"/>
-<pin name="P$58" x="45.72" y="12.7" length="middle" rot="R270"/>
-<pin name="P$59" x="40.64" y="12.7" length="middle" rot="R270"/>
-<pin name="P$60" x="35.56" y="12.7" length="middle" rot="R270"/>
-<pin name="P$61" x="30.48" y="12.7" length="middle" rot="R270"/>
-<pin name="P$62" x="25.4" y="12.7" length="middle" rot="R270"/>
-<pin name="P$63" x="20.32" y="12.7" length="middle" rot="R270"/>
-<pin name="P$64" x="15.24" y="12.7" length="middle" rot="R270"/>
+<pin name="VBAT" x="0" y="0" length="middle"/>
+<pin name="PC13" x="0" y="-5.08" length="middle"/>
+<pin name="PC14-OSC32_IN" x="0" y="-10.16" length="middle"/>
+<pin name="PC15-OSC32_OUT" x="0" y="-15.24" length="middle"/>
+<pin name="PF0-OSC_IN" x="0" y="-20.32" length="middle"/>
+<pin name="PF1-OSC_OUT" x="0" y="-25.4" length="middle"/>
+<pin name="NRST" x="0" y="-30.48" length="middle"/>
+<pin name="PC0" x="0" y="-35.56" length="middle"/>
+<pin name="PC1" x="0" y="-40.64" length="middle"/>
+<pin name="PC2" x="0" y="-45.72" length="middle"/>
+<pin name="PC3" x="0" y="-50.8" length="middle"/>
+<pin name="VSSA" x="0" y="-55.88" length="middle"/>
+<pin name="VDDA" x="0" y="-60.96" length="middle"/>
+<pin name="PA0" x="0" y="-66.04" length="middle"/>
+<pin name="PA1" x="0" y="-71.12" length="middle"/>
+<pin name="PA2" x="0" y="-76.2" length="middle"/>
+<pin name="PA3" x="15.24" y="-88.9" length="middle" rot="R90"/>
+<pin name="VSS" x="20.32" y="-88.9" length="middle" rot="R90"/>
+<pin name="VDD" x="25.4" y="-88.9" length="middle" rot="R90"/>
+<pin name="PA4" x="30.48" y="-88.9" length="middle" rot="R90"/>
+<pin name="PA5" x="35.56" y="-88.9" length="middle" rot="R90"/>
+<pin name="PA6" x="40.64" y="-88.9" length="middle" rot="R90"/>
+<pin name="PA7" x="45.72" y="-88.9" length="middle" rot="R90"/>
+<pin name="PC4" x="50.8" y="-88.9" length="middle" rot="R90"/>
+<pin name="PC5" x="55.88" y="-88.9" length="middle" rot="R90"/>
+<pin name="PB0" x="60.96" y="-88.9" length="middle" rot="R90"/>
+<pin name="PB1" x="66.04" y="-88.9" length="middle" rot="R90"/>
+<pin name="PB2" x="71.12" y="-88.9" length="middle" rot="R90"/>
+<pin name="PB10" x="76.2" y="-88.9" length="middle" rot="R90"/>
+<pin name="PB11" x="81.28" y="-88.9" length="middle" rot="R90"/>
+<pin name="VSS@1" x="86.36" y="-88.9" length="middle" rot="R90"/>
+<pin name="VDD@1" x="91.44" y="-88.9" length="middle" rot="R90"/>
+<pin name="PB12" x="106.68" y="-76.2" length="middle" rot="R180"/>
+<pin name="PB13" x="106.68" y="-71.12" length="middle" rot="R180"/>
+<pin name="PB14" x="106.68" y="-66.04" length="middle" rot="R180"/>
+<pin name="PB15" x="106.68" y="-60.96" length="middle" rot="R180"/>
+<pin name="PC6" x="106.68" y="-55.88" length="middle" rot="R180"/>
+<pin name="PC7" x="106.68" y="-50.8" length="middle" rot="R180"/>
+<pin name="PC8" x="106.68" y="-45.72" length="middle" rot="R180"/>
+<pin name="PC9" x="106.68" y="-40.64" length="middle" rot="R180"/>
+<pin name="PA8" x="106.68" y="-35.56" length="middle" rot="R180"/>
+<pin name="PA9" x="106.68" y="-30.48" length="middle" rot="R180"/>
+<pin name="PA10" x="106.68" y="-25.4" length="middle" rot="R180"/>
+<pin name="PA11" x="106.68" y="-20.32" length="middle" rot="R180"/>
+<pin name="PA12" x="106.68" y="-15.24" length="middle" rot="R180"/>
+<pin name="PA13" x="106.68" y="-10.16" length="middle" rot="R180"/>
+<pin name="VSS@2" x="106.68" y="-5.08" length="middle" rot="R180"/>
+<pin name="VDDIO2" x="106.68" y="0" length="middle" rot="R180"/>
+<pin name="PA14" x="91.44" y="12.7" length="middle" rot="R270"/>
+<pin name="PA15" x="86.36" y="12.7" length="middle" rot="R270"/>
+<pin name="PC10" x="81.28" y="12.7" length="middle" rot="R270"/>
+<pin name="PC11" x="76.2" y="12.7" length="middle" rot="R270"/>
+<pin name="PC12" x="71.12" y="12.7" length="middle" rot="R270"/>
+<pin name="PD2" x="66.04" y="12.7" length="middle" rot="R270"/>
+<pin name="PB3" x="60.96" y="12.7" length="middle" rot="R270"/>
+<pin name="PB4" x="55.88" y="12.7" length="middle" rot="R270"/>
+<pin name="PB5" x="50.8" y="12.7" length="middle" rot="R270"/>
+<pin name="PB6" x="45.72" y="12.7" length="middle" rot="R270"/>
+<pin name="PB7" x="40.64" y="12.7" length="middle" rot="R270"/>
+<pin name="BOOT0" x="35.56" y="12.7" length="middle" rot="R270"/>
+<pin name="PB8" x="30.48" y="12.7" length="middle" rot="R270"/>
+<pin name="PB9" x="25.4" y="12.7" length="middle" rot="R270"/>
+<pin name="VSS@3" x="20.32" y="12.7" length="middle" rot="R270"/>
+<pin name="VDD@4" x="15.24" y="12.7" length="middle" rot="R270"/>
 <wire x1="5.08" y1="7.62" x2="5.08" y2="-83.82" width="0.254" layer="94"/>
 <wire x1="5.08" y1="-83.82" x2="101.6" y2="-83.82" width="0.254" layer="94"/>
 <wire x1="101.6" y1="-83.82" x2="101.6" y2="7.62" width="0.254" layer="94"/>
