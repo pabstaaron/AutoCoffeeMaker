@@ -11,6 +11,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+
+
+    <TextView
+        android:id="@+id/favoritesLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/title_bar"
+        android:textColor="#ffefcc"
+        android:textSize="22dp"
+        android:text="Favorites"
+        android:textAlignment="center" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
