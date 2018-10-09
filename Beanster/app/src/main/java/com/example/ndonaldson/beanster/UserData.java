@@ -40,4 +40,8 @@ public class UserData {
     public void setPassword(String password){
         this.password = password;
     }
+
+    public  HashMap<String, RequestData> getFavorites(){
+        return favorites;
+    }
 }

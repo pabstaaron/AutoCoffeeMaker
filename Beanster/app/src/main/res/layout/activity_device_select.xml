@@ -193,4 +193,10 @@
         android:text="Sign In"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />
+
+    <FrameLayout
+        android:id="@+id/fragmentContainer2"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+    </FrameLayout>
 </RelativeLayout>

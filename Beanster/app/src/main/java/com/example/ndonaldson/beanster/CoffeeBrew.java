@@ -4,16 +4,22 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
 import com.google.gson.Gson;
@@ -34,8 +40,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.HashMap;
 
-public class CoffeeBrew extends AppCompatActivity {
+public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener, FavoritesFragment.OnFragmentInteractionListener {
 
     private WifiRunner.ConnectStatus mConnectStatus;
 
@@ -45,6 +52,7 @@ public class CoffeeBrew extends AppCompatActivity {
     private Button basicButton;
     private Button advancedButton;
     private Button loginButton;
+    private Button favoritesButton;
 
     //BasicButtons
     private Button amountSmallButton;
@@ -101,6 +109,8 @@ public class CoffeeBrew extends AppCompatActivity {
     private float pressDiff = 70;
     private float tempDiff = 70;
     private Context mContext;
+    private String userName;
+    private FrameLayout fragmentContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +139,7 @@ public class CoffeeBrew extends AppCompatActivity {
         activeState = ActiveState.BASIC;
         advancedState = new AdvancedState();
         basicState = new BasicState();
-
+        fragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer3);
         requestData = new RequestData();
 
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
@@ -156,6 +166,63 @@ public class CoffeeBrew extends AppCompatActivity {
                 if(activeState == ActiveState.ADVANCED) requestData.setWithAdvance(advancedState);
                 else requestData.setWithBasic(basicState);
                 new SendPost().execute(requestData);
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setCancelable(false);
+                builder.setMessage("Would you like to save this particular brew?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                                final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+
+                                AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+
+                                final EditText edittext = new EditText(mContext);
+                                alert.setTitle("Please enter the name you would like to save it under: ");
+
+                                alert.setView(edittext);
+
+                                alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        dialog.dismiss();
+                                        String saveName = edittext.getText().toString();
+                                        if (!saveName.isEmpty()){
+                                            SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                                            if(sharedPreferences.contains("currentUser")){
+                                                if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                                                    String currentUser = sharedPreferences.getString("currentUser", "");
+                                                    UserData currentUserData;
+                                                    Gson gson = new Gson();
+                                                    HashMap<String, UserData> users = gson.fromJson(sharedPreferences.getString("userData", ""), HashMap.class);
+                                                    currentUserData = users.get(currentUser);
+                                                    currentUserData.addFavorite(saveName, requestData);
+                                                }
+                                            }
+                                        }
+                                        else{
+                                            Toast toast = Toast.makeText(mContext, "Save name cannot be empty...", Toast.LENGTH_SHORT);
+                                            toast.setGravity(Gravity.CENTER, 0, 0);
+                                            toast.show();
+                                        }
+                                        dialog.cancel();
+                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
+                                    }
+                                });
+
+                                alert.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        dialog.cancel();
+                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
+                                    }
+                                });
+
+                                alert.show();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
             }
         });
 
@@ -208,6 +275,72 @@ public class CoffeeBrew extends AppCompatActivity {
                 else{
                     //TODO: Ask user if they want to change user. Follow steps above or cancel
                 }
+            }
+        });
+
+
+        loginButton = (Button) findViewById(R.id.loginButton3);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!loginButton.getText().equals("Login")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setCancelable(false);
+                    builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                            Gson gson = new Gson();
+                            UserData emptyUser = new UserData();
+                            String json = gson.toJson(emptyUser);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("currentUser", json).apply();
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                            builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    openLoginFragment();
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            }).show();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    }).show();
+                }
+                else{
+                    openLoginFragment();
+                }
+            }
+        });
+
+        SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+        if(sharedPreferences.contains("currentUser")){
+            if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                loginButton.setText(sharedPreferences.getString("currentUser", ""));
+            }
+        }
+
+        favoritesButton = (Button) findViewById(R.id.favoritesButton);
+        if(!loginButton.getText().toString().equals("Login")){
+            favoritesButton.setVisibility(View.INVISIBLE);
+            favoritesButton.setEnabled(false);
+        } else{
+            favoritesButton.setVisibility(View.VISIBLE);
+            favoritesButton.setEnabled(true);
+        }
+        favoritesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFavoritesFragment();
             }
         });
 
@@ -1502,5 +1635,37 @@ public class CoffeeBrew extends AppCompatActivity {
 
     protected void onStartNewActivity() {
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+    }
+
+    private void openLoginFragment(){
+        LoginFragment fragment = LoginFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_from_top, R.anim.slide_to_top, R.anim.slide_from_top, R.anim.slide_to_top);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.add(R.id.fragmentContainer3, fragment, "LOGIN_FRAGMENT").commit();
+    }
+
+    private void openFavoritesFragment(){
+        FavoritesFragment fragment = FavoritesFragment.newInstance(loginButton.getText().toString());
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_from_bottom, R.anim.slide_to_bottom, R.anim.slide_from_bottom, R.anim.slide_to_bottom);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.add(R.id.fragmentContainer3, fragment, "FAVORITES_FRAGMENT").commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(RequestData requestData) {
+        if(requestData == null) return;
+        this.requestData = requestData;
+        onBackPressed();
+    }
+
+    @Override
+    public void onFragmentInteraction(String sendBackUsername) {
+        if(sendBackUsername.isEmpty()) return;
+        loginButton.setText(sendBackUsername);
+        onBackPressed();
     }
 }

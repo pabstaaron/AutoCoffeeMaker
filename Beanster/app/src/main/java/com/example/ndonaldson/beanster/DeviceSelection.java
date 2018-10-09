@@ -7,8 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Parcelable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,18 +29,20 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.google.gson.Gson;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceSelection extends AppCompatActivity implements WifiViewHolder.OnItemSelectedListener{
+public class DeviceSelection extends AppCompatActivity implements WifiViewHolder.OnItemSelectedListener, LoginFragment.OnFragmentInteractionListener{
 
     private WifiRunner.ConnectStatus mConnectStatus;
     private ArrayList<Device> mDeviceIds;
@@ -60,6 +65,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     private Boolean isConnected;
     private Boolean closingActivity;
     private Boolean leavingBack;
+    private FrameLayout fragmentContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,14 +241,53 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!loginButton.getText().equals("Login")){
-                        //TODO: Open fragment for login and return data to save to shared preferences. We will use db in fragment or here to grab data.
+                    if(!loginButton.getText().equals("Login")) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        builder.setCancelable(false);
+                        builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                                Gson gson = new Gson();
+                                UserData emptyUser = new UserData();
+                                String json = gson.toJson(emptyUser);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("currentUser", json).apply();
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        openFragment();
+                                    }
+                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                }).show();
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }).show();
                     }
                     else{
-                        //TODO: Ask user if they want to change user. Follow steps above or cancel
+                        openFragment();
                     }
                 }
             });
+
+            SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+            if(sharedPreferences.contains("currentUser")){
+                if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                    loginButton.setText(sharedPreferences.getString("currentUser", ""));
+                }
+            }
+
+            fragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer2);
 
             devicesLabel = (TextView) findViewById(R.id.deviceLabel);
             devicesLabel.setText(Html.fromHtml(getString(R.string.devicesTitle)));
@@ -494,5 +540,21 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     protected void onStartNewActivity() {
         if(leavingBack) overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
         else overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
+
+    private void openFragment(){
+        LoginFragment fragment = LoginFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_from_top, R.anim.slide_to_top, R.anim.slide_from_top, R.anim.slide_to_top);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.add(R.id.fragmentContainer2, fragment, "LOGIN_FRAGMENT").commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(String sendBackUsername) {
+        if(sendBackUsername.isEmpty()) return;
+        loginButton.setText(sendBackUsername);
+        onBackPressed();
     }
 }

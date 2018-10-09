@@ -87,12 +87,11 @@ public class LoginFragment extends Fragment {
                         if(cachedUser.getPassword().equals(pass)){
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             Gson gson = new Gson();
-                            String json = gson.toJson(cachedUser);
                             if(!sharedPreferences.contains("currentUser")){
-                                editor.putString("currentUser", json).commit();
+                                editor.putString("currentUser", cachedUser.getUsername()).commit();
                             }
                             else{
-                                editor.putString("currentUser", json).apply();
+                                editor.putString("currentUser", cachedUser.getUsername()).apply();
                             }
                             sendBack(cachedUser.getUsername());
                         }

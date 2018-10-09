@@ -146,8 +146,6 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
             @Override
             public void onClick(View v) {
                 if(!loginButton.getText().equals("Login")) {
-
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setCancelable(false);
                     builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -169,14 +167,14 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-
+                                    dialog.cancel();
                                 }
                             }).show();
                         }
                     }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-
+                            dialog.cancel();
                         }
                     }).show();
                 }
@@ -186,8 +184,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
             }
         });
 
-        if(getIntent().hasExtra("user")){
-            loginButton.setText(getIntent().getExtras().getString("user"));
+        SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+        if(sharedPreferences.contains("currentUser")){
+            if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                loginButton.setText(sharedPreferences.getString("currentUser", ""));
+            }
         }
 
         if(getIntent() != null && getIntent().hasExtra("connected")){

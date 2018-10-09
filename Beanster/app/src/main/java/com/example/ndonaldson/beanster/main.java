@@ -128,12 +128,6 @@ public class main extends AppCompatActivity {
             String json = gson.toJson(data);
             editor.putString("userData", json).commit();
         }
-        if(sharedPreferences.contains("currentUser")){
-            Gson gson = new Gson();
-            String json = sharedPreferences.getString("currentUser", "");
-            UserData user = gson.fromJson(json, UserData.class);
-            intent.putExtra("user", user.getUsername());
-        }
         startActivity(intent);
         finish();
     }
