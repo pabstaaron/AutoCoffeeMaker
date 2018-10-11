@@ -1,10 +1,14 @@
 package com.example.ndonaldson.beanster;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +32,6 @@ public class LoginFragment extends Fragment {
     private Button createButton;
     private EditText usernameText;
     private EditText passwordText;
-    private Context mContext;
     private HashMap<String, UserData> userData;
 
     private SharedPreferences sharedPreferences;
@@ -37,6 +40,12 @@ public class LoginFragment extends Fragment {
 
     public LoginFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mListener = (OnFragmentInteractionListener) activity;
     }
 
     /**
@@ -52,12 +61,12 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         sharedPreferences = this.getActivity().getSharedPreferences("beanster", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("userData", "");
         userData = gson.fromJson(json, HashMap.class);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,6 +105,12 @@ public class LoginFragment extends Fragment {
                             sendBack(cachedUser.getUsername());
                         }
                     }
+                    else{
+                        Toast.makeText(getActivity(), "User does not exist...", Toast.LENGTH_LONG ).show();
+                    }
+                }
+                else{
+                    Toast.makeText(getActivity(), "Username and Password both have to be filled out...", Toast.LENGTH_LONG ).show();
                 }
             }
         });
@@ -104,14 +119,13 @@ public class LoginFragment extends Fragment {
             public void onClick(View v) {
                 String user = usernameText.getText().toString();
                 String pass = passwordText.getText().toString();
-                if(!user.isEmpty() && !pass.isEmpty()){
-                    if(userData.containsKey(user)){
-                        Toast toast = new Toast(getActivity().getApplicationContext());
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.setDuration(Toast.LENGTH_LONG);
-                        toast.setText("User already exists...");
-                        toast.show();
-                    }
+                if(user.isEmpty() || pass.isEmpty()){
+                    Toast.makeText(getActivity(), "Username and Password both have to be filled out...", Toast.LENGTH_LONG ).show();
+
+                }
+
+                if(userData.containsKey(user)){
+                    Toast.makeText(getActivity(), "User already exists...", Toast.LENGTH_LONG ).show();
                 }
                 else{
                     userData.put(user, new UserData(user, pass));
@@ -119,15 +133,19 @@ public class LoginFragment extends Fragment {
                     Gson gson = new Gson();
                     String json = gson.toJson(userData);
                     editor.putString("userData", json).apply();
-                    sendBack(user);
+                    Toast.makeText(getActivity(), "User successfully created...", Toast.LENGTH_LONG ).show();
                 }
             }
         });
+
+        usernameText.requestFocus();
 
         return view;
     }
 
     public void sendBack(String sendBackUsername) {
+
+
         if (mListener != null) {
             mListener.onFragmentInteraction(sendBackUsername);
         }

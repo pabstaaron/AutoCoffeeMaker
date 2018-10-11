@@ -269,20 +269,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!loginButton.getText().equals("Login")){
-                    //TODO: Open fragment for login and return data to save to shared preferences. We will use db in fragment or here to grab data.
-                }
-                else{
-                    //TODO: Ask user if they want to change user. Follow steps above or cancel
-                }
-            }
-        });
-
-
-        loginButton = (Button) findViewById(R.id.loginButton3);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 if(!loginButton.getText().equals("Login")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setCancelable(false);
@@ -1664,8 +1650,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
     @Override
     public void onFragmentInteraction(String sendBackUsername) {
-        if(sendBackUsername.isEmpty()) return;
-        loginButton.setText(sendBackUsername);
-        onBackPressed();
+        if(!sendBackUsername.isEmpty())loginButton.setText(sendBackUsername);
+        getSupportFragmentManager().popBackStack();
     }
 }

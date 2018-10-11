@@ -553,8 +553,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
 
     @Override
     public void onFragmentInteraction(String sendBackUsername) {
-        if(sendBackUsername.isEmpty()) return;
-        loginButton.setText(sendBackUsername);
-        onBackPressed();
+        if(!sendBackUsername.isEmpty())loginButton.setText(sendBackUsername);
+        getSupportFragmentManager().popBackStack();
     }
 }

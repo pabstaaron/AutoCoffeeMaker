@@ -89,7 +89,7 @@
             android:textColor="#ffefcc"
             android:width="130dp"
             android:background="@drawable/buttonstyle"
-            android:text="Sign In"
+            android:text="Login"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true" />
 

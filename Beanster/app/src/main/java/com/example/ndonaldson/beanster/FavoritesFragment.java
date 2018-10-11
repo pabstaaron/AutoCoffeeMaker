@@ -1,5 +1,6 @@
 package com.example.ndonaldson.beanster;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -51,13 +52,27 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     public static FavoritesFragment newInstance(String user) {
         FavoritesFragment fragment = new FavoritesFragment();
         Bundle args = new Bundle();
+        args.putString("user", user);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mListener = (FavoritesFragment.OnFragmentInteractionListener) activity;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(!savedInstanceState.keySet().contains("user")){
+            sendBack(null);
+            return;
+        }
+        else{
+            user = savedInstanceState.getString("user");
+        }
         sharedPreferences = this.getActivity().getSharedPreferences("beanster", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("userData", "");
@@ -73,6 +88,8 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
         recyclerView = (RecyclerView) view.findViewById(R.id.selection_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
+        currentUserData = userData.get(user);
+
         List<WifiSelectItem> selectableItems = generateItems();
         adapter = new WifiAdapter(this, selectableItems, false);
         recyclerView.setAdapter(adapter);
@@ -84,7 +101,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
         okayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendBack(requestData);
+                sendBack(currentUserData.getFavorites().get(requestDataName));
             }
         });
 

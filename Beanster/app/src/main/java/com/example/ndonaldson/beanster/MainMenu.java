@@ -141,11 +141,21 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
             }
         });
 
+
+
         loginButton = (Button) findViewById(R.id.loginButton);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+        if(sharedPreferences.contains("currentUser")){
+            if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                loginButton.setText(sharedPreferences.getString("currentUser", ""));
+            }
+        }
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!loginButton.getText().equals("Login")) {
+                if(!loginButton.getText().toString().equals("Login")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setCancelable(false);
                     builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -184,13 +194,6 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
             }
         });
 
-        SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
-        if(sharedPreferences.contains("currentUser")){
-            if(!sharedPreferences.getString("currentUser", "").isEmpty()){
-                loginButton.setText(sharedPreferences.getString("currentUser", ""));
-            }
-        }
-
         if(getIntent() != null && getIntent().hasExtra("connected")){
             isConnected = (Boolean) getIntent().getExtras().get("connected");
             if(isConnected) wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.wifion));
@@ -204,6 +207,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
             connectButton.setEnabled(true);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
             connectButton.setTextColor(Color.rgb(255, 239, 204));
+
+            loginButton.setEnabled(true);
+            loginButton.setBackground(getDrawable(R.drawable.buttonstyle));
+            loginButton.setTextColor(Color.rgb(255, 239, 204));
+
             cradle.setVisibility(View.INVISIBLE);
             circle.setVisibility(View.INVISIBLE);
             connectingText.setVisibility(View.INVISIBLE);
@@ -214,6 +222,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
             connectButton.setTextColor(Color.rgb(204, 204, 204));
             connectButton.setEnabled(false);
+
+            loginButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+            loginButton.setTextColor(Color.rgb(204, 204, 204));
+            loginButton.setEnabled(false);
+
             cradle.setVisibility(View.VISIBLE);
             circle.setVisibility(View.VISIBLE);
             connectingText.setVisibility(View.VISIBLE);
@@ -276,6 +289,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
+
+                        loginButton.setEnabled(true);
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        loginButton.setTextColor(Color.rgb(255, 239, 204));
+
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
@@ -289,6 +307,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
+
+                        loginButton.setEnabled(true);
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        loginButton.setTextColor(Color.rgb(255, 239, 204));
+
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
@@ -299,6 +322,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
                         connectButton.setTextColor(Color.rgb(204, 204, 204));
                         connectButton.setEnabled(false);
+
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        loginButton.setTextColor(Color.rgb(204, 204, 204));
+                        loginButton.setEnabled(false);
+
                         cradle.setVisibility(View.VISIBLE);
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
@@ -311,6 +339,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
                         connectButton.setTextColor(Color.rgb(204, 204, 204));
                         connectButton.setEnabled(false);
+
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        loginButton.setTextColor(Color.rgb(204, 204, 204));
+                        loginButton.setEnabled(false);
+
                         cradle.setVisibility(View.VISIBLE);
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
@@ -388,8 +421,7 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
 
     @Override
     public void onFragmentInteraction(String sendBackUsername) {
-        if(sendBackUsername.isEmpty()) return;
-        loginButton.setText(sendBackUsername);
-        onBackPressed();
+        if(!sendBackUsername.isEmpty())loginButton.setText(sendBackUsername);
+        getSupportFragmentManager().popBackStack();
     }
 }
