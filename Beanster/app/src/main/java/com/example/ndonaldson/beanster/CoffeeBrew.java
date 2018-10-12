@@ -291,7 +291,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-
+                                    SharedPreferences.Editor editor = getSharedPreferences("beanster", MODE_PRIVATE).edit();
+                                    editor.putString("currentUser", "").apply();
+                                    loginButton.setText("Login");
+                                    dialog.cancel();
                                 }
                             }).show();
                         }
@@ -316,7 +319,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
 
         favoritesButton = (Button) findViewById(R.id.favoritesButton);
-        if(!loginButton.getText().toString().equals("Login")){
+        if(loginButton.getText().toString().equals("Login")){
             favoritesButton.setVisibility(View.INVISIBLE);
             favoritesButton.setEnabled(false);
         } else{
@@ -1650,7 +1653,11 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
     @Override
     public void onFragmentInteraction(String sendBackUsername) {
-        if(!sendBackUsername.isEmpty())loginButton.setText(sendBackUsername);
+        if(!sendBackUsername.isEmpty()){
+            loginButton.setText(sendBackUsername);
+            favoritesButton.setEnabled(true);
+            favoritesButton.setVisibility(View.VISIBLE);
+        }
         getSupportFragmentManager().popBackStack();
     }
 }

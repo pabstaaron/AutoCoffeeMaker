@@ -7,23 +7,32 @@
     android:background="#ffefcc"
     tools:context="com.example.ndonaldson.beanster.CoffeeBrew"
     tools:layout_editor_absoluteY="25dp"
-    tools:layout_editor_absoluteX="0dp">
+    tools:layout_editor_absoluteX="0dp"
+    android:stateListAnimator="@null"
+    >
 
     <android.support.constraint.Guideline
+        android:stateListAnimator="@null"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline2"
         app:layout_constraintGuide_percent="0.15"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="90dp" />
 
     <android.support.constraint.Guideline
+        android:stateListAnimator="@null"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/guideline3"
         app:layout_constraintGuide_percent="0.9"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="540dp" />
 
     <android.support.v7.widget.GridLayout
+        android:stateListAnimator="@null"
         android:layout_width="947dp"
         android:layout_height="48dp"
         android:layout_marginLeft="8dp"
@@ -60,6 +69,7 @@
     </android.support.v7.widget.GridLayout>
 
     <android.support.v7.widget.GridLayout
+        android:stateListAnimator="@null"
         android:layout_width="947dp"
         android:layout_height="50dp"
         android:layout_marginLeft="8dp"
@@ -125,6 +135,7 @@
     </android.support.v7.widget.GridLayout>
 
     <com.warkiz.widget.IndicatorStayLayout
+        android:stateListAnimator="@null"
         android:id="@+id/indicatorLayout1"
         android:layout_width="0dp"
         android:layout_height="125dp"
@@ -132,11 +143,10 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="-22dp"
         android:weightSum="1"
-        app:layout_constraintLeft_toLeftOf="@id/guideline2"
-        app:layout_constraintRight_toRightOf="@id/guideline3"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayout2">
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout2"
+        app:layout_constraintRight_toLeftOf="@+id/guideline3">
 
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/tempSlider"
@@ -176,17 +186,18 @@
     </com.warkiz.widget.IndicatorStayLayout>
 
     <com.warkiz.widget.IndicatorStayLayout
+        android:stateListAnimator="@null"
         android:id="@+id/indicatorLayout2"
         android:layout_width="0dp"
         android:layout_height="125dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="56dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:weightSum="1"
-        app:layout_constraintLeft_toLeftOf="@id/guideline2"
-        app:layout_constraintRight_toRightOf="@id/guideline3"        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/indicatorLayout1"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toLeftOf="@+id/guideline3">
 
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/pressSlider"
@@ -226,18 +237,18 @@
     </com.warkiz.widget.IndicatorStayLayout>
 
     <com.warkiz.widget.IndicatorStayLayout
+        android:stateListAnimator="@null"
         android:id="@+id/indicatorLayout3"
         android:layout_width="0dp"
         android:layout_height="125dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="56dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:weightSum="1"
-        app:layout_constraintLeft_toLeftOf="@id/guideline2"
-        app:layout_constraintRight_toRightOf="@id/guideline3"
-        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/indicatorLayout2"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toLeftOf="@+id/guideline3">
 
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/dispSlider"
@@ -277,13 +288,14 @@
     </com.warkiz.widget.IndicatorStayLayout>
 
     <android.support.v7.widget.GridLayout
+        android:stateListAnimator="@null"
         android:layout_width="943dp"
         android:layout_height="51dp"
         android:layout_marginLeft="8dp"
         app:columnCount="3"
         app:rowCount="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/gridLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout2"
         android:layout_marginTop="55dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
@@ -325,13 +337,14 @@
     </android.support.v7.widget.GridLayout>
 
     <GridLayout
+        android:stateListAnimator="@null"
         android:layout_width="943dp"
         android:layout_height="51dp"
         android:layout_marginLeft="8dp"
         android:columnCount="3"
         android:rowCount="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/gridLayoutAmount"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayoutAmount"
         android:layout_marginTop="55dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
@@ -373,13 +386,14 @@
     </GridLayout>
 
     <GridLayout
+        android:stateListAnimator="@null"
         android:layout_width="943dp"
         android:layout_height="51dp"
         android:layout_marginLeft="8dp"
         android:columnCount="3"
         android:rowCount="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/gridLayoutStrength"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayoutStrength"
         android:layout_marginTop="55dp"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
@@ -432,9 +446,12 @@
         app:layout_constraintTop_toTopOf="@+id/indicatorLayout1"
         android:spinnerMode="dropdown"
         android:backgroundTint="#664400"
-        android:layout_marginTop="46dp" />
+        android:layout_marginTop="46dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <Button
+        android:stateListAnimator="@null"
         android:id="@+id/brewButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -445,9 +462,11 @@
         app:layout_constraintLeft_toRightOf="@+id/backButton"
         android:layout_marginTop="340dp"
         android:layout_marginRight="40dp"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout2"
+        android:layout_marginEnd="40dp" />
 
     <Button
+        android:stateListAnimator="@null"
         android:id="@+id/favoritesButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -460,9 +479,11 @@
         android:layout_marginTop="340dp"
         android:layout_marginRight="40dp"
         app:layout_constraintTop_toBottomOf="@+id/gridLayout2"
-        app:layout_constraintHorizontal_bias="0.439" />
+        app:layout_constraintHorizontal_bias="0.439"
+        android:layout_marginEnd="40dp" />
 
     <Button
+        android:stateListAnimator="@null"
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -473,7 +494,8 @@
         android:layout_marginBottom="35dp"
         android:layout_marginLeft="35dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/brewButton" />
+        app:layout_constraintRight_toLeftOf="@+id/brewButton"
+        android:layout_marginStart="35dp" />
 
     <EditText
         android:id="@+id/label1"
@@ -485,8 +507,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="43dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/gridLayout2"
-        app:layout_constraintBottom_toBottomOf="@id/indicatorLayout1"
+        app:layout_constraintTop_toBottomOf="@+id/gridLayout2"
+        app:layout_constraintBottom_toBottomOf="@+id/indicatorLayout1"
         android:text="Amount:"/>
     <EditText
         android:id="@+id/label2"
@@ -498,8 +520,8 @@
         android:focusableInTouchMode="false"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/indicatorLayout1"
-        app:layout_constraintBottom_toBottomOf="@id/indicatorLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/indicatorLayout1"
+        app:layout_constraintBottom_toBottomOf="@+id/indicatorLayout2"
         android:text="Strength:"/>
     <EditText
         android:id="@+id/label3"
@@ -511,24 +533,26 @@
         android:focusableInTouchMode="false"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/indicatorLayout2"
-        app:layout_constraintBottom_toBottomOf="@id/indicatorLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/indicatorLayout2"
+        app:layout_constraintBottom_toBottomOf="@+id/indicatorLayout3"
         android:text="Froth:"/>
 
     <Button
+        android:stateListAnimator="@null"
         android:id="@+id/loginButton3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#ffefcc"
-        android:width="100dp"
+        android:width="130dp"
         android:background="@drawable/buttonstyle"
-        android:text="Sign In"
+        android:text="Login"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="1dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="3dp"
+        android:layout_marginEnd="1dp" />
 
     <FrameLayout
         android:id="@+id/fragmentContainer3"

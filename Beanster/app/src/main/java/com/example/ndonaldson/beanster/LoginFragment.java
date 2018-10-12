@@ -18,9 +18,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 
 /**
@@ -64,7 +66,12 @@ public class LoginFragment extends Fragment {
         sharedPreferences = this.getActivity().getSharedPreferences("beanster", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("userData", "");
-        userData = gson.fromJson(json, HashMap.class);
+        try {
+            userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
+            }.getType());
+        } catch(Exception e){
+            Log.i("LoginFragment", e.getLocalizedMessage());
+        }
     }
 
 
@@ -90,28 +97,31 @@ public class LoginFragment extends Fragment {
             public void onClick(View v) {
                 String user = usernameText.getText().toString();
                 String pass = passwordText.getText().toString();
-                if(!user.isEmpty() && !pass.isEmpty()){
-                    if(userData.containsKey(user)){
-                        UserData cachedUser = userData.get(user);
-                        if(cachedUser.getPassword().equals(pass)){
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            Gson gson = new Gson();
-                            if(!sharedPreferences.contains("currentUser")){
-                                editor.putString("currentUser", cachedUser.getUsername()).commit();
+                try {
+                    if (!user.isEmpty() && !pass.isEmpty()) {
+                        if (userData.containsKey(user)) {
+                            UserData cachedUser = userData.get(user);
+                            if (cachedUser.getPassword().equals(pass)) {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                if (!sharedPreferences.contains("currentUser")) {
+                                    editor.putString("currentUser", cachedUser.getUsername()).commit();
+                                } else {
+                                    editor.putString("currentUser", cachedUser.getUsername()).apply();
+                                }
+                                sendBack(cachedUser.getUsername());
                             }
-                            else{
-                                editor.putString("currentUser", cachedUser.getUsername()).apply();
-                            }
-                            sendBack(cachedUser.getUsername());
+                        } else {
+                            Toast.makeText(getActivity(), "User does not exist...", Toast.LENGTH_LONG).show();
                         }
                     }
-                    else{
-                        Toast.makeText(getActivity(), "User does not exist...", Toast.LENGTH_LONG ).show();
-                    }
-                }
+
                 else{
                     Toast.makeText(getActivity(), "Username and Password both have to be filled out...", Toast.LENGTH_LONG ).show();
                 }
+                } catch(Exception e){
+                    Log.i("LoginFragment", e.getLocalizedMessage());
+                }
+
             }
         });
         createButton.setOnClickListener(new View.OnClickListener() {
@@ -121,19 +131,22 @@ public class LoginFragment extends Fragment {
                 String pass = passwordText.getText().toString();
                 if(user.isEmpty() || pass.isEmpty()){
                     Toast.makeText(getActivity(), "Username and Password both have to be filled out...", Toast.LENGTH_LONG ).show();
-
                 }
 
                 if(userData.containsKey(user)){
                     Toast.makeText(getActivity(), "User already exists...", Toast.LENGTH_LONG ).show();
                 }
-                else{
+                else if(user.length() < 8 || pass.length() < 16){
                     userData.put(user, new UserData(user, pass));
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     Gson gson = new Gson();
                     String json = gson.toJson(userData);
                     editor.putString("userData", json).apply();
                     Toast.makeText(getActivity(), "User successfully created...", Toast.LENGTH_LONG ).show();
+                    sendBack(user);
+                }
+                else{
+                    Toast.makeText(getActivity(), "Username or password are too long, Username must be no longer than 8 characters, Password must be no longer than 16 characters", Toast.LENGTH_LONG ).show();
                 }
             }
         });

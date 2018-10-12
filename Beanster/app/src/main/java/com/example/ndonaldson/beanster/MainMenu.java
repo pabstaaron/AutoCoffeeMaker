@@ -177,7 +177,11 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    SharedPreferences.Editor editor = getSharedPreferences("beanster", MODE_PRIVATE).edit();
+                                    editor.putString("currentUser", "").apply();
+                                    loginButton.setText("Login");
                                     dialog.cancel();
+
                                 }
                             }).show();
                         }
