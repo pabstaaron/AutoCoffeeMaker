@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +78,12 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
         sharedPreferences = this.getActivity().getSharedPreferences("beanster", Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("userData", "");
-        userData = gson.fromJson(json, HashMap.class);
+        try {
+            userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
+            }.getType());
+        } catch(Exception e){
+            Log.i("LoginFragment", e.getLocalizedMessage());
+        }
     }
 
     @Override
@@ -85,7 +92,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
 
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.selection_list);
+        recyclerView = (RecyclerView) view.findViewById(R.id.favorites);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
         currentUserData = userData.get(user);

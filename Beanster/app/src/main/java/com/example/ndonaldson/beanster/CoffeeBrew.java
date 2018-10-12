@@ -1648,7 +1648,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     public void onFragmentInteraction(RequestData requestData) {
         if(requestData == null) return;
         this.requestData = requestData;
-        onBackPressed();
+        getSupportFragmentManager().popBackStack();
     }
 
     @Override
