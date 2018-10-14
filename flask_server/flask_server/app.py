@@ -1,6 +1,8 @@
-from flask import Flask
+
 from flask import jsonify
 from flask import request
+from flask import Flask
+from stm32 import STM32
 import time
 import settings
 import json
@@ -40,6 +42,31 @@ def am_i_connected(serial):
         return jsonify(post_data), 200
 
 
+@app.route('/pwm/<serial>', methods=["POST"])
+def change_duty_cycle(serial): 
+    """
+    change_duty_cycle: Takes in a payload of 'dutyCyle' and changes the pwm signal
+    resulting in a change of the LED
+    """
+    if(request.is_json):
+        content = request.get_json()
+    
+    if "dutyCycle" not in content:
+        return _make_bad_data_return("dutyCycle")
+    
+    stm = STM32("COM3")
+    reply = stm.pwm(content["dutyCycle"])
+    print(reply)
+    post_data = {'utc': int(time.time()),
+                 'request': 'PWM Changed',
+                 'type': _settings,
+                 'reply': reply,
+                 'serial number': _serial}
+    if(_settings == "computer" or serial != _serial):
+        return jsonify(post_data), 400
+    else:
+        return jsonify(post_data), 200
+
 @app.route('/coffee/<serial>', methods=['POST'])
 def make_me_a_coffee(serial):
     """
@@ -71,9 +98,13 @@ def make_me_a_coffee(serial):
                      'serial number': _serial}
         return jsonify(post_data), 400
     else:
+        stm = STM32("COM3")
+        reply = stm.sample_cmd()
+        print(reply)
         post_data = {'utc': int(time.time()),
                      'request': 'Make me a Coffee',
                      'type': _settings,
+                     'reply': reply,
                      'serial number': _serial}
         return jsonify(post_data), 201
 

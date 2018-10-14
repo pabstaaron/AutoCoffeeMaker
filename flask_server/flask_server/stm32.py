@@ -1,5 +1,6 @@
 import serial
 import re
+import time
 
 
 class STM32(object):
@@ -16,11 +17,11 @@ class STM32(object):
         if m is None:
             raise Exception('COMPORT must be of COMXX format')
         self._COMPORT = COMPORT
-        self.TERMINATOR = "\r\n"
+        self.TERMINATOR = "\r"
         self.logger = None  # Add Logger mechanism
         try:
             self.stm = serial.Serial(port=self._COMPORT,
-                                     baudrate=15200,
+                                     baudrate=115200,
                                      timeout=1)
         except serial.serialutil.SerialException:
             print("Could not open {}".format(self._COMPORT))
@@ -59,7 +60,8 @@ class STM32(object):
             if not self.is_port_open():
                 self.stm.open()
             self.stm.write("{}{}".format(cmd, self.TERMINATOR).encode())
-            return self._get_serial_data().decode('utf8')
+            time.sleep(.10)
+            return self._get_serial_data()
         except ValueError:
             exit()
 
@@ -67,7 +69,13 @@ class STM32(object):
         """
         Reads a line from the stm device and then closes
         """
-        x = self.stm.readline()
+        x = ""
+        try:
+            bytesToRead = self.stm.inWaiting()
+            print(bytesToRead)
+            x += self.stm.read(bytesToRead).decode('ascii')
+        except serial.SerialTimeoutException:
+            print("timeout")
         self.stm.close()
         return x
 
@@ -76,4 +84,11 @@ class STM32(object):
         This is an example of how we will make our cmd calls.
         'see _cmd'
         """
-        return self._cmd("Sample CMD")
+        return self._cmd("brew 1 2 3 4 5 6 7")
+    
+    def pwm(self, dutyCyle):
+        """
+        Sets the dutyCycle of the pwm pin to 'dutyCycle'
+        """
+        return self._cmd("pwm {}".format(dutyCyle))
+
