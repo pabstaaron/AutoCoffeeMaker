@@ -158,7 +158,6 @@ public class LoginFragment extends Fragment {
 
     public void sendBack(String sendBackUsername) {
 
-
         if (mListener != null) {
             mListener.onFragmentInteraction(sendBackUsername);
         }

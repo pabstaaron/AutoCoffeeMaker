@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.warkiz.widget.IndicatorSeekBar;
 import com.warkiz.widget.IndicatorStayLayout;
 import com.warkiz.widget.OnSeekChangeListener;
@@ -111,6 +113,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     private Context mContext;
     private String userName;
     private FrameLayout fragmentContainer;
+    private boolean favoritedBrew = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +138,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         /**
          * DATA SETUP
          */
-        mContext = getApplicationContext();
+        mContext = this;
         activeState = ActiveState.BASIC;
         advancedState = new AdvancedState();
         basicState = new BasicState();
@@ -163,16 +166,19 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         brewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(activeState == ActiveState.ADVANCED) requestData.setWithAdvance(advancedState);
-                else requestData.setWithBasic(basicState);
-                new SendPost().execute(requestData);
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setCancelable(false);
-                builder.setMessage("Would you like to save this particular brew?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                try {
+                    if (activeState == ActiveState.ADVANCED)
+                        requestData.setWithAdvance(advancedState);
+                    else requestData.setWithBasic(basicState);
+                    new SendPost().execute(requestData);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setCancelable(false);
+                    if(!favoritedBrew) {
+                        builder.setMessage("Would you like to save this particular brew?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
                                 final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+                                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
                                 AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
 
@@ -185,44 +191,67 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         dialog.dismiss();
                                         String saveName = edittext.getText().toString();
-                                        if (!saveName.isEmpty()){
+                                        if (saveName != null && !saveName.isEmpty()) {
                                             SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
-                                            if(sharedPreferences.contains("currentUser")){
-                                                if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                                            if (sharedPreferences.contains("currentUser")) {
+                                                if (!sharedPreferences.getString("currentUser", "").isEmpty()) {
                                                     String currentUser = sharedPreferences.getString("currentUser", "");
                                                     UserData currentUserData;
                                                     Gson gson = new Gson();
-                                                    HashMap<String, UserData> users = gson.fromJson(sharedPreferences.getString("userData", ""), HashMap.class);
-                                                    currentUserData = users.get(currentUser);
-                                                    currentUserData.addFavorite(saveName, requestData);
+                                                    String json = sharedPreferences.getString("userData", "");
+                                                    try {
+                                                        HashMap<String, UserData> userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
+                                                        }.getType());
+                                                        currentUserData = userData.get(currentUser);
+                                                        if (currentUserData == null)
+                                                            Log.i("CoffeeBrew", "currentUserData is null");
+                                                        else
+                                                            Log.i("CoffeeBrew", "Trying to save " + saveName + " for user: " + currentUserData.getUsername());
+                                                        if (requestData == null)
+                                                            Log.i("CoffeeBrew", "requestData is null!");
+                                                        currentUserData.addFavorite(saveName, requestData);
+                                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                        json = gson.toJson(userData);
+                                                        editor.putString("userData", json).commit();
+                                                        Toast toast = Toast.makeText(mContext, "Favorite saved...", Toast.LENGTH_SHORT);
+                                                        toast.setGravity(Gravity.CENTER, 0, 0);
+                                                        toast.show();
+                                                    } catch (Exception e) {
+                                                        Log.i("CoffeeBrew", e.getLocalizedMessage());
+                                                    }
                                                 }
                                             }
-                                        }
-                                        else{
+                                        } else {
                                             Toast toast = Toast.makeText(mContext, "Save name cannot be empty...", Toast.LENGTH_SHORT);
                                             toast.setGravity(Gravity.CENTER, 0, 0);
                                             toast.show();
                                         }
                                         dialog.cancel();
-                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
+                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
                                     }
                                 });
 
                                 alert.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         dialog.cancel();
-                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
+                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
                                     }
                                 });
 
                                 alert.show();
                             }
                         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        }).show();
                     }
-                });
+                } catch(Exception e){
+                    Log.i("CoffeeBrew", e.getLocalizedMessage());
+                }
+
+                favoritedBrew = false;
             }
         });
 
@@ -269,19 +298,21 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!loginButton.getText().equals("Login")) {
+                if(!loginButton.getText().toString().equals("Login")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setCancelable(false);
                     builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            loginButton.setText("Login");
+                            favoritesButton.setVisibility(View.INVISIBLE);
+                            favoritesButton.setEnabled(false);
                             SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
                             Gson gson = new Gson();
                             UserData emptyUser = new UserData();
                             String json = gson.toJson(emptyUser);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putString("currentUser", json).apply();
-
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                             builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
@@ -295,6 +326,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                     editor.putString("currentUser", "").apply();
                                     loginButton.setText("Login");
                                     dialog.cancel();
+
                                 }
                             }).show();
                         }
@@ -340,6 +372,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         amountSmallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.amount = BasicState.State.FIRST;
                 amountSmallButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 amountSmallButton.setTextColor(Color.parseColor("#664400"));
@@ -351,6 +384,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         amountMediumButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.amount = BasicState.State.SECOND;
                 amountMediumButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 amountMediumButton.setTextColor(Color.parseColor("#664400"));
@@ -362,6 +396,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         amountLargeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.amount = BasicState.State.THIRD;
                 amountLargeButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 amountLargeButton.setTextColor(Color.parseColor("#664400"));
@@ -373,6 +408,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         strengthMildButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.strength = BasicState.State.FIRST;
                 strengthMildButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 strengthMildButton.setTextColor(Color.parseColor("#664400"));
@@ -384,6 +420,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         strengthRegularButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.strength = BasicState.State.SECOND;
                 strengthRegularButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 strengthRegularButton.setTextColor(Color.parseColor("#664400"));
@@ -395,6 +432,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         strengthStrongButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.strength = BasicState.State.THIRD;
                 strengthStrongButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 strengthStrongButton.setTextColor(Color.parseColor("#664400"));
@@ -406,6 +444,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         frothNoneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.froth = BasicState.State.FIRST;
                 frothNoneButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 frothNoneButton.setTextColor(Color.parseColor("#664400"));
@@ -417,6 +456,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         frothFrothyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.froth = BasicState.State.SECOND;
                 frothFrothyButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 frothFrothyButton.setTextColor(Color.parseColor("#664400"));
@@ -428,6 +468,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         frothFrothiestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                favoritedBrew = false;
                 basicState.froth = BasicState.State.THIRD;
                 frothFrothiestButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 frothFrothiestButton.setTextColor(Color.parseColor("#664400"));
@@ -521,6 +562,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             @Override
             public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+                favoritedBrew = false;
             }
 
             @Override
@@ -541,6 +583,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             @Override
             public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+                favoritedBrew = false;
             }
 
             @Override
@@ -561,6 +604,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             @Override
             public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+                favoritedBrew = false;
             }
 
             @Override
@@ -610,7 +654,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
         deviceIntent.putExtra("connected", true);
         startActivity(deviceIntent);
-        finish();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
     }
 
@@ -653,30 +696,34 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             String result = "";
             try {
                 HttpPost request = new HttpPost(new URI("http://192.168.5.1:5000/coffee/" + connectedPassword));
-                Log.i("Brew", "URI: " + request.getURI());
+                Log.i("CoffeeBrew", "URI: " + request.getURI());
                 String json = new Gson().toJson(data);
-                Log.i("Brew", "JSON to send: " + json);
+                Log.i("CoffeeBrew", "JSON to send: " + json);
                 StringEntity stuff =new StringEntity(json);
                 request.setEntity(stuff);
                 request.addHeader("Accept","application/json");
                 request.addHeader("content-type", "application/json");
                 HttpResponse response = httpClient.execute(request);
                 int responseCode = response.getStatusLine().getStatusCode();
-                Toast toast = new Toast(mContext);
-                toast.setDuration(Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.CENTER, 0, 0);
+//                Toast toast = new Toast(mContext);
+//                toast.setDuration(Toast.LENGTH_LONG);
+//                toast.setGravity(Gravity.CENTER, 0, 0);
+                Log.i("CoffeeBrew", "responsCode: " + responseCode);
                 if(responseCode == HttpURLConnection.HTTP_CREATED){
-                    toast.setText("Your drink is being brewed...");
+                    Toast.makeText(mContext, "Your drink is being brewed...", Toast.LENGTH_LONG).show();
                 } else if(responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR){
-                    toast.setText("There was a problem brewing your drink...");
+                    //toast.setText("There was a problem brewing your drink...");
+                    Toast.makeText(mContext, "There was a problem brewing your drink...", Toast.LENGTH_LONG).show();
                 }
                 else if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
-                    toast.setText("Data sent corrupted...");
+                    //toast.setText("Data sent corrupted...");
+                    Toast.makeText(mContext, "Data sent was corrupted...", Toast.LENGTH_LONG).show();
                 }
                 else if(responseCode == HttpURLConnection.HTTP_CONFLICT){
-                    toast.setText("A drink is currently being brewed...");
+                  //  toast.setText("A drink is currently being brewed...");
+                    Toast.makeText(mContext, "A drink is currently being brewed...", Toast.LENGTH_LONG).show();
                 }
-                toast.show();
+//                toast.show();
             }catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Brew", e.getLocalizedMessage());
@@ -1616,9 +1663,14 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
     }
 
+    private void updateFromFavorites(){
+               
+    }
+
     @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         onStartNewActivity();
     }
 
@@ -1646,8 +1698,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
     @Override
     public void onFragmentInteraction(RequestData requestData) {
-        if(requestData == null) return;
-        this.requestData = requestData;
+        if(requestData != null) {
+            this.requestData = requestData;
+            favoritedBrew = true;
+        };
         getSupportFragmentManager().popBackStack();
     }
 

@@ -13,12 +13,14 @@ public class UserData {
     public UserData(String username, String password){
         this.username = username;
         this.password = password;
+        favorites = new HashMap<>();
     }
 
     //Used for "no current/past user"
     public UserData(){
         username = "";
         password = "";
+        favorites = new HashMap<>();
     }
 
     public void addFavorite(String title, RequestData settings){

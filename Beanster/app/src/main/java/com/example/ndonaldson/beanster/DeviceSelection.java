@@ -71,9 +71,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Log.i("BRUH", "creatingDeviceSelection");
-
         try {
+            leavingBack = false;
             mContext = this;
             deviceSelectedName = "";
             closingActivity = false;
@@ -247,6 +246,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                loginButton.setText("Login");
                                 SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
                                 Gson gson = new Gson();
                                 UserData emptyUser = new UserData();
@@ -537,6 +537,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
     @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         onStartNewActivity();
     }
 

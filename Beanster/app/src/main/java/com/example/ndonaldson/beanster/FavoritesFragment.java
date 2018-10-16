@@ -68,12 +68,21 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!savedInstanceState.keySet().contains("user")){
+        Log.i("Favorites", "onCreate called!");
+        if(getArguments() == null || !getArguments().containsKey("user")){
+            Log.i("Favorites", "arguments are null!");
             sendBack(null);
             return;
         }
         else{
-            user = savedInstanceState.getString("user");
+            if(getArguments().getString("user") == null || getArguments().getString("user").isEmpty()){
+                Log.i("Favorites", "user is null or empty!");
+                sendBack(null);
+                return;
+            } else {
+                Log.i("Favorites", "setting user!");
+                user = getArguments().getString("user");
+            }
         }
         sharedPreferences = this.getActivity().getSharedPreferences("beanster", Context.MODE_PRIVATE);
         Gson gson = new Gson();
@@ -82,7 +91,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
             userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
             }.getType());
         } catch(Exception e){
-            Log.i("LoginFragment", e.getLocalizedMessage());
+            Log.i("Favorites", e.getLocalizedMessage());
         }
     }
 
@@ -91,33 +100,38 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorites, container, false);
 
+        try {
+            recyclerView = (RecyclerView) view.findViewById(R.id.favorites);
+            recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.favorites);
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+            currentUserData = userData.get(user);
 
-        currentUserData = userData.get(user);
+            List<WifiSelectItem> selectableItems = generateItems();
+            adapter = new WifiAdapter(this, selectableItems, false);
+            recyclerView.setAdapter(adapter);
 
-        List<WifiSelectItem> selectableItems = generateItems();
-        adapter = new WifiAdapter(this, selectableItems, false);
-        recyclerView.setAdapter(adapter);
-
-        cancelButton = (Button) view.findViewById(R.id.fragmentCancelButton2);
-        okayButton = (Button) view.findViewById(R.id.fragmentOkayButton);
+            cancelButton = (Button) view.findViewById(R.id.fragmentCancelButton2);
+            okayButton = (Button) view.findViewById(R.id.fragmentOkayButton);
 
 
-        okayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBack(currentUserData.getFavorites().get(requestDataName));
-            }
-        });
+            okayButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendBack(currentUserData.getFavorites().get(requestDataName));
+                }
+            });
+            okayButton.setEnabled(false);
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendBack(null);
-            }
-        });
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendBack(null);
+                }
+            });
+
+        } catch(Exception e){
+            Log.i("Favorites", e.getLocalizedMessage());
+        }
 
         return view;
     }
@@ -161,8 +175,13 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
 
         List<WifiSelectItem> selectableItems = new ArrayList<>();
         selectableItems.clear();
-        for(String r: currentUserData.getFavorites().keySet()){
-            selectableItems.add(new WifiSelectItem(r));
+
+        if(currentUserData.getFavorites() != null && currentUserData.getFavorites().keySet() != null && !currentUserData.getFavorites().keySet().isEmpty()) {
+
+            for (String r : currentUserData.getFavorites().keySet()) {
+                Log.i("Favorites", "Adding " + r + " to the list");
+                selectableItems.add(new WifiSelectItem(r));
+            }
         }
 
         return selectableItems;

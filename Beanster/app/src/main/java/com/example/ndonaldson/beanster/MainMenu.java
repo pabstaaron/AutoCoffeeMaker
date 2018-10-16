@@ -407,6 +407,7 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
     @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         onStartNewActivity();
     }
 
