@@ -17,12 +17,26 @@ void red_off() {
 	GPIOC->BSRR |= GPIO_BSRR_BR_6;
 }
 
+void red_toggle(int enable) {
+	if(enable)
+		red_on();
+	else
+		red_off();
+}
+
 void orange_on() {
 	GPIOC->BSRR |= GPIO_BSRR_BS_8;
 }
 
 void orange_off() {
 	GPIOC->BSRR |= GPIO_BSRR_BR_8;
+}
+
+void orange_toggle(int enable) {
+	if(enable)
+		orange_on();
+	else 
+		orange_off();
 }
 
 void blue_on() {
@@ -33,12 +47,26 @@ void blue_off() {
 	GPIOC->BSRR |= GPIO_BSRR_BR_7;
 }
 
+void blue_toggle(int enable) {
+	if(enable)
+		blue_on();
+	else
+		blue_off();
+}
+
 void green_on() {
 	GPIOC->BSRR |= GPIO_BSRR_BS_9;
 }
 
 void green_off() {
 	GPIOC->BSRR |= GPIO_BSRR_BR_9;
+}
+
+void green_toggle(int enable) {
+	if(enable)
+		green_on();
+	else
+		green_off();
 }
 
 void clear() {

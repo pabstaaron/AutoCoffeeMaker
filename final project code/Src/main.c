@@ -41,6 +41,7 @@
 #include "stm32f0xx_hal.h"
 #include "leds.h"
 #include "UART.h"
+#include "stepper.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -102,8 +103,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	LEDS_Init();
 	UART_Init();
+	STEPPER_Init();
   /* USER CODE END 2 */
-
+	rotate(5, 250);
+	rotate_degrees(-15, 100);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
