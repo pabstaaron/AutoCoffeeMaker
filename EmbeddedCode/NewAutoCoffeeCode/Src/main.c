@@ -41,6 +41,7 @@
 #include "stm32f0xx_hal.h"
 #include "UART.h"
 #include "stepper.h"
+#include "arduinoStepper.h"
 
 ADC_HandleTypeDef hadc;
 
@@ -75,13 +76,27 @@ int main(void)
  
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+
+	gpio_pin_t m1, m2, m3, m4;
 	
-	STEPPER_Init();
+	m1.gpioBlock = GPIOB;
+	m1.pinNumber = GPIO_PIN_3;
+	
+	m2.gpioBlock = GPIOB;
+	m2.pinNumber = GPIO_PIN_4;
+	
+	m3.gpioBlock = GPIOB;
+	m3.pinNumber = GPIO_PIN_5;
+	
+	m4.gpioBlock = GPIOB;
+	m4.pinNumber = GPIO_PIN_6;
+	
+	stepper_t motorOne = stepper_init(200, m1, m2, m3, m4); // Bind a new motor instance
+	setSpeed(motorOne, 5); // set to 5RPM
 	
   while (1)
   {
-		rotate(1, 100);
-		HAL_Delay(10);
+		step(motorOne, 10); // Continually spin the motor
   }
 
 }

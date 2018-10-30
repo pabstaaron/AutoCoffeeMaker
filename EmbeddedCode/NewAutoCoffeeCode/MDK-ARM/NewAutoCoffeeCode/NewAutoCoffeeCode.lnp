@@ -5,6 +5,7 @@
 "newautocoffeecode\main.o"
 "newautocoffeecode\stm32f0xx_it.o"
 "newautocoffeecode\stm32f0xx_hal_msp.o"
+"newautocoffeecode\arduinostepper.o"
 "newautocoffeecode\stm32f0xx_hal_adc.o"
 "newautocoffeecode\stm32f0xx_hal_adc_ex.o"
 "newautocoffeecode\stm32f0xx_hal_tim.o"

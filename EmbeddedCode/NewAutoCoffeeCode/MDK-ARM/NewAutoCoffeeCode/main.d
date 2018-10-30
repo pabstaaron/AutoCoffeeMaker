@@ -32,3 +32,4 @@ newautocoffeecode\main.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_tim.
 newautocoffeecode\main.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_tim_ex.h
 newautocoffeecode\main.o: ../Src/UART.h
 newautocoffeecode\main.o: ../Src/stepper.h
+newautocoffeecode\main.o: ../Src/arduinoStepper.h
