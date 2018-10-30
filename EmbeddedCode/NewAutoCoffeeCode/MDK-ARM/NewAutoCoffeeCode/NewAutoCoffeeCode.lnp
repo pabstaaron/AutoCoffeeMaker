@@ -1,0 +1,28 @@
+--cpu Cortex-M0
+"newautocoffeecode\startup_stm32f072xb.o"
+"newautocoffeecode\stepper.o"
+"newautocoffeecode\uart.o"
+"newautocoffeecode\main.o"
+"newautocoffeecode\stm32f0xx_it.o"
+"newautocoffeecode\stm32f0xx_hal_msp.o"
+"newautocoffeecode\stm32f0xx_hal_adc.o"
+"newautocoffeecode\stm32f0xx_hal_adc_ex.o"
+"newautocoffeecode\stm32f0xx_hal_tim.o"
+"newautocoffeecode\stm32f0xx_hal_tim_ex.o"
+"newautocoffeecode\stm32f0xx_hal_rcc.o"
+"newautocoffeecode\stm32f0xx_hal_rcc_ex.o"
+"newautocoffeecode\stm32f0xx_hal.o"
+"newautocoffeecode\stm32f0xx_hal_i2c.o"
+"newautocoffeecode\stm32f0xx_hal_i2c_ex.o"
+"newautocoffeecode\stm32f0xx_hal_gpio.o"
+"newautocoffeecode\stm32f0xx_hal_dma.o"
+"newautocoffeecode\stm32f0xx_hal_cortex.o"
+"newautocoffeecode\stm32f0xx_hal_pwr.o"
+"newautocoffeecode\stm32f0xx_hal_pwr_ex.o"
+"newautocoffeecode\stm32f0xx_hal_flash.o"
+"newautocoffeecode\stm32f0xx_hal_flash_ex.o"
+"newautocoffeecode\system_stm32f0xx.o"
+--library_type=microlib --strict --scatter "NewAutoCoffeeCode\NewAutoCoffeeCode.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "NewAutoCoffeeCode.map" -o NewAutoCoffeeCode\NewAutoCoffeeCode.axf
