@@ -37,6 +37,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     private SharedPreferences sharedPreferences;
     private Button cancelButton;
     private Button okayButton;
+    private Button clearButton;
     private String user;
     private RecyclerView recyclerView;
     private WifiAdapter adapter;
@@ -112,8 +113,21 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
 
             cancelButton = (Button) view.findViewById(R.id.fragmentCancelButton2);
             okayButton = (Button) view.findViewById(R.id.fragmentOkayButton);
+            clearButton = (Button) view.findViewById(R.id.fragmentClearButton);
 
-
+            clearButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    currentUserData.getFavorites().remove(requestDataName);
+                    List<WifiSelectItem> selectableItems = generateItems();
+                    adapter = new WifiAdapter(this, selectableItems, false);
+                    recyclerView.setAdapter(adapter);                    Gson gson = new Gson();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    String json = gson.toJson(userData);
+                    editor.putString("userData", json).commit();
+                    Toast.makeText(getActivity(), "Favorite deleted...", Toast.LENGTH_LONG ).show();
+                }
+            });
             okayButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -121,6 +135,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
                 }
             });
             okayButton.setEnabled(false);
+            clearButton.setEnabled(false);
 
             cancelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -152,10 +167,12 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     public void onItemSelected(SelectableWifi item) {
         if(adapter.getSelectedItems().isEmpty()) {
             okayButton.setEnabled(false);
+            clearButton.setEnabled(false);
             requestDataName = "";
         }
         else {
             okayButton.setEnabled(true);
+            clearButton.setEnabled(true);
             requestDataName = item.getDeviceID();
         }
     }
@@ -174,7 +191,6 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     public List<WifiSelectItem> generateItems(){
 
         List<WifiSelectItem> selectableItems = new ArrayList<>();
-        selectableItems.clear();
 
         if(currentUserData.getFavorites() != null && currentUserData.getFavorites().keySet() != null && !currentUserData.getFavorites().keySet().isEmpty()) {
 

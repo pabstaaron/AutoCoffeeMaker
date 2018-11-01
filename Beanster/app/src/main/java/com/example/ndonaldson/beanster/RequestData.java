@@ -94,4 +94,21 @@ public class RequestData{
         this.syrupDisp = advancedState.syrupState.disp;
         this.syrup = advancedState.syrupState.type;
     }
+
+    @Override
+    public boolean equals(Object o){
+
+        if(o == this) return true;
+        if(!(o instanceof RequestData)) return false;
+
+        RequestData r = (RequestData) o;
+
+        if(this.waterDisp == r.waterDisp && this.waterPress == r.waterPress && this.waterTemp == r.waterTemp &&
+                this.milkDisp == r.milkDisp && this.milkTemp == r.milkTemp && this.frothDisp == r.frothDisp &&
+                this.frothPress == r.frothPress && this.coffeeDisp == r.coffeeDisp &&
+                this.syrupDisp == r.syrupDisp && this.syrup == r.syrup)
+            return true;
+
+        return false;
+    }
 }

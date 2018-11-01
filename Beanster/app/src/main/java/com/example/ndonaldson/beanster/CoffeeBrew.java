@@ -190,17 +190,17 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                 alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         dialog.dismiss();
-                                        String saveName = edittext.getText().toString();
+                                        final String saveName = edittext.getText().toString();
                                         if (saveName != null && !saveName.isEmpty()) {
-                                            SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                                            final SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
                                             if (sharedPreferences.contains("currentUser")) {
                                                 if (!sharedPreferences.getString("currentUser", "").isEmpty()) {
                                                     String currentUser = sharedPreferences.getString("currentUser", "");
-                                                    UserData currentUserData;
-                                                    Gson gson = new Gson();
+                                                    final UserData currentUserData;
+                                                    final Gson gson = new Gson();
                                                     String json = sharedPreferences.getString("userData", "");
                                                     try {
-                                                        HashMap<String, UserData> userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
+                                                        final HashMap<String, UserData> userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
                                                         }.getType());
                                                         currentUserData = userData.get(currentUser);
                                                         if (currentUserData == null)
@@ -209,7 +209,29 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                                             Log.i("CoffeeBrew", "Trying to save " + saveName + " for user: " + currentUserData.getUsername());
                                                         if (requestData == null)
                                                             Log.i("CoffeeBrew", "requestData is null!");
-                                                        currentUserData.addFavorite(saveName, requestData);
+                                                        boolean exists = false;
+                                                        for(final String s : currentUserData.getFavorites().keySet()){
+                                                            final RequestData r = currentUserData.getFavorites().get(s);
+                                                            if(requestData.equals(r)){
+                                                                exists = true;
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                                                builder.setCancelable(false);
+                                                                builder.setMessage("This brew already exists, continue saving with new name?").setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+
+                                                                    @Override
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        currentUserData.getFavorites().remove(s);
+                                                                        currentUserData.addFavorite(saveName, r);
+                                                                    }
+                                                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        dialog.cancel();
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                        if(!exists) currentUserData.addFavorite(saveName, requestData);
                                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                                         json = gson.toJson(userData);
                                                         editor.putString("userData", json).commit();

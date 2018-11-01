@@ -70,7 +70,21 @@
                 android:id="@+id/fragmentOkayButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Okay"
+                android:text="Select"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/fragmentClearButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear"
                 android:layout_gravity="center"/>
         </LinearLayout>
     </LinearLayout>
