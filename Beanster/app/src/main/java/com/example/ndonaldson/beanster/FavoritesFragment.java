@@ -41,6 +41,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     private String user;
     private RecyclerView recyclerView;
     private WifiAdapter adapter;
+    private Context mContext;
 
     private FavoritesFragment.OnFragmentInteractionListener mListener;
 
@@ -108,8 +109,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
             currentUserData = userData.get(user);
 
             List<WifiSelectItem> selectableItems = generateItems();
-            adapter = new WifiAdapter(this, selectableItems, false);
-            recyclerView.setAdapter(adapter);
+            setAdapter(selectableItems);
 
             cancelButton = (Button) view.findViewById(R.id.fragmentCancelButton2);
             okayButton = (Button) view.findViewById(R.id.fragmentOkayButton);
@@ -120,12 +120,22 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
                 public void onClick(View v) {
                     currentUserData.getFavorites().remove(requestDataName);
                     List<WifiSelectItem> selectableItems = generateItems();
-                    adapter = new WifiAdapter(this, selectableItems, false);
-                    recyclerView.setAdapter(adapter);                    Gson gson = new Gson();
+                    setAdapter(selectableItems);
+                    Gson gson = new Gson();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     String json = gson.toJson(userData);
                     editor.putString("userData", json).commit();
+                    okayButton.setEnabled(false);
+                    clearButton.setEnabled(false);
                     Toast.makeText(getActivity(), "Favorite deleted...", Toast.LENGTH_LONG ).show();
+
+                    okayButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+                    okayButton.setTextColor(Color.rgb(204, 204, 204));
+                    okayButton.setEnabled(false);
+
+                    clearButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+                    clearButton.setTextColor(Color.rgb(204, 204, 204));
+                    clearButton.setEnabled(false);
                 }
             });
             okayButton.setOnClickListener(new View.OnClickListener() {
@@ -134,8 +144,14 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
                     sendBack(currentUserData.getFavorites().get(requestDataName));
                 }
             });
+            okayButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+            okayButton.setTextColor(Color.rgb(204, 204, 204));
             okayButton.setEnabled(false);
+
+            clearButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+            clearButton.setTextColor(Color.rgb(204, 204, 204));
             clearButton.setEnabled(false);
+            requestDataName = "";
 
             cancelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -166,13 +182,23 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     @Override
     public void onItemSelected(SelectableWifi item) {
         if(adapter.getSelectedItems().isEmpty()) {
+            okayButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+            okayButton.setTextColor(Color.rgb(204, 204, 204));
             okayButton.setEnabled(false);
+
+            clearButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+            clearButton.setTextColor(Color.rgb(204, 204, 204));
             clearButton.setEnabled(false);
             requestDataName = "";
         }
         else {
             okayButton.setEnabled(true);
+            okayButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyle));
+            okayButton.setTextColor(Color.rgb(255, 239, 204));
+
             clearButton.setEnabled(true);
+            clearButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyle));
+            clearButton.setTextColor(Color.rgb(255, 239, 204));
             requestDataName = item.getDeviceID();
         }
     }
@@ -201,5 +227,10 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
         }
 
         return selectableItems;
+    }
+
+    public void setAdapter(List<WifiSelectItem> items){
+        adapter = new WifiAdapter(this, items, false);
+        recyclerView.setAdapter(adapter);
     }
 }

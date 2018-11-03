@@ -1,15 +1,23 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@android:color/white"
     android:layout_height="match_parent"
     android:clickable="true"
     tools:context="com.example.ndonaldson.beanster.LoginFragment">
+
+
+    <ImageView
+        android:id="@+id/image3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/beans"/>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/fragmentUserName"
+        android:maxLines="1"
         android:layout_marginTop="124dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
@@ -23,6 +31,7 @@
         android:layout_marginTop="57dp"
         android:layout_below="@+id/fragmentUserName"
         android:layout_alignParentStart="true"
+        android:maxLines="1"
         android:hint="Password"
         android:id="@+id/fragmentPassword"
         android:layout_marginStart="100dp"
@@ -47,6 +56,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:background="@drawable/buttonstyle"
+                android:textColor="#ffefcc"
                 android:text="Cancel"
                 android:layout_gravity="right"/>
         </LinearLayout>
@@ -61,6 +72,8 @@
                 android:id="@+id/fragmentLoginButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/buttonstyle"
+                android:textColor="#ffefcc"
                 android:text="Login"
                 android:layout_gravity="center"/>
         </LinearLayout>
@@ -75,6 +88,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:background="@drawable/buttonstyle"
+                android:textColor="#ffefcc"
                 android:text="Create"
                 android:layout_gravity="left"/>
         </LinearLayout>

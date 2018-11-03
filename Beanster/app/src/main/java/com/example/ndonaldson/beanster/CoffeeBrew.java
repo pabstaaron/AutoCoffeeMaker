@@ -96,7 +96,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
     //Spinner
     private Spinner mySpinner;
-    private String[] syrups = {"Syrup1", "Syrup2"};
+    private String[] syrups = {"Disabled", "Enabled"};
 
     //Data
     private String connectedPassword;
@@ -114,6 +114,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     private String userName;
     private FrameLayout fragmentContainer;
     private boolean favoritedBrew = false;
+    private UserData currentUserData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,114 +167,11 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         brewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    if (activeState == ActiveState.ADVANCED)
-                        requestData.setWithAdvance(advancedState);
-                    else requestData.setWithBasic(basicState);
-                    new SendPost().execute(requestData);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                    builder.setCancelable(false);
-                    if(!favoritedBrew) {
-                        builder.setMessage("Would you like to save this particular brew?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-
-                                AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
-
-                                final EditText edittext = new EditText(mContext);
-                                alert.setTitle("Please enter the name you would like to save it under: ");
-
-                                alert.setView(edittext);
-
-                                alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        dialog.dismiss();
-                                        final String saveName = edittext.getText().toString();
-                                        if (saveName != null && !saveName.isEmpty()) {
-                                            final SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
-                                            if (sharedPreferences.contains("currentUser")) {
-                                                if (!sharedPreferences.getString("currentUser", "").isEmpty()) {
-                                                    String currentUser = sharedPreferences.getString("currentUser", "");
-                                                    final UserData currentUserData;
-                                                    final Gson gson = new Gson();
-                                                    String json = sharedPreferences.getString("userData", "");
-                                                    try {
-                                                        final HashMap<String, UserData> userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
-                                                        }.getType());
-                                                        currentUserData = userData.get(currentUser);
-                                                        if (currentUserData == null)
-                                                            Log.i("CoffeeBrew", "currentUserData is null");
-                                                        else
-                                                            Log.i("CoffeeBrew", "Trying to save " + saveName + " for user: " + currentUserData.getUsername());
-                                                        if (requestData == null)
-                                                            Log.i("CoffeeBrew", "requestData is null!");
-                                                        boolean exists = false;
-                                                        for(final String s : currentUserData.getFavorites().keySet()){
-                                                            final RequestData r = currentUserData.getFavorites().get(s);
-                                                            if(requestData.equals(r)){
-                                                                exists = true;
-                                                                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                                                                builder.setCancelable(false);
-                                                                builder.setMessage("This brew already exists, continue saving with new name?").setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-
-                                                                    @Override
-                                                                    public void onClick(DialogInterface dialog, int which) {
-                                                                        currentUserData.getFavorites().remove(s);
-                                                                        currentUserData.addFavorite(saveName, r);
-                                                                    }
-                                                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                                                    @Override
-                                                                    public void onClick(DialogInterface dialog, int which) {
-                                                                        dialog.cancel();
-                                                                    }
-                                                                });
-                                                            }
-                                                        }
-                                                        if(!exists) currentUserData.addFavorite(saveName, requestData);
-                                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                                        json = gson.toJson(userData);
-                                                        editor.putString("userData", json).commit();
-                                                        Toast toast = Toast.makeText(mContext, "Favorite saved...", Toast.LENGTH_SHORT);
-                                                        toast.setGravity(Gravity.CENTER, 0, 0);
-                                                        toast.show();
-                                                    } catch (Exception e) {
-                                                        Log.i("CoffeeBrew", e.getLocalizedMessage());
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            Toast toast = Toast.makeText(mContext, "Save name cannot be empty...", Toast.LENGTH_SHORT);
-                                            toast.setGravity(Gravity.CENTER, 0, 0);
-                                            toast.show();
-                                        }
-                                        dialog.cancel();
-                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
-                                    }
-                                });
-
-                                alert.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                        dialog.cancel();
-                                        imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
-                                    }
-                                });
-
-                                alert.show();
-                            }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
-                            }
-                        }).show();
-                    }
-                } catch(Exception e){
-                    Log.i("CoffeeBrew", e.getLocalizedMessage());
-                }
-
-                favoritedBrew = false;
+                if (activeState == ActiveState.ADVANCED)
+                    requestData.setWithAdvance(advancedState);
+                else
+                    requestData.setWithBasic(basicState);
+                new SendPost().execute(requestData);
             }
         });
 
@@ -330,11 +228,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                             favoritesButton.setVisibility(View.INVISIBLE);
                             favoritesButton.setEnabled(false);
                             SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
-                            Gson gson = new Gson();
-                            UserData emptyUser = new UserData();
-                            String json = gson.toJson(emptyUser);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("currentUser", json).apply();
+                            editor.putString("currentUser", "").apply();
+                            loginButton.setText("Login");
+
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                             builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
@@ -344,9 +241,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    SharedPreferences.Editor editor = getSharedPreferences("beanster", MODE_PRIVATE).edit();
-                                    editor.putString("currentUser", "").apply();
-                                    loginButton.setText("Login");
                                     dialog.cancel();
 
                                 }
@@ -373,12 +267,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
 
         favoritesButton = (Button) findViewById(R.id.favoritesButton);
-        if(loginButton.getText().toString().equals("Login")){
-            favoritesButton.setVisibility(View.INVISIBLE);
-            favoritesButton.setEnabled(false);
-        } else{
+        if (activeState == ActiveState.ADVANCED && !loginButton.getText().toString().equals("Login")){
             favoritesButton.setVisibility(View.VISIBLE);
             favoritesButton.setEnabled(true);
+        }
+        else{
+            favoritesButton.setVisibility(View.INVISIBLE);
+            favoritesButton.setEnabled(false);
         }
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -727,23 +622,35 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 request.addHeader("content-type", "application/json");
                 HttpResponse response = httpClient.execute(request);
                 int responseCode = response.getStatusLine().getStatusCode();
-//                Toast toast = new Toast(mContext);
-//                toast.setDuration(Toast.LENGTH_LONG);
-//                toast.setGravity(Gravity.CENTER, 0, 0);
+
                 Log.i("CoffeeBrew", "responsCode: " + responseCode);
-                if(responseCode == HttpURLConnection.HTTP_CREATED){
-                    Toast.makeText(mContext, "Your drink is being brewed...", Toast.LENGTH_LONG).show();
+                if(responseCode == HttpURLConnection.HTTP_OK){
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(mContext, "Your drink is being brewed...", Toast.LENGTH_LONG).show();
+                            onResponse();
+                        }
+                    });
                 } else if(responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR){
-                    //toast.setText("There was a problem brewing your drink...");
-                    Toast.makeText(mContext, "There was a problem brewing your drink...", Toast.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(mContext, "There was a problem brewing your drink...", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
                 else if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
-                    //toast.setText("Data sent corrupted...");
-                    Toast.makeText(mContext, "Data sent was corrupted...", Toast.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(mContext, "Data sent was corrupted...", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
                 else if(responseCode == HttpURLConnection.HTTP_CONFLICT){
-                  //  toast.setText("A drink is currently being brewed...");
-                    Toast.makeText(mContext, "A drink is currently being brewed...", Toast.LENGTH_LONG).show();
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(mContext, "A drink is currently being brewed...", Toast.LENGTH_LONG).show();
+                        }
+                    });
                 }
 //                toast.show();
             }catch (Exception e) {
@@ -852,12 +759,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     public static class WaterState{
         public int temp;
         public int disp;
-        public int press;
+       // public int press;
 
         public WaterState(){
             temp = 70;
             disp = 70;
-            press = 70;
+           // press = 70;
         }
     }
 
@@ -994,12 +901,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
-                indicatorLayout2.setEnabled(true);
-                pressSeekbar.setEnabled(true);
+                indicatorLayout2.setEnabled(false);
                 pressSeekbar.setVisibility(View.VISIBLE);
+                pressSeekbar.setEnabled(false);
 
                 label1.setText("Temperature(" + (char) 0x00B0 + "F):");
-                label2.setText("Pressure(psi):");
+                label2.setText("");
                 label3.setText("Dispense(oz):");
                 break;
             }
@@ -1146,6 +1053,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
         }
+
+        favoritesButton.setEnabled(true);
+        favoritesButton.setVisibility(View.VISIBLE);
     }
 
     public void hideBasic(){
@@ -1208,6 +1118,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         label1.setText("Amount:");
         label2.setText("Strength:");
         label3.setText("Froth:");
+
+        favoritesButton.setVisibility(View.INVISIBLE);
+        favoritesButton.setEnabled(false);
     }
 
     public void playSliders(final AdvancedState.ActiveSection prevState, AdvancedState.ActiveSection currState){
@@ -1218,7 +1131,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         switch(prevState){
             case WATER:{
                 prevDisp = advancedState.waterState.disp;
-                prevPress = advancedState.waterState.press;
+                //prevPress = advancedState.waterState.press;
                 prevTemp = advancedState.waterState.temp;
                 break;
             }
@@ -1248,11 +1161,23 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             }
         }
 
+        if(currState == prevState){
+            advancedState.coffeeState.disp = requestData.coffeeDisp;
+            advancedState.frothState.disp = requestData.frothDisp;
+            advancedState.frothState.press = requestData.frothPress;
+            advancedState.milkState.disp = requestData.milkDisp;
+            advancedState.milkState.temp = requestData.milkTemp;
+            advancedState.waterState.disp = requestData.waterDisp;
+            advancedState.waterState.temp = requestData.waterTemp;
+            advancedState.syrupState.disp = requestData.syrupDisp;
+            advancedState.syrupState.disp = requestData.syrup;
+        }
+
         switch(currState){
             case WATER:{
                 dispDiff = prevDisp - advancedState.waterState.disp;
                 tempDiff = prevTemp - advancedState.waterState.temp;
-                pressDiff = prevPress - advancedState.waterState.press;
+                //pressDiff = prevPress - advancedState.waterState.press;
                 break;
             }
             case MILK:{
@@ -1477,12 +1402,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             dispSeekbar.setVisibility(View.VISIBLE);
             indicatorLayout3.setEnabled(true);
 
-            pressSeekbar.setEnabled(true);
             pressSeekbar.setVisibility(View.VISIBLE);
-            indicatorLayout2.setEnabled(true);
+            pressSeekbar.setEnabled(false);
+            indicatorLayout2.setEnabled(false);
 
             label1.setText("Temperature(" + (char) 0x00B0 + "F):");
-            label2.setText("Pressure(psi):");
+            label2.setText("");
             label3.setText("Dispense(oz):");
         }
 
@@ -1649,7 +1574,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                     advancedState.waterState.temp = val;
                 }
                 else if (bar == 1){
-                    advancedState.waterState.press = val;
+                    //advancedState.waterState.press = val;
                 }
                 else{
                     advancedState.waterState.disp = val;
@@ -1683,10 +1608,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
         }
-    }
-
-    private void updateFromFavorites(){
-               
     }
 
     @Override
@@ -1723,7 +1644,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         if(requestData != null) {
             this.requestData = requestData;
             favoritedBrew = true;
-        };
+            playSliders(advancedState.activeSection, advancedState.activeSection);
+        }
         getSupportFragmentManager().popBackStack();
     }
 
@@ -1731,9 +1653,156 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     public void onFragmentInteraction(String sendBackUsername) {
         if(!sendBackUsername.isEmpty()){
             loginButton.setText(sendBackUsername);
-            favoritesButton.setEnabled(true);
-            favoritesButton.setVisibility(View.VISIBLE);
+            if(activeState == ActiveState.ADVANCED) {
+                favoritesButton.setEnabled(true);
+                favoritesButton.setVisibility(View.VISIBLE);
+            }
         }
         getSupportFragmentManager().popBackStack();
+    }
+
+    public void onResponse() {
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setCancelable(false);
+            if (!favoritedBrew && activeState == ActiveState.ADVANCED) {
+                builder.setMessage("Would you like to save this particular brew?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+                        AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+
+                        final EditText edittext = new EditText(mContext);
+                        alert.setTitle("Please enter the name you would like to save it under: ");
+
+                        alert.setView(edittext);
+
+                        alert.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                                final String saveName = edittext.getText().toString();
+                                if (saveName != null && !saveName.isEmpty() && saveName.length() < 12) {
+                                    final SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                                    if (sharedPreferences.contains("currentUser")) {
+                                        if (!sharedPreferences.getString("currentUser", "").isEmpty()) {
+                                            String currentUser = sharedPreferences.getString("currentUser", "");
+                                            final Gson gson = new Gson();
+                                            String json = sharedPreferences.getString("userData", "");
+                                            try {
+                                                final HashMap<String, UserData> userData = gson.fromJson(json, new TypeToken<HashMap<String, UserData>>() {
+                                                }.getType());
+                                                currentUserData = userData.get(currentUser);
+                                                if (currentUserData == null)
+                                                    Log.i("CoffeeBrew", "currentUserData is null");
+                                                else
+                                                    Log.i("CoffeeBrew", "Trying to save " + saveName + " for user: " + currentUserData.getUsername());
+                                                if (requestData == null)
+                                                    Log.i("CoffeeBrew", "requestData is null!");
+                                                boolean exists = false;
+                                                Log.i("CoffeeBrew", "CurrentUserData favorites");
+                                                for (final String s : currentUserData.getFavorites().keySet()) {
+                                                    final RequestData r = currentUserData.getFavorites().get(s);
+                                                    if (requestData.equals(r)) {
+                                                        Log.i("CoffeeBrew", "Brew already existed");
+                                                        Log.i("CoffeeBrew", "requestData for " + s + ":");
+                                                        Log.i("CoffeeBrew", currentUserData.getFavorites().get(s).toString());
+                                                        Log.i("CoffeeBrew", "current request data: \n" + requestData.toString());
+                                                        exists = true;
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                                        builder.setCancelable(false);
+                                                        builder.setMessage("These brew settings already exists, continue saving with new name?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                currentUserData.getFavorites().remove(s);
+                                                                currentUserData.addFavorite(saveName, r);
+                                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                String json = gson.toJson(userData);
+                                                                editor.putString("userData", json).apply();
+                                                                Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_SHORT);
+                                                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                                                toast.show();
+                                                            }
+                                                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                dialog.cancel();
+                                                            }
+                                                        }).show();
+                                                    }
+                                                    if(s.equals(saveName)){
+                                                        exists = true;
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                                                        builder.setCancelable(false);
+                                                        builder.setMessage("This favorite name already exists, would you like to overwrite the data?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                currentUserData.getFavorites().remove(s);
+                                                                currentUserData.addFavorite(saveName, requestData);
+                                                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                String json = gson.toJson(userData);
+                                                                editor.putString("userData", json).apply();
+                                                                Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_SHORT);
+                                                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                                                toast.show();
+                                                            }
+                                                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                dialog.cancel();
+                                                            }
+                                                        }).show();
+                                                    }
+                                                }
+                                                if (!exists) {
+                                                    currentUserData.addFavorite(saveName, requestData);
+                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                    json = gson.toJson(userData);
+                                                    editor.putString("userData", json).apply();
+                                                }
+
+
+                                            } catch (Exception e) {
+                                                Log.i("CoffeeBrew", e.getLocalizedMessage());
+                                            }
+                                        }
+                                    }
+                                } else if (saveName.length() > 12) {
+                                    Toast toast = Toast.makeText(mContext, "Save name must be shorter than 12 characters...", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                    toast.show();
+                                } else {
+                                    Toast toast = Toast.makeText(mContext, "Save name cannot be empty...", Toast.LENGTH_SHORT);
+                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                    toast.show();
+                                }
+                                dialog.cancel();
+                                imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+                            }
+                        });
+
+                        alert.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.cancel();
+                                imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN, 0);
+                            }
+                        });
+
+                        alert.show();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        favoritedBrew = false;
+                        dialog.cancel();
+                    }
+                }).show();
+            }
+        } catch (Exception e) {
+            Log.i("CoffeeBrew", e.getLocalizedMessage());
+        }
     }
 }

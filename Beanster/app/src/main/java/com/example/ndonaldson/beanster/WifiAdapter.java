@@ -60,7 +60,13 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
         }
 
         holder.mItem = selectableItem;
-        holder.setColor(Color.LTGRAY);
+
+        if(selectableItem.isSelected()){
+            holder.setColor(Color.LTGRAY);
+        }
+        else{
+            holder.setColor(Color.DKGRAY);
+        }
     }
 
     @Override

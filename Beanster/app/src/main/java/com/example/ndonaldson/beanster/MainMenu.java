@@ -162,11 +162,9 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
-                            Gson gson = new Gson();
-                            UserData emptyUser = new UserData();
-                            String json = gson.toJson(emptyUser);
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("currentUser", json).apply();
+                            editor.putString("currentUser", "").apply();
+                            loginButton.setText("Login");
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                             builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -177,9 +175,6 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                             }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    SharedPreferences.Editor editor = getSharedPreferences("beanster", MODE_PRIVATE).edit();
-                                    editor.putString("currentUser", "").apply();
-                                    loginButton.setText("Login");
                                     dialog.cancel();
 
                                 }

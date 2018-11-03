@@ -2,9 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:clickable="true"
+    android:background="#A0522D"
     tools:context="com.example.ndonaldson.beanster.LoginFragment">
+
+    <ImageView
+        android:id="@+id/image3"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/beansupsidedown"/>
 
 <LinearLayout
     android:id="@+id/favorite_list"
@@ -28,12 +35,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="10">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/favorites"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#88000000">
-    </android.support.v7.widget.RecyclerView>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/favorites"
+            android:layout_width="440dp"
+            android:layout_height="350dp"
+            android:background="#88000000"
+            android:layout_weight="1.67"></android.support.v7.widget.RecyclerView>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <LinearLayout
@@ -57,6 +75,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:text="Cancel"
+                android:background="@drawable/buttonstyle"
+                android:textColor="#ffefcc"
                 android:layout_gravity="center"/>
         </LinearLayout>
 
@@ -71,6 +91,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Select"
+                android:background="@drawable/buttonstyle"
+                android:textColor="#ffefcc"
                 android:layout_gravity="center"/>
         </LinearLayout>
 
@@ -85,6 +107,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Clear"
+                android:background="@drawable/buttonstyle"
+                android:textColor="#ffefcc"
                 android:layout_gravity="center"/>
         </LinearLayout>
     </LinearLayout>

@@ -7,7 +7,6 @@ package com.example.ndonaldson.beanster;
 
 public class SelectableWifi extends WifiSelectItem {
     private boolean isSelected = false;
-    private int mColor;
 
 
     public SelectableWifi(WifiSelectItem item, boolean isSelected) {

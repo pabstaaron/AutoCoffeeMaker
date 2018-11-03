@@ -4,10 +4,13 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -95,59 +98,119 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String user = usernameText.getText().toString();
-                String pass = passwordText.getText().toString();
-                try {
-                    if (!user.isEmpty() && !pass.isEmpty()) {
-                        if (userData.containsKey(user)) {
-                            UserData cachedUser = userData.get(user);
-                            if (cachedUser.getPassword().equals(pass)) {
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                if (!sharedPreferences.contains("currentUser")) {
-                                    editor.putString("currentUser", cachedUser.getUsername()).commit();
-                                } else {
-                                    editor.putString("currentUser", cachedUser.getUsername()).apply();
-                                }
-                                sendBack(cachedUser.getUsername());
+            String user = usernameText.getText().toString();
+            String pass = passwordText.getText().toString();
+            try {
+                if (!user.isEmpty() && !pass.isEmpty()) {
+                    if (userData.containsKey(user)) {
+                        UserData cachedUser = userData.get(user);
+                        if (cachedUser.getPassword().equals(pass)) {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            if (!sharedPreferences.contains("currentUser")) {
+                                editor.putString("currentUser", cachedUser.getUsername()).commit();
+                            } else {
+                                editor.putString("currentUser", cachedUser.getUsername()).apply();
                             }
-                        } else {
-                            Toast.makeText(getActivity(), "User does not exist...", Toast.LENGTH_LONG).show();
+                            sendBack(cachedUser.getUsername());
                         }
+                        else{
+                            Toast.makeText(getActivity(), "Incorrect password...", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "User does not exist...", Toast.LENGTH_LONG).show();
                     }
-
-                else{
-                    Toast.makeText(getActivity(), "Username and Password both have to be filled out...", Toast.LENGTH_LONG ).show();
-                }
-                } catch(Exception e){
-                    Log.i("LoginFragment", e.getLocalizedMessage());
                 }
 
+            } catch(Exception e){
+                Log.i("LoginFragment", e.getLocalizedMessage());
+            }
             }
         });
         createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String user = usernameText.getText().toString();
-                String pass = passwordText.getText().toString();
-                if(user.isEmpty() || pass.isEmpty()){
-                    Toast.makeText(getActivity(), "Username and Password both have to be filled out...", Toast.LENGTH_LONG ).show();
-                }
+            String user = usernameText.getText().toString();
+            String pass = passwordText.getText().toString();
 
-                if(userData.containsKey(user)){
-                    Toast.makeText(getActivity(), "User already exists...", Toast.LENGTH_LONG ).show();
+            if(userData.containsKey(user)){
+                Toast.makeText(getActivity(), "User already exists...", Toast.LENGTH_LONG ).show();
+            }
+            else if(user.length() < 8 || pass.length() < 16){
+                userData.put(user, new UserData(user, pass));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                Gson gson = new Gson();
+                String json = gson.toJson(userData);
+                editor.putString("userData", json).apply();
+                if (!sharedPreferences.contains("currentUser")) {
+                    editor.putString("currentUser", user).commit();
+                } else {
+                    editor.putString("currentUser", user).apply();
                 }
-                else if(user.length() < 8 || pass.length() < 16){
-                    userData.put(user, new UserData(user, pass));
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(userData);
-                    editor.putString("userData", json).apply();
-                    Toast.makeText(getActivity(), "User successfully created...", Toast.LENGTH_LONG ).show();
-                    sendBack(user);
+                Toast.makeText(getActivity(), "User successfully created...", Toast.LENGTH_LONG ).show();
+                sendBack(user);
+            }
+            }
+        });
+
+        createButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+        createButton.setTextColor(Color.rgb(204, 204, 204));
+        createButton.setEnabled(false);
+
+        loginButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
+        loginButton.setTextColor(Color.rgb(204, 204, 204));
+        loginButton.setEnabled(false);
+
+        usernameText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() > 0){
+                    if(passwordText.length() > 0){
+                        createButton.setEnabled(true);
+                        createButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyle));
+                        createButton.setTextColor(Color.rgb(255, 239, 204));
+
+                        loginButton.setEnabled(true);
+                        loginButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyle));
+                        loginButton.setTextColor(Color.rgb(255, 239, 204));
+                    }
                 }
-                else{
-                    Toast.makeText(getActivity(), "Username or password are too long, Username must be no longer than 8 characters, Password must be no longer than 16 characters", Toast.LENGTH_LONG ).show();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        passwordText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() > 0){
+                    if(usernameText.length() > 0){
+                        createButton.setEnabled(true);
+                        createButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyle));
+                        createButton.setTextColor(Color.rgb(255, 239, 204));
+
+                        loginButton.setEnabled(true);
+                        loginButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyle));
+                        loginButton.setTextColor(Color.rgb(255, 239, 204));
+                    }
                 }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
 

@@ -30,7 +30,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/coffee1"/>
+                    android:src="@drawable/coffee3"/>
                 <ImageView
                     android:id="@+id/image2"
                     android:layout_width="fill_parent"
@@ -41,7 +41,7 @@
                     android:id="@+id/image3"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:scaleType="fitXY"
+                    android:scaleType="matrix"
                     android:src="@drawable/coffee3"/>
                 <ImageView
                     android:id="@+id/image4"

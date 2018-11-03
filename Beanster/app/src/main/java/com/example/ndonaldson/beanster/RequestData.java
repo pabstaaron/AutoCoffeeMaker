@@ -18,21 +18,21 @@ package com.example.ndonaldson.beanster;
  • The amount of coffee to dispense; in kilograms.
  */
 public class RequestData{
-    private int waterTemp;
-    private int milkTemp;
-    private int waterPress;
-    private int frothPress;
-    private int waterDisp;
-    private int milkDisp;
-    private int frothDisp;
-    private int coffeeDisp;
-    private int syrupDisp;
-    private int syrup;
+    public int waterTemp;
+    public int milkTemp;
+    //private int waterPress;
+    public int frothPress;
+    public int waterDisp;
+    public int milkDisp;
+    public int frothDisp;
+    public int coffeeDisp;
+    public int syrupDisp;
+    public int syrup;
 
     public RequestData(){
         this.waterTemp = 70;
         this.milkTemp = 70;
-        this.waterPress = 70;
+        //this.waterPress = 70;
         this.frothPress = 70;
         this.waterDisp = 70;
         this.milkDisp = 70;
@@ -84,7 +84,7 @@ public class RequestData{
 
     public void setWithAdvance(CoffeeBrew.AdvancedState advancedState){
         this.waterTemp = advancedState.waterState.temp;
-        this.waterPress = advancedState.waterState.press;
+        //this.waterPress = advancedState.waterState.press;
         this.waterDisp = advancedState.waterState.disp;
         this.milkTemp = advancedState.milkState.temp;
         this.milkDisp = advancedState.milkState.disp;
@@ -103,12 +103,28 @@ public class RequestData{
 
         RequestData r = (RequestData) o;
 
-        if(this.waterDisp == r.waterDisp && this.waterPress == r.waterPress && this.waterTemp == r.waterTemp &&
+        if(this.waterDisp == r.waterDisp && /*this.waterPress == r.waterPress*/ this.waterTemp == r.waterTemp &&
                 this.milkDisp == r.milkDisp && this.milkTemp == r.milkTemp && this.frothDisp == r.frothDisp &&
                 this.frothPress == r.frothPress && this.coffeeDisp == r.coffeeDisp &&
                 this.syrupDisp == r.syrupDisp && this.syrup == r.syrup)
             return true;
 
         return false;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("Water Temp: " + waterTemp + "\n");
+        //builder.append("Water Press: " + waterPress + "\n");
+        builder.append("Water Disp: " + waterDisp + "\n");
+        builder.append("Milk Temp: " + milkTemp + "\n");
+        builder.append("Milk Disp: " + milkDisp + "\n");
+        builder.append("Froth Press: " + frothPress + "\n");
+        builder.append("Froth Disp: " + frothDisp + "\n");
+        builder.append("Coffee Disp: " + coffeeDisp + "\n");
+        builder.append("Syrup Disp: " + syrupDisp + "\n");
+        builder.append("Syrup Choice: " + syrup + "\n");
+        return builder.toString();
     }
 }
