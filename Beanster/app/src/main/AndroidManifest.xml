@@ -37,8 +37,13 @@
         <activity
             android:name=".CoffeeBrew"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            />
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".ClearCacheActivity"
+            android:label="@string/title_activity_clear_cache"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true">
+        </activity>
     </application>
 
 </manifest>

@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Beanster</string>
     <string name="devicesTitle"> &lt;u>Devices&lt;/u></string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_clear_cache">ClearCacheActivity</string>
 </resources>
