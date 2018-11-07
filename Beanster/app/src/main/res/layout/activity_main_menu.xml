@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:stateListAnimator="@null"
     tools:context="com.example.ndonaldson.beanster.MainMenu">
 
     <RelativeLayout
@@ -40,7 +41,7 @@
                     android:id="@+id/image3"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:scaleType="fitXY"
+                    android:scaleType="matrix"
                     android:src="@drawable/coffee3"/>
                 <ImageView
                     android:id="@+id/image4"
@@ -79,6 +80,17 @@
             android:layout_marginBottom="91dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ffefcc"
+            android:width="130dp"
+            android:background="@drawable/buttonstyle"
+            android:text="Login"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -152,5 +164,12 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="24dp" />
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+        </FrameLayout>
     </RelativeLayout>
+
 </android.support.constraint.ConstraintLayout>

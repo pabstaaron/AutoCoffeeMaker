@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/gridButtonUnselected"
+    android:id="@+id/buttonBorderBlack"
     android:insetLeft="4dp"
     android:insetTop="6dp"
     android:insetRight="4dp"
@@ -10,6 +10,7 @@
     <ripple android:color="?attr/colorControlHighlight">
         <item>
             <shape android:shape="rectangle">
+                <corners android:radius="100dp" />
                 <solid android:color="#664400" />
                 <padding android:bottom="6dp" />
                 <stroke android:width="2px" android:color="@android:color/black"/>

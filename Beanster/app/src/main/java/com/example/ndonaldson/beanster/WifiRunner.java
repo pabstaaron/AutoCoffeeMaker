@@ -407,8 +407,6 @@ public class WifiRunner implements Runnable {
 
         if(lastDevice == null){
             Log.i("WifiRunner", "LastDevice is null");
-            connectStatus = ConnectStatus.WAITING_FOR_USER;
-            sendIntent("status");
             return;
         }
         String networkSSID = lastDevice.getHostName();

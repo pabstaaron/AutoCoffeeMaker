@@ -7,10 +7,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.PermissionInfo;
-import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,16 +18,14 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.webkit.PermissionRequest;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ViewFlipper;
 
+import com.google.gson.Gson;
 import com.victor.loading.newton.NewtonCradleLoading;
 
-import java.security.Permission;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  *@author Nathan Donaldson
@@ -40,6 +36,7 @@ public class main extends AppCompatActivity {
     private Animation fade_in, fade_out;
     private ViewFlipper viewFlipper;
     private Button connectButton;
+    private SharedPreferences sharedPreferences;
 
 
     private static final int WRITE_EXTERNAL_STORAGE_CODE = 1;
@@ -83,6 +80,9 @@ public class main extends AppCompatActivity {
         connectButton = (Button) findViewById(R.id.connectButtonMain);
         connectButton.setVisibility(View.INVISIBLE);
 
+
+        sharedPreferences = getSharedPreferences("beanster", Context.MODE_PRIVATE);
+
         try {
             viewFlipper = (ViewFlipper) this.findViewById(R.id.backgroundViewMain);
             fade_in = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
@@ -121,6 +121,13 @@ public class main extends AppCompatActivity {
      */
     private void begin(){
         Intent intent = new Intent(this, MainMenu.class);
+        if(!sharedPreferences.contains("userData")){
+            HashMap<String, UserData> data = new HashMap<>();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(data);
+            editor.putString("userData", json).commit();
+        }
         startActivity(intent);
         finish();
     }

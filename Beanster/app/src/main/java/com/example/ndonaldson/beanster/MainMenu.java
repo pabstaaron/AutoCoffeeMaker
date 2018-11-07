@@ -4,11 +4,16 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.Slide;
@@ -20,12 +25,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.google.gson.Gson;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 /**
@@ -36,10 +43,11 @@ import com.victor.loading.newton.NewtonCradleLoading;
  * Also displays current connection state and requires LAN connection
  * to proceed.
  */
-public class MainMenu extends AppCompatActivity {
+public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener {
 
     private WifiRunner.ConnectStatus connectStatus;
     private Button connectButton;
+    private Button loginButton;
     private TextView connectingText;
     private NewtonCradleLoading cradle;
     private ProgressBar circle;
@@ -52,6 +60,7 @@ public class MainMenu extends AppCompatActivity {
     private String deviceMacAddress;
     private Boolean isConnected;
     private Boolean closingActivity;
+    private FrameLayout fragmentContainer;
 
     private static ThreadManager tm;
     private static WifiRunner wr;
@@ -69,6 +78,7 @@ public class MainMenu extends AppCompatActivity {
         deviceHostName = "";
         mContext = this;
         closingActivity = false;
+        fragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer);
         connectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
 
         Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -113,13 +123,13 @@ public class MainMenu extends AppCompatActivity {
             Log.i("MainMenu", e.getLocalizedMessage());
         }
 
-        connectButton = (Button) findViewById(R.id.connectButton);
         cradle = (NewtonCradleLoading) findViewById(R.id.newton_cradle_loading);
         circle = (ProgressBar) findViewById(R.id.progressBar);
         connectingText = (TextView) findViewById(R.id.connectText);
         wifiStatus = (ImageButton) findViewById(R.id.wifiStatus);
         getWindow().setExitTransition(new Slide());
 
+        connectButton = (Button) findViewById(R.id.connectButton);
         connectButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -131,6 +141,57 @@ public class MainMenu extends AppCompatActivity {
             }
         });
 
+
+
+        loginButton = (Button) findViewById(R.id.loginButton);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+        if(sharedPreferences.contains("currentUser")){
+            if(!sharedPreferences.getString("currentUser", "").isEmpty()){
+                loginButton.setText(sharedPreferences.getString("currentUser", ""));
+            }
+        }
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!loginButton.getText().toString().equals("Login")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setCancelable(false);
+                    builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences sharedPreferences = getSharedPreferences("beanster", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("currentUser", "").apply();
+                            loginButton.setText("Login");
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                            builder.setMessage("Would you like to login with a new user?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    openFragment();
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+
+                                }
+                            }).show();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    }).show();
+                }
+                else{
+                    openFragment();
+                }
+            }
+        });
 
         if(getIntent() != null && getIntent().hasExtra("connected")){
             isConnected = (Boolean) getIntent().getExtras().get("connected");
@@ -145,6 +206,11 @@ public class MainMenu extends AppCompatActivity {
             connectButton.setEnabled(true);
             connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
             connectButton.setTextColor(Color.rgb(255, 239, 204));
+
+            loginButton.setEnabled(true);
+            loginButton.setBackground(getDrawable(R.drawable.buttonstyle));
+            loginButton.setTextColor(Color.rgb(255, 239, 204));
+
             cradle.setVisibility(View.INVISIBLE);
             circle.setVisibility(View.INVISIBLE);
             connectingText.setVisibility(View.INVISIBLE);
@@ -155,6 +221,11 @@ public class MainMenu extends AppCompatActivity {
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
             connectButton.setTextColor(Color.rgb(204, 204, 204));
             connectButton.setEnabled(false);
+
+            loginButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+            loginButton.setTextColor(Color.rgb(204, 204, 204));
+            loginButton.setEnabled(false);
+
             cradle.setVisibility(View.VISIBLE);
             circle.setVisibility(View.VISIBLE);
             connectingText.setVisibility(View.VISIBLE);
@@ -217,6 +288,11 @@ public class MainMenu extends AppCompatActivity {
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
+
+                        loginButton.setEnabled(true);
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        loginButton.setTextColor(Color.rgb(255, 239, 204));
+
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
@@ -230,6 +306,11 @@ public class MainMenu extends AppCompatActivity {
                         connectButton.setEnabled(true);
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         connectButton.setTextColor(Color.rgb(255, 239, 204));
+
+                        loginButton.setEnabled(true);
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyle));
+                        loginButton.setTextColor(Color.rgb(255, 239, 204));
+
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
@@ -240,6 +321,11 @@ public class MainMenu extends AppCompatActivity {
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
                         connectButton.setTextColor(Color.rgb(204, 204, 204));
                         connectButton.setEnabled(false);
+
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        loginButton.setTextColor(Color.rgb(204, 204, 204));
+                        loginButton.setEnabled(false);
+
                         cradle.setVisibility(View.VISIBLE);
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
@@ -252,6 +338,11 @@ public class MainMenu extends AppCompatActivity {
                         connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
                         connectButton.setTextColor(Color.rgb(204, 204, 204));
                         connectButton.setEnabled(false);
+
+                        loginButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        loginButton.setTextColor(Color.rgb(204, 204, 204));
+                        loginButton.setEnabled(false);
+
                         cradle.setVisibility(View.VISIBLE);
                         circle.setVisibility(View.VISIBLE);
                         connectingText.setVisibility(View.VISIBLE);
@@ -311,10 +402,26 @@ public class MainMenu extends AppCompatActivity {
     @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(wifiStatusReceiver);
         onStartNewActivity();
     }
 
     protected void onStartNewActivity() {
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
+
+    private void openFragment(){
+        LoginFragment fragment = LoginFragment.newInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_from_top, R.anim.slide_to_top, R.anim.slide_from_top, R.anim.slide_to_top);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.add(R.id.fragmentContainer, fragment, "LOGIN_FRAGMENT").commit();
+    }
+
+    @Override
+    public void onFragmentInteraction(String sendBackUsername) {
+        if(!sendBackUsername.isEmpty())loginButton.setText(sendBackUsername);
+        getSupportFragmentManager().popBackStack();
     }
 }

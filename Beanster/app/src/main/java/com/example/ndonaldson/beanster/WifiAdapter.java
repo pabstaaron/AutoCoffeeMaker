@@ -28,10 +28,8 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
         this.isMultiSelectionEnabled = isMultiSelectionEnabled;
 
         mValues = new ArrayList<>();
-        boolean ltGray = true;
         for (WifiSelectItem item : items) {
-            mValues.add(new SelectableWifi(item, false, ltGray ? Color.LTGRAY : Color.DKGRAY));
-            ltGray = false;
+            mValues.add(new SelectableWifi(item, false));
         }
     }
 
@@ -62,8 +60,12 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
         }
 
         holder.mItem = selectableItem;
-        if(!holder.mItem.isSelected()){
-            holder.setColor(selectableItem.getColor());
+
+        if(selectableItem.isSelected()){
+            holder.setColor(Color.LTGRAY);
+        }
+        else{
+            holder.setColor(Color.DKGRAY);
         }
     }
 
