@@ -17,6 +17,7 @@
 #define MIN_ACTUATOR_TRANISTION 6000 // The time the acuators need to make a transition
 
 #define TAMPER_SERVO_PIN 11 // The control pin for the tamper
+#define DISPOSE_SERVO_PIN 12 // The control pin for the tamper
 
 const String TAMP_STRING = "TAMP\r\n";
 const String BREW_STRING = "BREW\r\n";
@@ -42,8 +43,8 @@ void runTamper();
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *brewMotor_t = AFMS.getStepper(200, 1);
+Adafruit_StepperMotor *dispenserMotor_t = AFMS.getStepper(200, 2);
 
-//NOT SURE IF USING THESE
 void brewForward(){
   brewMotor_t->step(1, FORWARD, SINGLE);
 }
@@ -52,9 +53,19 @@ void brewBackward(){
   brewMotor_t->step(1, BACKWARD, SINGLE);
 }
 
-AccelStepper brewMotor(brewForward, brewBackward);
+void dispenserForward(){
+  dispenserMotor_t->step(1, FORWARD, SINGLE);
+}
 
-Servo actuator;
+void dispenserBackward(){
+  dispenserMotor_t->step(1, BACKWARD, SINGLE);
+}
+
+AccelStepper brewMotor(brewForward, brewBackward);
+AccelStepper dispenserMotor(dispenserForward, dispenserBackward);
+
+Servo tamping_actuator;
+Servo disposing_actuator;
 int linearValue = 1500;
 
 void setup() {
@@ -62,117 +73,120 @@ void setup() {
   Serial.println("In setup");
 
   AFMS.begin();
-
   
-
-//  NOT SURE IF USING
-//  pinMode(LEFTHOME, INPUT);
-//  pinMode(RIGHTHOME, INPUT);
-
   pinMode(TAMPSWITCH, INPUT);
   pinMode(DISPOSE_SWITCH, INPUT);
   
- actuator.attach(TAMPER_SERVO_PIN, 1050, 2000);
+ tamping_actuator.attach(TAMPER_SERVO_PIN, 1050, 2000);
+ disposing_actuator.attach(DISPOSE_SERVO_PIN, 1050, 2000);
  pinMode(TAMPER_SERVO_PIN, OUTPUT);
+ pinMode(DISPOSE_SERVO_PIN, OUTPUT);
 
   //brewHome(); // Home the brewing motor
   //brewMotor->setSpeed(1000);
 
   brewMotor.setMaxSpeed(1000.0);
   brewMotor.setAcceleration(200.0);
+
+  dispenserMotor.setMaxSpeed(1000.0);
+  dispenserMotor.setAcceleration(200.0);
   
   Serial.println("Motor Initilized");
 
-  actuator.writeMicroseconds(0);
+  tamping_actuator.writeMicroseconds(0);
+  disposing_actuator.writeMicroseconds(0);
   delay(2000);
 }
 
 void loop() {
 
-  actuator.writeMicroseconds(2000);
-  delay(6000);
-  actuator.writeMicroseconds(0);
-  delay(6000);
+//  actuator.writeMicroseconds(2000); 
+//  delay(6000);
+//  actuator.writeMicroseconds(0);
+//  delay(6000);
   
-//  String incoming = "";
-//  brewMotor.setAcceleration(200.0);
-//  // Read Serial Input
-//  if(Serial.available() > 0) {
-//    incoming = Serial.readString();
-//  }
-//  
-//  if(incoming == TAMP_STRING) {
-//    Serial.println("TAMP RECIEVED");
-//    //tampStep();
-//    
-//    stopped = true;
-//  }
-//  
-//  else if(incoming == BREW_STRING) {
-//    Serial.println("BREW RECIEVED");
-//    brewMotor.moveTo(endPosition / 2);
-//    brewing = true;
-//    stopped = false;
-//  }
-//  
-//  else if(incoming == DISPOSE_STRING) {
-//    Serial.println("DISPOSE RECIEVED");
-//    disposeStep();
-//    stopped = true;
-//  }
-//  
-//  else if(incoming == "STOP\r\n") {
-//    stopped = true;
-//  }
-//  
-//  else if (incoming == "CALIBRATE\r\n" || calibrating) { 
-//    Serial.println("Calibrate recieved");
-//    calibrating = true;
-//    if(digitalRead(DISPOSE_SWITCH) != LOW){
-//      disposeStep();
-//      Serial.println("End position: ");
-//      Serial.println(brewMotor.currentPosition());
-//      delay(500);
-//      tampStep();
-//      Serial.println("Start position: ");
-//      Serial.println(brewMotor.currentPosition());
-//    }
-//    //This runs if already at the end when calibrating
-//    else{
-//      tampStep();
-//      Serial.println("Start position: ");
-//      Serial.println(brewMotor.currentPosition());
-//      delay(500);
-//      disposeStep();
-//      Serial.println("End position: ");
-//      Serial.println(brewMotor.currentPosition());
-//      delay(500);
-//      tampStep();
-//      Serial.println("Start position: ");
-//      Serial.println(brewMotor.currentPosition());
-//    }
-//    calibrating = false;
-//    stopped = true;
-//  }
-//  else {
-//    Serial.flush();
-//   }
-//
-//   if(brewMotor.distanceToGo() == 0) {
-//    if(brewing){
-//      Serial.println("Current Brewing position: ");
-//      Serial.println(brewMotor.currentPosition());
-//      brewing = false;
-//    }
-//    stopped = true;
-//   }
-//   
-//   if(!stopped)
-//   {
-//    brewMotor.run();
-//   }
-//   else
-//    brewMotor.stop();
+  String incoming = "";
+  brewMotor.setAcceleration(200.0);
+  // Read Serial Input
+  if(Serial.available() > 0) {
+    incoming = Serial.readString();
+  }
+  if(incoming == "DISPENSE\r\n") {
+    Serial.println("Dispense Recieved");
+    dispenserMotor.moveTo(1000);
+    while(dispenserMotor.distanceToGo() != 0) {
+      dispenserMotor.run();
+    }
+  }
+  else if(incoming == TAMP_STRING) {
+    Serial.println("TAMP RECIEVED");
+    disposing_actuator.writeMicroseconds(0);
+    tampStep();
+    delay(3000);
+    tamping_actuator.writeMicroseconds(2000);
+    
+    stopped = true;
+  }
+  
+  else if(incoming == BREW_STRING) {
+    Serial.println("BREW RECIEVED");
+    tamping_actuator.writeMicroseconds(0);
+    disposing_actuator.writeMicroseconds(0);
+    delay(3000);
+    brewMotor.moveTo(endPosition / 2);
+    brewing = true;
+    stopped = false;
+  }
+  
+  else if(incoming == DISPOSE_STRING) {
+    Serial.println("DISPOSE RECIEVED");
+    tamping_actuator.writeMicroseconds(0);
+    disposeStep();
+    delay(3000);
+    disposing_actuator.writeMicroseconds(2000);
+    stopped = true;
+  }
+  
+  else if(incoming == "STOP\r\n") {
+    stopped = true;
+  }
+  
+  else if (incoming == "CALIBRATE\r\n" || calibrating) { 
+    Serial.println("Calibrate recieved");
+    calibrating = true;
+    tampStep();
+    Serial.println("Start position: ");
+    Serial.println(brewMotor.currentPosition());
+    delay(500);
+    disposeStep();
+    Serial.println("End position: ");
+    Serial.println(brewMotor.currentPosition());
+    delay(500);
+    tampStep();
+    Serial.println("Start position: ");
+    Serial.println(brewMotor.currentPosition());
+    calibrating = false;
+    stopped = true;
+  }
+  else {
+    Serial.flush();
+   }
+
+   if(brewMotor.distanceToGo() == 0) {
+    if(brewing){
+      Serial.println("Current Brewing position: ");
+      Serial.println(brewMotor.currentPosition());
+      brewing = false;
+    }
+    stopped = true;
+   }
+   
+   if(!stopped)
+   {
+    brewMotor.run();
+   }
+   else
+    brewMotor.stop();
 }
 
 /*
@@ -184,13 +198,13 @@ void tampStep() {
     brewMotor.moveTo(TAMP_POSITION);
 
     // Do a blocking step
-    while(brewMotor.distanceToGo() != 0 && digitalRead(TAMPSWITCH) != LOW) {
+    while(brewMotor.distanceToGo() != 0 && digitalRead(TAMPSWITCH) != HIGH) {
       brewMotor.run();
     }
     
     // Continually move by 1 step until target is reached
     int extraSteps = 0;
-    while(digitalRead(TAMPSWITCH) != LOW) {
+    while(digitalRead(TAMPSWITCH) != HIGH) {
       brewMotor.moveTo(brewMotor.currentPosition() - 1);
       brewMotor.run();
     }
@@ -213,7 +227,7 @@ void disposeStep() {
 
     // Do a blocking step
     int stepsMissed = 0;
-    while(brewMotor.distanceToGo() != 0 && digitalRead(DISPOSE_SWITCH) != LOW) {
+    while(brewMotor.distanceToGo() != 0 && digitalRead(DISPOSE_SWITCH) != HIGH) {
       brewMotor.run();
     }
 
@@ -223,7 +237,7 @@ void disposeStep() {
     // Continually move by 1 step until target is reached
     // Sets new endPosition if previous calibration wasn't right
     int extraSteps = 0;
-    while(digitalRead(DISPOSE_SWITCH) != LOW) {
+    while(digitalRead(DISPOSE_SWITCH) != HIGH) {
       brewMotor.moveTo(brewMotor.currentPosition() + 1);
       extraSteps++;   
       brewMotor.run();
