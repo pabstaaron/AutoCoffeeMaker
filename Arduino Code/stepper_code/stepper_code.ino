@@ -1,15 +1,8 @@
-/*
- * Spins a motor on channel 1 on a loop
- */
 #include <Wire.h>
 #include <Servo.h> 
 #include <Adafruit_MotorShield.h>
 #include <AccelStepper.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-
-//NOT SURE IF USING THESE
-//#define LEFTHOME 8 // TODO - Decide on these pins
-//#define RIGHTHOME 9
 
 #define TAMPSWITCH A0
 #define DISPOSE_SWITCH A5
@@ -31,15 +24,18 @@ bool brewing = false;
 bool calibrating = true;
 uint16_t endPosition = 0;
 uint16_t TAMP_POSITION = 0;
-uint16_t DISPOSE_CALIBRATE_POSITION = 300;
+uint16_t DISPOSE_CALIBRATE_POSITION = 575;
 
-void brewHome();
 void tampStep();
+void disposeStep();
+void brewStep();
+void dispenseStep();
+void calibrate();
+
 void tamperInit();
 void runTamper();
-//NOT SURE IF USING THESE
-//void accelStep(Adafruit_DCMotor motor, int steps, int dir);
-//void brewMove(int steps, int dir);
+void startUp();
+void parseSerialInput();
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *brewMotor_t = AFMS.getStepper(200, 1);
@@ -69,7 +65,7 @@ Servo disposing_actuator;
 int linearValue = 1500;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("In setup");
 
   AFMS.begin();
@@ -77,13 +73,10 @@ void setup() {
   pinMode(TAMPSWITCH, INPUT);
   pinMode(DISPOSE_SWITCH, INPUT);
   
- tamping_actuator.attach(TAMPER_SERVO_PIN, 1050, 2000);
- disposing_actuator.attach(DISPOSE_SERVO_PIN, 1050, 2000);
- pinMode(TAMPER_SERVO_PIN, OUTPUT);
- pinMode(DISPOSE_SERVO_PIN, OUTPUT);
-
-  //brewHome(); // Home the brewing motor
-  //brewMotor->setSpeed(1000);
+  tamping_actuator.attach(TAMPER_SERVO_PIN, 1050, 2000);
+  disposing_actuator.attach(DISPOSE_SERVO_PIN, 1050, 2000);
+  pinMode(TAMPER_SERVO_PIN, OUTPUT);
+  pinMode(DISPOSE_SERVO_PIN, OUTPUT);
 
   brewMotor.setMaxSpeed(1000.0);
   brewMotor.setAcceleration(200.0);
@@ -92,57 +85,123 @@ void setup() {
   dispenserMotor.setAcceleration(200.0);
   
   Serial.println("Motor Initilized");
-
-  tamping_actuator.writeMicroseconds(0);
-  disposing_actuator.writeMicroseconds(0);
-  delay(2000);
+  startUp();
 }
 
 void loop() {
-
-//  actuator.writeMicroseconds(2000); 
-//  delay(6000);
-//  actuator.writeMicroseconds(0);
-//  delay(6000);
-  
-  String incoming = "";
+ /*
+  * Reset the acceleration to default on every loop because if we abruptly stop the motor 
+  * we have to set acceleration to 0 to do so.
+  */
   brewMotor.setAcceleration(200.0);
+  
   // Read Serial Input
+  parseSerialInput();
+
+  // Check brewing positioning
+  if(brewMotor.distanceToGo() == 0) {
+    if(brewing){
+      Serial.println("Current Brewing position: ");
+      Serial.println(brewMotor.currentPosition());
+      brewing = false;
+    }
+    stopped = true;
+   }
+
+ // If we did not signal to stop the motor, continue telling the motor to run
+ if(!stopped)
+ {
+   brewMotor.run();
+ }
+ else
+   brewMotor.stop();
+}
+
+/*
+ * Code ran on startup for a visual representation of if
+ * things are connected properly
+ */
+void startUp() {
+  // Move Actuators
+  tamping_actuator.writeMicroseconds(1150);
+  disposing_actuator.writeMicroseconds(1150);
+  delay(3000);
+  tamping_actuator.writeMicroseconds(0);
+  disposing_actuator.writeMicroseconds(0);
+  delay(1000);
+  
+  // Move dispense motor
+  Serial.print("Dispense Motor Startup:");
+  dispenserMotor.moveTo(10);
+  while(dispenserMotor.distanceToGo() != 0) {
+     dispenserMotor.run();
+  }
+  dispenserMotor.moveTo(0);
+  while(dispenserMotor.distanceToGo() != 0) {
+      dispenserMotor.run();
+  }
+  Serial.println("COMPLETE");
+  delay(1500);
+    
+  // Move brew motor
+  Serial.print("Brew Motor Startup:");
+  brewMotor.moveTo(10);
+  while(brewMotor.distanceToGo() != 0 && digitalRead(TAMPSWITCH) != HIGH && digitalRead(DISPOSE_SWITCH) != HIGH) {
+     brewMotor.run();
+  }
+  brewMotor.moveTo(0);
+  while(brewMotor.distanceToGo() != 0 && digitalRead(TAMPSWITCH) != HIGH && digitalRead(DISPOSE_SWITCH) != HIGH) {
+      brewMotor.run();
+  }
+  Serial.println("COMPLETE");
+  delay(1500);
+  Serial.println("STARTUP COMPLETED");
+}
+
+/*
+ * Parses the input via serial and delegates the response to another function
+ */
+void parseSerialInput() {
+  String incoming = "";
   if(Serial.available() > 0) {
     incoming = Serial.readString();
   }
+  
   if(incoming == "DISPENSE\r\n") {
     Serial.println("Dispense Recieved");
-    dispenserMotor.moveTo(1000);
-    while(dispenserMotor.distanceToGo() != 0) {
-      dispenserMotor.run();
-    }
+    dispenseStep();
   }
+  
   else if(incoming == TAMP_STRING) {
-    Serial.println("TAMP RECIEVED");
+    Serial.println("Tamp Recieved");
     disposing_actuator.writeMicroseconds(0);
+    delay(2000);
+    
     tampStep();
-    delay(3000);
+
+    delay(2000);
     tamping_actuator.writeMicroseconds(2000);
     
     stopped = true;
   }
   
   else if(incoming == BREW_STRING) {
-    Serial.println("BREW RECIEVED");
+    Serial.println("Brew recieved");
     tamping_actuator.writeMicroseconds(0);
     disposing_actuator.writeMicroseconds(0);
-    delay(3000);
-    brewMotor.moveTo(endPosition / 2);
-    brewing = true;
+    delay(2000);
+    brewStep();
     stopped = false;
   }
   
   else if(incoming == DISPOSE_STRING) {
-    Serial.println("DISPOSE RECIEVED");
+    Serial.println("Dispose Recieved");
     tamping_actuator.writeMicroseconds(0);
+    delay(2000);
+    
     disposeStep();
-    delay(3000);
+    
+    delay(2000);
     disposing_actuator.writeMicroseconds(2000);
     stopped = true;
   }
@@ -153,40 +212,12 @@ void loop() {
   
   else if (incoming == "CALIBRATE\r\n" || calibrating) { 
     Serial.println("Calibrate recieved");
-    calibrating = true;
-    tampStep();
-    Serial.println("Start position: ");
-    Serial.println(brewMotor.currentPosition());
-    delay(500);
-    disposeStep();
-    Serial.println("End position: ");
-    Serial.println(brewMotor.currentPosition());
-    delay(500);
-    tampStep();
-    Serial.println("Start position: ");
-    Serial.println(brewMotor.currentPosition());
-    calibrating = false;
+    calibrate();
     stopped = true;
   }
   else {
     Serial.flush();
-   }
-
-   if(brewMotor.distanceToGo() == 0) {
-    if(brewing){
-      Serial.println("Current Brewing position: ");
-      Serial.println(brewMotor.currentPosition());
-      brewing = false;
-    }
-    stopped = true;
-   }
-   
-   if(!stopped)
-   {
-    brewMotor.run();
-   }
-   else
-    brewMotor.stop();
+  }
 }
 
 /*
@@ -217,11 +248,24 @@ void tampStep() {
 }
 
 /*
+ * Handles the brew step
+ * As of right now we move to the direct middle of
+ * the tamp and dispense position
+ */
+void brewStep() {    
+    brewMotor.moveTo(endPosition / 2);
+    while(brewMotor.distanceToGo() != 0) {
+      brewMotor.run();
+    }
+    brewing = true;
+}
+
+/*
  * Handles the dispose step:
  * 
  * Will run the normal step and then increment 1 until <switch> is depressed
  */
-void disposeStep() {
+void disposeStep() {    
     if(calibrating)brewMotor.moveTo(DISPOSE_CALIBRATE_POSITION);
     else brewMotor.moveTo(endPosition);
 
@@ -230,9 +274,6 @@ void disposeStep() {
     while(brewMotor.distanceToGo() != 0 && digitalRead(DISPOSE_SWITCH) != HIGH) {
       brewMotor.run();
     }
-
-    //stepsMissed = DISPOSE_POSITION - brewMotor.distanceToGo();
-    
     
     // Continually move by 1 step until target is reached
     // Sets new endPosition if previous calibration wasn't right
@@ -246,55 +287,36 @@ void disposeStep() {
 
     brewMotor.setAcceleration(0.0);
     brewMotor.stop();
-
-    // Update the position to the new calibrated position
-    //DISPOSE_POSITION = DISPOSE_POSITION + extraSteps - stepsMissed;
-    // Serial.println("New Dispose Position: ");
-    // Serial.println(DISPOSE_POSITION);
 }
 
-//NOT SURE IF USING
+/*
+ * Handles the dispense step.
+ * As of right now, it will just spin the motor
+ */
+void dispenseStep() {
+    dispenserMotor.moveTo(1000);
+    while(dispenserMotor.distanceToGo() != 0) {
+      dispenserMotor.run();
+    }
+}
 
-// Home the motor
-//void brewHome(){
-//  brewMove(100, FORWARD);
-//  while(!digitalRead(LEFTHOME)){
-//    brewMove(1, BACKWARD);
-//  } 
-//}
-//
-//// Move the brew motor while checking to make sure that we haven't hit an endstop
-//// Return if an endstop is hit
-//void brewMove(int steps, int dir){
-//  uint16_t stepsTaken = 0;
-//  if(dir == FORWARD){
-//    while(!digitalRead(LEFTHOME) && stepsTaken < steps){
-//      brewMotor_t->step(1, FORWARD, MICROSTEP);
-//      stepsTaken++;
-//    }
-//  }
-//  else{
-//    while(!digitalRead(RIGHTHOME) && stepsTaken < steps){
-//      brewMotor_t->step(1, BACKWARD, MICROSTEP);
-//      stepsTaken++;
-//    }
-//  }
-//}
-//
-//// Step the motor with acceleration
-//// TODO - Implement
-////  Need to ramp up speed over the steps
-//void accelStep(Adafruit_StepperMotor* motor, int steps, int dir){
-//  motor->setSpeed(10); // RPMs
-//  motor->step(steps, dir, MICROSTEP);
-//}
-
-
-//void tamperInit(){
-//  ACTUATOR.attach(ACTUATOR, 1050, 2000);
-//  ACTUATOR.writeMicroseconds(1500);
-//}
-//
-//void runTamper(){
-//  ACTUATOR.writeMicroseconds(1700);
-//}
+/*
+ * Calibrates the brewMotor and sets the ENV variables for step locations
+ */
+void calibrate() {
+    calibrating = true;
+    tampStep();
+    Serial.println("Start position: ");
+    Serial.println(brewMotor.currentPosition());
+    delay(500);
+    
+    disposeStep();
+    Serial.println("End position: ");
+    Serial.println(brewMotor.currentPosition());
+    delay(500);
+    
+    tampStep();
+    Serial.println("Start position: ");
+    Serial.println(brewMotor.currentPosition());
+    calibrating = false;
+}
