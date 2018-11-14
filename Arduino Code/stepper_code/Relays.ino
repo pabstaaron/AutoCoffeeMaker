@@ -39,6 +39,22 @@ void setRelay4(bool enable) {
 }
 
 /**
+ * Turns the boiler on/off
+ */
+void setBoiler(bool enable){
+  setRelay1(enable);
+  setRelay2(enable);
+}
+
+/**
+ * Turns the brewing pump on/off
+ */
+void setPump(bool enable){
+  setRelay3(enable);
+  setRelay4(enable);
+}
+
+/**
  * Sets all relays in the system to off
  */
 void resetAllRelays() {

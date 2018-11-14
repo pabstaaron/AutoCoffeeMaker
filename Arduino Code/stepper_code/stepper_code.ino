@@ -23,6 +23,8 @@ const String TAMP_STRING = "TAMP\r\n";
 const String BREW_STRING = "BREW\r\n";
 const String DISPOSE_STRING = "DISPOSE\r\n";
 const String CALIBRATE = "CALIBRATE\r\n";
+const String HOME = "HOME\r\n";
+const String FIRE_BOILER = "FIRE_BOILER\r\n";
 
 // Flags and Global Non Constants
 bool stopped = true;
@@ -45,10 +47,13 @@ void setDisposerTo(uint16_t percentage);
 void resetActuators();
 
 // Relay Functions
-void setRelay1(bool enable);
-void setRelay2(bool enable);
-void setRelay3(bool enable);
-void setRelay4(bool enable);
+// Note: duplicated boiler and pump relays to avoid potential current issues
+void setRelay1(bool enable); // boiler relay
+void setRelay2(bool enable); // boiler relay
+void setRelay3(bool enable); // pump relay
+void setRelay4(bool enable); // pump relay
+void setBoiler(bool enable);
+void setPump(bool enable);
 void resetAllRelays();
 
 // Main Functions
@@ -220,7 +225,28 @@ void parseSerialInput() {
   else if(incoming == "STOP\r\n") {
     stopped = true;
   }
-  
+  else if(incoming == HOME){
+    Serial.println("Resetting...");
+    resetAllRelays();
+    resetActuators();
+    tampStep();  
+  }
+  else if(incoming == FIRE_BOILER){
+    // test fire the boiler
+    resetActuators(); // Open up the brew channel from any potential obstructions
+    tampStep();
+    resetAllRelays();
+
+    delay(5000);
+
+    setPump(true);
+    setBoiler(true);
+
+    delay(20000);
+
+    setPump(false);
+    setBoiler(false);
+  }
   else if (incoming == "CALIBRATE\r\n" || calibrating) { 
     Serial.println("Calibrate recieved");
     resetActuators();
