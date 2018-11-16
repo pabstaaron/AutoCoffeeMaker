@@ -2,6 +2,7 @@
 #include <Servo.h> 
 #include <Adafruit_MotorShield.h>
 #include <AccelStepper.h>
+#include "Arduino.h"
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
 // Pins
@@ -13,26 +14,31 @@
 #define RELAY_SWITCH2 10
 #define RELAY_SWITCH3 9
 #define RELAY_SWITCH4 6
-
+#define TEMP 
 
 // Constants 
 #define MIN_ACTUATOR_TRANISTION 6000 // The time the acuators need to make a transition
+#define TAMP_EXTENSION 60
+
 
 // UART Constants
 const String TAMP_STRING = "TAMP\r\n";
 const String BREW_STRING = "BREW\r\n";
 const String DISPOSE_STRING = "DISPOSE\r\n";
+const String DISPENSE_STRING = "DISPENSE\r\n";
 const String CALIBRATE = "CALIBRATE\r\n";
 const String HOME = "HOME\r\n";
 const String FIRE_BOILER = "FIRE_BOILER\r\n";
+const String EXTEND = "EXTEND\r\n";
 
 // Flags and Global Non Constants
-bool stopped = true;
+bool stopped = false;
 bool brewing = false;
 bool calibrating = true;
 uint16_t endPosition = 0;
 uint16_t TAMP_POSITION = 0;
 uint16_t DISPOSE_CALIBRATE_POSITION = 600;
+bool extended = false;
 
 // Stepper Functions
 void tampStep();
@@ -55,6 +61,8 @@ void setRelay4(bool enable); // pump relay
 void setBoiler(bool enable);
 void setPump(bool enable);
 void resetAllRelays();
+
+String getSubstringValue(String data, char deliminator, int index);
 
 // Main Functions
 void startUp();
@@ -143,9 +151,10 @@ void startUp() {
   resetAllRelays();
   
   // Move Actuators
-  setTamperTo(50);
-  setDisposerTo(50);
-  delay(3000);
+  setTamperTo(5);
+  delay(1000);
+  setDisposerTo(5);
+  delay(1000);
   resetActuators();
   delay(1000);
   
@@ -177,6 +186,26 @@ void startUp() {
   Serial.println("STARTUP COMPLETED");
 }
 
+/**
+ * Will substring `data` with `deliminator` and return the string at `index` if it exists
+ * https://stackoverflow.com/questions/29671455/how-to-split-a-string-using-a-specific-delimiter-in-arduino
+ */
+String getSubstringValue(String data, char deliminator, int index) {
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length() - 1;
+
+  for(int i = 0; i <= maxIndex && found <= index; i++) {
+    if(data.charAt(i) == deliminator || i == maxIndex) {
+      found++;
+      strIndex[0] = strIndex[1]+1;
+      strIndex[1] = (i == maxIndex) ? i+1: i;
+    }
+  }
+
+  return found > index ? data.substring(strIndex[0], strIndex[1]): "";
+}
+
 /*
  * Parses the input via serial and delegates the response to another function
  */
@@ -186,10 +215,27 @@ void parseSerialInput() {
     incoming = Serial.readString();
   }
   
-  if(incoming == "DISPENSE\r\n") {
+  if(incoming == DISPENSE_STRING) {
     Serial.println("Dispense Recieved");
     dispenseStep();
     digitalWrite(RELAY_SWITCH1, HIGH);
+  }
+
+  else if (incoming.indexOf("DEMO") != -1) {
+    String value1 = getSubstringValue(incoming, ',', 1);
+    String value2 = getSubstringValue(incoming, ',', 2);
+    // Signals the demo
+    Serial.print("Demo started with:");
+    Serial.print(value1);
+    Serial.print(" and ");
+    Serial.print(value2);
+    tampStep();
+    dispenseStep();
+    brewStep();
+    delay(1000);
+    disposeStep();
+    tampStep();
+    Serial.println("Demo completed");
   }
   
   else if(incoming == TAMP_STRING) {
@@ -198,7 +244,7 @@ void parseSerialInput() {
     
     tampStep();
 
-    setTamperTo(100);
+    setTamperTo(TAMP_EXTENSION);
     stopped = true;
   }
   
@@ -208,7 +254,7 @@ void parseSerialInput() {
     
     brewStep();
     
-    digitalWrite(RELAY_SWITCH1, LOW);
+    //digitalWrite(RELAY_SWITCH1, LOW);
     stopped = false;
   }
   
@@ -218,19 +264,21 @@ void parseSerialInput() {
     
     disposeStep();
     
-    setDisposerTo(100);
+    setDisposerTo(TAMP_EXTENSION);
     stopped = true;
   }
   
   else if(incoming == "STOP\r\n") {
     stopped = true;
   }
+  
   else if(incoming == HOME){
     Serial.println("Resetting...");
     resetAllRelays();
     resetActuators();
     tampStep();  
   }
+  
   else if(incoming == FIRE_BOILER){
     // test fire the boiler
     resetActuators(); // Open up the brew channel from any potential obstructions
@@ -247,12 +295,26 @@ void parseSerialInput() {
     setPump(false);
     setBoiler(false);
   }
+  
+  else if(incoming == EXTEND){
+    if(!extended){
+      setTamperTo(TAMP_EXTENSION);
+      setDisposerTo(TAMP_EXTENSION);
+      extended = true;
+    }
+    else{
+      resetActuators();
+      extended = false;
+    }
+  }
+  
   else if (incoming == "CALIBRATE\r\n" || calibrating) { 
     Serial.println("Calibrate recieved");
     resetActuators();
     calibrate();
     stopped = true;
   }
+  
   else {
     Serial.flush();
   }
