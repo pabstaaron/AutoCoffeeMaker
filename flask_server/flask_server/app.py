@@ -2,7 +2,7 @@
 from flask import jsonify
 from flask import request
 from flask import Flask
-from stm32 import STM32
+from serialUART import SerialUART
 import time
 import settings
 import json
@@ -54,8 +54,8 @@ def change_duty_cycle(serial):
     if "dutyCycle" not in content:
         return _make_bad_data_return("dutyCycle")
     
-    stm = STM32("COM3")
-    reply = stm.pwm(content["dutyCycle"])
+    dut = SerialUART("COM9")
+    reply = dut.pwm(content["dutyCycle"])
     print(reply)
     post_data = {'utc': int(time.time()),
                  'request': 'PWM Changed',
@@ -80,6 +80,7 @@ def make_me_a_coffee(serial):
     """
     if(request.is_json):
         content = request.get_json()
+    print(content)
 
     if "pressure" not in content:
         return _make_bad_data_return("pressure")
@@ -98,8 +99,10 @@ def make_me_a_coffee(serial):
                      'serial number': _serial}
         return jsonify(post_data), 400
     else:
-        stm = STM32("COM3")
-        reply = stm.sample_cmd()
+        print("UART Command Trying to send")
+        serial = SerialUART("COM9")
+        # Start the process
+        reply = serial.demo(content["pressure"], content["temperature"])
         print(reply)
         post_data = {'utc': int(time.time()),
                      'request': 'Make me a Coffee',

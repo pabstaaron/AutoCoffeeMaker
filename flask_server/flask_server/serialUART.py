@@ -3,10 +3,10 @@ import re
 import time
 
 
-class STM32(object):
+class SerialUART(object):
     """
     Class Object that represents a communication link through UART to \
-    an STM32 Board
+    an DUT Board
     """
     def __init__(self, COMPORT):
         """
@@ -17,10 +17,10 @@ class STM32(object):
         if m is None:
             raise Exception('COMPORT must be of COMXX format')
         self._COMPORT = COMPORT
-        self.TERMINATOR = "\r"
+        self.TERMINATOR = "\r\n"
         self.logger = None  # Add Logger mechanism
         try:
-            self.stm = serial.Serial(port=self._COMPORT,
+            self.dut = serial.Serial(port=self._COMPORT,
                                      baudrate=115200,
                                      timeout=1)
         except serial.serialutil.SerialException:
@@ -28,14 +28,14 @@ class STM32(object):
             exit()
 
     def __str__(self):
-        return "STM32F0 Board @ {}".format(self._COMPORT)
+        return "dut32F0 Board @ {}".format(self._COMPORT)
 
     def open_port(self):
         """
         Tries to open the port, else throws
         """
         try:
-            self.stm.open()
+            self.dut.open()
         except serial.serialutil.SerialException:
             return "Could not open {}".format(self._COMPORT)
 
@@ -43,23 +43,23 @@ class STM32(object):
         """
         returns true if port is open, else false
         """
-        return self.stm.isOpen()
+        return self.dut.isOpen()
 
     def close(self):
         """
         Closes the port
         """
-        self.stm.close()
+        self.dut.close()
 
     def _cmd(self, cmd):
         """
-        Writes 'cmd' to the stm board and reads back the response. If the
+        Writes 'cmd' to the dut board and reads back the response. If the
         device does not provide a response it will throw, else returns
         """
         try:
             if not self.is_port_open():
-                self.stm.open()
-            self.stm.write("{}{}".format(cmd, self.TERMINATOR).encode())
+                self.dut.open()
+            self.dut.write("{}{}".format(cmd, self.TERMINATOR).encode())
             time.sleep(.10)
             return self._get_serial_data()
         except ValueError:
@@ -67,16 +67,14 @@ class STM32(object):
 
     def _get_serial_data(self):
         """
-        Reads a line from the stm device and then closes
+        Reads a line from the dut device and then closes
         """
         x = ""
         try:
-            bytesToRead = self.stm.inWaiting()
-            print(bytesToRead)
-            x += self.stm.read(bytesToRead).decode('ascii')
+            x += self.dut.readline().decode('ascii')
         except serial.SerialTimeoutException:
             print("timeout")
-        self.stm.close()
+        self.dut.close()
         return x
 
     def sample_cmd(self):
@@ -84,7 +82,13 @@ class STM32(object):
         This is an example of how we will make our cmd calls.
         'see _cmd'
         """
-        return self._cmd("brew 1 2 3 4 5 6 7")
+        return self._cmd("")
+    
+    def demo(self, val1, val2):
+        """
+        Sends the DEMO command with values `val1` and `val2`
+        """
+        return self._cmd("DEMO,{},{}".format(val1, val2))
     
     def pwm(self, dutyCyle):
         """
