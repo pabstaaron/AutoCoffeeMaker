@@ -14,7 +14,7 @@
 #define RELAY_SWITCH2 10
 #define RELAY_SWITCH3 9
 #define RELAY_SWITCH4 6
-#define TEMP 
+#define TEMP A1
 
 // Constants 
 #define MIN_ACTUATOR_TRANISTION 6000 // The time the acuators need to make a transition
@@ -32,9 +32,9 @@ const String FIRE_BOILER = "FIRE_BOILER\r\n";
 const String EXTEND = "EXTEND\r\n";
 
 // Flags and Global Non Constants
-bool stopped = false;
+bool stopped = true;
 bool brewing = false;
-bool calibrating = true;
+bool calibrating = false;
 uint16_t endPosition = 0;
 uint16_t TAMP_POSITION = 0;
 uint16_t DISPOSE_CALIBRATE_POSITION = 600;
@@ -61,6 +61,7 @@ void setRelay4(bool enable); // pump relay
 void setBoiler(bool enable);
 void setPump(bool enable);
 void resetAllRelays();
+float readTemp();
 
 String getSubstringValue(String data, char deliminator, int index);
 
@@ -94,9 +95,16 @@ void setup() {
   pinMode(RELAY_SWITCH2, OUTPUT);
   pinMode(RELAY_SWITCH3, OUTPUT);
   pinMode(RELAY_SWITCH4, OUTPUT);
+
+  digitalWrite(RELAY_SWITCH1, HIGH);
+  digitalWrite(RELAY_SWITCH2, HIGH);
+  digitalWrite(RELAY_SWITCH3, HIGH);
+  digitalWrite(RELAY_SWITCH4, HIGH);
   
   tamping_actuator.attach(TAMPER_SERVO_PIN, 1050, 2000);
   disposing_actuator.attach(DISPOSE_SERVO_PIN, 1050, 2000);
+
+  resetActuators();
   
   brewMotor.setMaxSpeed(1000.0);
   brewMotor.setAcceleration(200.0);
@@ -105,7 +113,7 @@ void setup() {
   dispenserMotor.setAcceleration(200.0);
   
   Serial.println("Motor Initilized");
-  startUp();
+  //startUp();
 }
 
 void loop() {
@@ -206,8 +214,49 @@ String getSubstringValue(String data, char deliminator, int index) {
   return found > index ? data.substring(strIndex[0], strIndex[1]): "";
 }
 
+float readTemp(){
+  uint16_t raw = analogRead(TEMP);
+  Serial.print("RAW: ");
+  Serial.println(raw);
+  float voltage = raw * (5.0 / 1023.0);
+  Serial.print("Volts: ");
+  Serial.println(voltage);
+  float temp = voltage / 0.005;
+  Serial.println(temp);
+  if(voltage > 2.5)
+    return 110;
+  else
+    return 0;
+}
+
+void brewDrive(){
+  Serial.println(readTemp());
+//  for(int i = 0; i < 1; i++){
+//    setPump(true);
+//    delay(30000);
+//    setPump(false);
+//    delay(2000);
+//  }
+  setBoiler(true);
+  long startTime = millis();
+  long currTime = millis();
+
+  while(currTime - startTime < 60000){
+    setBoiler(true);
+    while(readTemp() < 60)
+      delay(500);
+    setPump(true);
+    setBoiler(false);
+    while(readTemp() > 50)
+    delay(500);
+    setPump(false);
+  }
+
+  resetAllRelays();
+}
+
 /*
- * Parses the input via serial and delegates the response to another function
+ * Parses the input via serial and delegates the reGIsponse to another function
  */
 void parseSerialInput() {
   String incoming = "";
@@ -283,17 +332,20 @@ void parseSerialInput() {
     // test fire the boiler
     resetActuators(); // Open up the brew channel from any potential obstructions
     tampStep();
-    resetAllRelays();
-
-    delay(5000);
 
     setPump(true);
-    setBoiler(true);
-
-    delay(20000);
-
-    setPump(false);
-    setBoiler(false);
+    delay(5000);
+    resetAllRelays();
+    brewDrive();
+//    delay(5000);
+//
+//    setPump(true);
+//    //setBoiler(true);
+//
+//    delay(60000);
+//
+//    setPump(false);
+//    setBoiler(false);
   }
   
   else if(incoming == EXTEND){
