@@ -217,7 +217,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
 
                             }
                             else{
-                                Toast toast = Toast.makeText(mContext, "SN cannot be empty...", Toast.LENGTH_SHORT);
+                                Toast toast = Toast.makeText(mContext, "SN cannot be empty...", Toast.LENGTH_LONG);
                                 toast.setGravity(Gravity.CENTER, 0, 0);
                                 toast.show();                            }
                             imm.toggleSoftInput(InputMethodManager.RESULT_HIDDEN,0);
@@ -432,7 +432,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     }
                     case NO_WIFI:{
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
-                        Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }
@@ -459,9 +459,11 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     }
                 }
                 String message = "";
-                if(intent.hasExtra("Failure")) message = "Failure to get response from  device...";
-                else if(!previousPassword.isEmpty()) message = "password " + previousPassword + " for device " + deviceSelected.getMacAddress() + " is not correct...";
-                Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+                if(intent.hasExtra("Failure"))
+                    message = "Failure to get response from device...";
+                else if(!previousPassword.isEmpty())
+                    message = "password " + previousPassword + " for device " + deviceSelected.getMacAddress() + " is not correct...";
+                Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }

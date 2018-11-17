@@ -258,7 +258,7 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
      *
      * CONNECT_TO_LAST: Trying to connect to last device, display proper indications.
      *
-     * SEARCHING: Scanning network on bootup, refreshes device's /proc/net/arp by pinging all devices on LAN
+     * SEARCHING: Scanning wifi network for devices with certain mac address
      */
     private BroadcastReceiver wifiStatusReceiver = new BroadcastReceiver() {
         @Override
@@ -283,6 +283,17 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         break;
                     }
                     case NO_WIFI: {
+
+                        if(isConnected){
+                            Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        } else{
+                            Toast toast = Toast.makeText(context, "Can't connect to previous device...", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
                         isConnected = false;
                         connectButton.setEnabled(true);
@@ -296,9 +307,6 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
                         cradle.setVisibility(View.INVISIBLE);
                         circle.setVisibility(View.INVISIBLE);
                         connectingText.setVisibility(View.INVISIBLE);
-                        Toast toast = Toast.makeText(context, "Can't connect to previous device...", Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
                         break;
                     }
                     case WAITING_FOR_USER: {
@@ -410,6 +418,9 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
+    /**
+     * Login fragment
+     */
     private void openFragment(){
         LoginFragment fragment = LoginFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -419,6 +430,10 @@ public class MainMenu extends AppCompatActivity implements LoginFragment.OnFragm
         fragmentTransaction.add(R.id.fragmentContainer, fragment, "LOGIN_FRAGMENT").commit();
     }
 
+    /**
+     * Received info from login fragment
+     * @param sendBackUsername
+     */
     @Override
     public void onFragmentInteraction(String sendBackUsername) {
         if(!sendBackUsername.isEmpty())loginButton.setText(sendBackUsername);

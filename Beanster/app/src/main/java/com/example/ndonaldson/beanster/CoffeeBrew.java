@@ -191,9 +191,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             @Override
             public void onClick(View v) {
                 activeState = ActiveState.BASIC;
-                basicButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                basicButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 basicButton.setTextColor(Color.parseColor("#664400"));
-                advancedButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                advancedButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 advancedButton.setTextColor(Color.parseColor("#ffefcc"));
                 hideAdvanced();
                 showBasic();
@@ -205,9 +205,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             @Override
             public void onClick(View v) {
                 activeState = ActiveState.ADVANCED;
-                advancedButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                advancedButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 advancedButton.setTextColor(Color.parseColor("#664400"));
-                basicButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                basicButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 basicButton.setTextColor(Color.parseColor("#ffefcc"));
                 hideBasic();
                 showAdvanced();
@@ -291,7 +291,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 favoritedBrew = false;
                 basicState.amount = BasicState.State.FIRST;
-                amountSmallButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                amountSmallButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 amountSmallButton.setTextColor(Color.parseColor("#664400"));
                 selectBasicButton(0, amountSmallButton);
             }
@@ -315,7 +315,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 favoritedBrew = false;
                 basicState.amount = BasicState.State.THIRD;
-                amountLargeButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                amountLargeButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 amountLargeButton.setTextColor(Color.parseColor("#664400"));
                 selectBasicButton(0, amountLargeButton);
             }
@@ -327,7 +327,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 favoritedBrew = false;
                 basicState.strength = BasicState.State.FIRST;
-                strengthMildButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                strengthMildButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 strengthMildButton.setTextColor(Color.parseColor("#664400"));
                 selectBasicButton(1, strengthMildButton);
             }
@@ -351,7 +351,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 favoritedBrew = false;
                 basicState.strength = BasicState.State.THIRD;
-                strengthStrongButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                strengthStrongButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 strengthStrongButton.setTextColor(Color.parseColor("#664400"));
                 selectBasicButton(1, strengthStrongButton);
             }
@@ -363,7 +363,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 favoritedBrew = false;
                 basicState.froth = BasicState.State.FIRST;
-                frothNoneButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                frothNoneButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 frothNoneButton.setTextColor(Color.parseColor("#664400"));
                 selectBasicButton(2, frothNoneButton);
             }
@@ -387,7 +387,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 favoritedBrew = false;
                 basicState.froth = BasicState.State.THIRD;
-                frothFrothiestButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                frothFrothiestButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 frothFrothiestButton.setTextColor(Color.parseColor("#664400"));
                 selectBasicButton(2, frothFrothiestButton);
             }
@@ -402,7 +402,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 playSliders(advancedState.activeSection, AdvancedState.ActiveSection.WATER);
                 advancedState.activeSection = AdvancedState.ActiveSection.WATER;
-                waterButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                waterButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 waterButton.setTextColor(Color.parseColor("#664400"));
                 selectAdvancedButton(advancedState.activeSection);
             }
@@ -414,7 +414,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 playSliders(advancedState.activeSection, AdvancedState.ActiveSection.MILK);
                 advancedState.activeSection = AdvancedState.ActiveSection.MILK;
-                milkButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                milkButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 milkButton.setTextColor(Color.parseColor("#664400"));
                 selectAdvancedButton(advancedState.activeSection);
             }
@@ -438,7 +438,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 playSliders(advancedState.activeSection, AdvancedState.ActiveSection.COFFEE);
                 advancedState.activeSection = AdvancedState.ActiveSection.COFFEE;
-                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 coffeeButton.setTextColor(Color.parseColor("#664400"));
                 selectAdvancedButton(advancedState.activeSection);
             }
@@ -450,7 +450,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 playSliders(advancedState.activeSection, AdvancedState.ActiveSection.SYRUP);
                 advancedState.activeSection = AdvancedState.ActiveSection.SYRUP;
-                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                syrupButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 syrupButton.setTextColor(Color.parseColor("#664400"));
                 selectAdvancedButton(advancedState.activeSection);
             }
@@ -624,35 +624,42 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 int responseCode = response.getStatusLine().getStatusCode();
 
                 Log.i("CoffeeBrew", "responsCode: " + responseCode);
-                if(responseCode == HttpURLConnection.HTTP_OK){
+                if(responseCode == HttpURLConnection.HTTP_CREATED){
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(mContext, "Your drink is being brewed...", Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(mContext, "Your drink is being brewed...", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
                             onResponse();
                         }
                     });
                 } else if(responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR){
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(mContext, "There was a problem brewing your drink...", Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(mContext, "There was a problem brewing your drink...", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
                         }
                     });
                 }
                 else if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST){
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(mContext, "Data sent was corrupted...", Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(mContext, "Data sent was corrupted...", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
                         }
                     });
                 }
-                else if(responseCode == HttpURLConnection.HTTP_CONFLICT){
+                else if(responseCode == HttpURLConnection.HTTP_OK){
                     runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(mContext, "A drink is currently being brewed...", Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(mContext, "A drink is currently being brewed...", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
                         }
                     });
                 }
-//                toast.show();
             }catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Brew", e.getLocalizedMessage());
@@ -690,6 +697,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                         break;
                     }
                     case NO_WIFI: {
+                        Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
                         Intent deviceIntent = new Intent(getApplicationContext(), DeviceSelection.class);
                         intent.putExtra("connected", false);
                         startActivity(deviceIntent);
@@ -848,6 +858,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         indicatorLayout2.setVisibility(View.INVISIBLE);
 
         indicatorLayout3.setVisibility(View.INVISIBLE);
+
+        favoritesButton.setVisibility(View.INVISIBLE);
+        favoritesButton.setEnabled(false);
     }
 
     public void showAdvanced(){
@@ -877,19 +890,19 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
         switch(advancedState.activeSection){
             case WATER:{
-                waterButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                waterButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 waterButton.setTextColor(Color.parseColor("#664400"));
 
-                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 indicatorLayout1.setVisibility(View.VISIBLE);
@@ -911,19 +924,19 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
             case MILK:{
-                milkButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                milkButton.setBackground(getDrawable(R.drawable.leftroundedselected));
                 milkButton.setTextColor(Color.parseColor("#664400"));
 
-                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 indicatorLayout1.setVisibility(View.VISIBLE);
@@ -948,16 +961,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 frothButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
                 frothButton.setTextColor(Color.parseColor("#664400"));
 
-                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 indicatorLayout3.setEnabled(true);
@@ -979,19 +992,19 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
             case SYRUP:{
-                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                syrupButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 syrupButton.setTextColor(Color.parseColor("#664400"));
 
-                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 mySpinner.setEnabled(true);
@@ -1016,19 +1029,19 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
             case COFFEE:{
-                coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 coffeeButton.setTextColor(Color.parseColor("#664400"));
 
-                milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
 
@@ -1054,8 +1067,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             }
         }
 
-        favoritesButton.setEnabled(true);
-        favoritesButton.setVisibility(View.VISIBLE);
+        if(!loginButton.getText().toString().equals("Login")) {
+            favoritesButton.setEnabled(true);
+            favoritesButton.setVisibility(View.VISIBLE);
+        }
     }
 
     public void hideBasic(){
@@ -1343,16 +1358,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
         if(state == AdvancedState.ActiveSection.FROTH) {
 
-            waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
             mySpinner.setEnabled(false);
@@ -1381,13 +1396,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
             mySpinner.setEnabled(false);
@@ -1416,13 +1431,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
             mySpinner.setEnabled(false);
@@ -1451,13 +1466,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            syrupButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
             mySpinner.setEnabled(false);
@@ -1486,13 +1501,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            waterButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            milkButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            coffeeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
             mySpinner.setEnabled(true);
@@ -1521,7 +1536,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         switch(row){
             case 0:{
                 if(button.getId() != R.id.basicAmountButton){
-                    amountSmallButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                    amountSmallButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                     amountSmallButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicAmountButton2){
@@ -1529,14 +1544,14 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                     amountMediumButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicAmountButton3){
-                    amountLargeButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                    amountLargeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                     amountLargeButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 break;
             }
             case 1:{
                 if(button.getId() != R.id.basicStrengthButton){
-                    strengthMildButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                    strengthMildButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                     strengthMildButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicStrengthButton2){
@@ -1544,14 +1559,14 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                     strengthRegularButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicStrengthButton3){
-                    strengthStrongButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                    strengthStrongButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                     strengthStrongButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 break;
             }
             case 2:{
                 if(button.getId() != R.id.basicFrothButton){
-                    frothNoneButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                    frothNoneButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                     frothNoneButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicFrothButton2){
@@ -1559,7 +1574,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                     frothFrothyButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicFrothButton3){
-                    frothFrothiestButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                    frothFrothiestButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                     frothFrothiestButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 break;
@@ -1721,7 +1736,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                                                 String json = gson.toJson(userData);
                                                                 editor.putString("userData", json).apply();
-                                                                Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_SHORT);
+                                                                Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_LONG);
                                                                 toast.setGravity(Gravity.CENTER, 0, 0);
                                                                 toast.show();
                                                             }
@@ -1745,7 +1760,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                                                 String json = gson.toJson(userData);
                                                                 editor.putString("userData", json).apply();
-                                                                Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_SHORT);
+                                                                Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_LONG);
                                                                 toast.setGravity(Gravity.CENTER, 0, 0);
                                                                 toast.show();
                                                             }
@@ -1762,6 +1777,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                                     json = gson.toJson(userData);
                                                     editor.putString("userData", json).apply();
+                                                    Toast toast = Toast.makeText(mContext, String.format("Favorite %s saved...", saveName), Toast.LENGTH_LONG);
+                                                    toast.setGravity(Gravity.CENTER, 0, 0);
+                                                    toast.show();
                                                 }
 
 
@@ -1771,11 +1789,11 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                                         }
                                     }
                                 } else if (saveName.length() > 12) {
-                                    Toast toast = Toast.makeText(mContext, "Save name must be shorter than 12 characters...", Toast.LENGTH_SHORT);
+                                    Toast toast = Toast.makeText(mContext, "Save name must be shorter than 12 characters...", Toast.LENGTH_LONG);
                                     toast.setGravity(Gravity.CENTER, 0, 0);
                                     toast.show();
                                 } else {
-                                    Toast toast = Toast.makeText(mContext, "Save name cannot be empty...", Toast.LENGTH_SHORT);
+                                    Toast toast = Toast.makeText(mContext, "Save name cannot be empty...", Toast.LENGTH_LONG);
                                     toast.setGravity(Gravity.CENTER, 0, 0);
                                     toast.show();
                                 }

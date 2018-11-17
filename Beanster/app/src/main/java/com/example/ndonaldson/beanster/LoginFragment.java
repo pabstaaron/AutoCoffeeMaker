@@ -89,6 +89,48 @@ public class LoginFragment extends Fragment {
         usernameText = (EditText) view.findViewById(R.id.fragmentUserName);
         passwordText = (EditText) view.findViewById(R.id.fragmentPassword);
 
+        usernameText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editable.toString().trim().length() == 10){
+                    usernameText.setError("Maximum length reached...");
+                } else{
+                    usernameText.setError(null);
+                }
+            }
+        });
+
+        passwordText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(editable.toString().trim().length() == 10){
+                    passwordText.setError("Maximum length reached...");
+                } else{
+                    passwordText.setError(null);
+                }
+            }
+        });
+
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -182,7 +182,7 @@ public class WifiRunner implements Runnable {
                                 String stackTrace = writer.toString();
                                 Log.i("WifiRunner", e.getLocalizedMessage());
                                 Log.i("WifiRunner", stackTrace);
-                                sendIntent("failure");
+                                if(isConnected != false) sendIntent("failure");
                                 lastDevice = null;
                             }
                             Log.i("WifiRunner", "responseCode:" + responseCode);
@@ -194,7 +194,7 @@ public class WifiRunner implements Runnable {
                                 Log.i("WifiRunner", "Failed to connect");
                                 isConnected = false;
                                 connectStatus = ConnectStatus.NO_WIFI;
-                                sendIntent("status");
+                                if(connectStatus != ConnectStatus.CONNECT_TO_LAST) sendIntent("status");
                                 connectStatus = ConnectStatus.WAITING_FOR_USER;
                                 lastDevice = null;
                                 sendIntent("status");
@@ -262,7 +262,7 @@ public class WifiRunner implements Runnable {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     Log.i("WifiRunner", e.getLocalizedMessage());
-                                    sendIntent("failure");
+                                    //if(isConnected != false) sendIntent("failure");
                                 }
                                 if (responseCode != HttpURLConnection.HTTP_OK) {
                                     if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {

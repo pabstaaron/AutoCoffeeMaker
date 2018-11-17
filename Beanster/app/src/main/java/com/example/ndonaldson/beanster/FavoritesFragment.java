@@ -127,7 +127,9 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
                     editor.putString("userData", json).commit();
                     okayButton.setEnabled(false);
                     clearButton.setEnabled(false);
-                    Toast.makeText(getActivity(), "Favorite deleted...", Toast.LENGTH_LONG ).show();
+                    Toast toast = Toast.makeText(getActivity(), "Favorite deleted...", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
 
                     okayButton.setBackground(getActivity().getDrawable(R.drawable.buttonstyledisable));
                     okayButton.setTextColor(Color.rgb(204, 204, 204));
