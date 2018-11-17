@@ -1,0 +1,24 @@
+--cpu Cortex-M0
+"gpiotest\startup_stm32f072xb.o"
+"gpiotest\main.o"
+"gpiotest\stm32f0xx_it.o"
+"gpiotest\stm32f0xx_hal_msp.o"
+"gpiotest\stm32f0xx_hal_tim.o"
+"gpiotest\stm32f0xx_hal_tim_ex.o"
+"gpiotest\stm32f0xx_hal_rcc.o"
+"gpiotest\stm32f0xx_hal_rcc_ex.o"
+"gpiotest\stm32f0xx_hal.o"
+"gpiotest\stm32f0xx_hal_i2c.o"
+"gpiotest\stm32f0xx_hal_i2c_ex.o"
+"gpiotest\stm32f0xx_hal_gpio.o"
+"gpiotest\stm32f0xx_hal_dma.o"
+"gpiotest\stm32f0xx_hal_cortex.o"
+"gpiotest\stm32f0xx_hal_pwr.o"
+"gpiotest\stm32f0xx_hal_pwr_ex.o"
+"gpiotest\stm32f0xx_hal_flash.o"
+"gpiotest\stm32f0xx_hal_flash_ex.o"
+"gpiotest\system_stm32f0xx.o"
+--library_type=microlib --strict --scatter "gpioTest\gpioTest.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "gpioTest.map" -o gpioTest\gpioTest.axf

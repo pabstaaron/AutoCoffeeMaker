@@ -43,6 +43,8 @@
 #include "stepper.h"
 #include "arduinoStepper.h"
 
+#define TIM3_ARR 1000;
+
 ADC_HandleTypeDef hadc;
 
 TIM_HandleTypeDef htim1;
@@ -58,6 +60,8 @@ static void MX_ADC_Init(void);
                                     
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
+void setTimer3ChOne(uint8_t duty);
+
 /**
   * @brief  The application entry point.
   *
@@ -69,7 +73,8 @@ int main(void)
   HAL_Init();
 
   MX_GPIO_Init();
-  MX_TIM3_Init();
+  //MX_TIM3_Init();
+	
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_ADC_Init();
@@ -91,14 +96,33 @@ int main(void)
 	m4.gpioBlock = GPIOB;
 	m4.pinNumber = GPIO_PIN_6;
 	
-	stepper_t motorOne = stepper_init(200, m1, m2, m3, m4); // Bind a new motor instance
-	setSpeed(motorOne, 5); // set to 5RPM
+	//stepper_t motorOne = stepper_init(200, m1, m2, m3, m4); // Bind a new motor instance
+	//setSpeed(motorOne, 1); // set to 5RPM
+	
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+	
+	//TIM3->CR1 |= 1; // Start timer 3
+	
+	setTimer3ChOne(50);
 	
   while (1)
   {
-		step(motorOne, 10); // Continually spin the motor
+	//	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
+	//	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_11);
+	//	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
+	//	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2);
+		//step(motorOne, 100); // Continually spin the motor
+		
+		HAL_Delay(500);
   }
 
+}
+
+// Sets the duty cycle of channel timer three channel one
+void setTimer3ChOne(uint8_t duty){
+	uint32_t newCCCR = (TIM3->ARR * duty) / 100;
+	
 }
 
 /**
@@ -354,7 +378,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 0;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 0;
+  htim3.Init.Period = TIM3_ARR;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
