@@ -304,11 +304,12 @@ altered after the acrylic housing was cut, so some mounting positions had to be
 manually opended with a drill.
 
 
-\begin{figure*}
-  \centering
-    \includegraphics[width=1.8\columnwidth]{render}
-    \caption{A render of the phyical system design.}
-\end{figure*}
+\begin{figure*}[!ht]
+\centering
+\includegraphics[width=0.5\columnwidth]{render.png}
+\frame{\includegraphics[width=0.5\columnwidth]{wifi.png}}
+\caption{Basic mockup of the homescreen, and wifi connection}
+\end{figure*} 
 
 \subsection{Electronics and Control}
 The electronics for the system were intially designed as a custom PCB that would
@@ -615,12 +616,8 @@ Our machine does, however, demonstrate that the espresso making process can be
 automated in a way that mimics the way in which a human would manually produce
 espresso.
 
-% 
 \section{Appendix A: Discoveries and Pitfalls}
-% Large stepper motor control system are hard, especially when super accurate
-% positioning is required
 
-% AccelStepper is a lifesaver
 
 \section{Appendix B: Bill of Materials}
 \begin{itemize}

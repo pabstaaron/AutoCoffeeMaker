@@ -620,8 +620,6 @@ espresso.
 % Large stepper motor control system are hard, especially when super accurate
 % positioning is required
 
-% AccelStepper is a lifesaver
-
 \section{Appendix B: Bill of Materials}
 \begin{itemize}
 \item Raspberry Pi 3
