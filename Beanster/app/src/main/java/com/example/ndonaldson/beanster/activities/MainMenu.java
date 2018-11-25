@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -32,7 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.google.gson.Gson;
+import com.example.ndonaldson.beanster.data.Device;
+import com.example.ndonaldson.beanster.fragments.LoginFragment;
+import com.example.ndonaldson.beanster.R;
+import com.example.ndonaldson.beanster.data.ThreadManager;
+import com.example.ndonaldson.beanster.wifi.WifiRunner;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 /**

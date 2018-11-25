@@ -1,26 +1,22 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.activities;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.os.Bundle;
+
+import com.example.ndonaldson.beanster.R;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
 
 /**
- * This class is used to overwrite the clear cache option under application management.
+ * This class is used to overwrite the clear data option under application management.
  * It gives the user the option to keep user information.
  */
-public class ClearCacheActivity extends AppCompatActivity {
 
+public class ClearDataActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private static final String  DEVICES_LOCATION = Environment.getExternalStorageDirectory().getAbsolutePath() + "/deviceIds.txt";
 
@@ -73,5 +69,4 @@ public class ClearCacheActivity extends AppCompatActivity {
             file.delete();
         }
     }
-
 }

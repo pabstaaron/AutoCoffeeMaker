@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -36,13 +36,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.google.gson.Gson;
+import com.example.ndonaldson.beanster.data.Device;
+import com.example.ndonaldson.beanster.fragments.LoginFragment;
+import com.example.ndonaldson.beanster.R;
+import com.example.ndonaldson.beanster.wifi.SelectableWifi;
+import com.example.ndonaldson.beanster.wifi.WifiAdapter;
+import com.example.ndonaldson.beanster.wifi.WifiRunner;
+import com.example.ndonaldson.beanster.wifi.WifiSelectItem;
+import com.example.ndonaldson.beanster.wifi.WifiViewHolder;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceSelection extends AppCompatActivity implements WifiViewHolder.OnItemSelectedListener, LoginFragment.OnFragmentInteractionListener{
+public class DeviceSelection extends AppCompatActivity implements WifiViewHolder.OnItemSelectedListener, LoginFragment.OnFragmentInteractionListener {
 
     private WifiRunner.ConnectStatus mConnectStatus;
     private ArrayList<Device> mDeviceIds;

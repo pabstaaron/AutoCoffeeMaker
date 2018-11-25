@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.wifi;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckedTextView;
+
+import com.example.ndonaldson.beanster.R;
 
 /**
  * The display for each card in the recyclerview

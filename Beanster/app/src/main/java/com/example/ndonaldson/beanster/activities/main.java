@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,11 +21,12 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ViewFlipper;
 
+import com.example.ndonaldson.beanster.R;
+import com.example.ndonaldson.beanster.data.UserData;
 import com.google.gson.Gson;
 import com.victor.loading.newton.NewtonCradleLoading;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  *@author Nathan Donaldson

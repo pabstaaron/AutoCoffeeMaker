@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

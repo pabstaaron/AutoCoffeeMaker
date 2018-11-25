@@ -1,45 +1,31 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.data;
 
 /**
  * Created by ndonaldson on 10/2/18.
  */
 
+import com.example.ndonaldson.beanster.activities.CoffeeBrew;
+
 /**
  • Brew water temperature; as a value in degress Farenheit.
- • Frothing pressure; as a value in PSI.
- • Brew water pressure, as a value in PSI.
  • Amount of water to dispense through the brewer, as a value in ounces.
  • Amount of milk dispensed through the frother, in ounces.
- • Temprature for milk to reach in frothing cycle, as a value in degrees Fahrenheit.
- • Amount of froth to produce; as a value from zero to 100.
- A value of zero will cause the milk to simply be warmed up (steamed), while a higher value will produce more foam.
- • What kind of syrup, along with how much; as two integer values. The first number will be a value between zero and four.
- The second number will be the amount of syrup to dispense; in ounces.
+ • Amount of froth to produce; as a value from zero to 100. A value of zero will cause the milk to simply be warmed up (steamed), while a higher value will produce more foam.
  • The amount of coffee to dispense; in kilograms.
  */
 public class RequestData{
     public int waterTemp;
-    public int milkTemp;
-    //private int waterPress;
-    public int frothPress;
     public int waterDisp;
     public int milkDisp;
-    public int frothDisp;
+    public int frothStr;
     public int coffeeDisp;
-    public int syrupDisp;
-    public int syrup;
 
     public RequestData(){
         this.waterTemp = 70;
-        this.milkTemp = 70;
-        //this.waterPress = 70;
-        this.frothPress = 70;
         this.waterDisp = 70;
         this.milkDisp = 70;
-        this.frothDisp = 70;
+        this.frothStr = 70;
         this.coffeeDisp = 70;
-        this.syrupDisp = 70;
-        this.syrup = 70;
     }
 
 
@@ -82,17 +68,16 @@ public class RequestData{
         }
     }
 
+    /**
+     * Set values with advanced state
+     * @param advancedState
+     */
     public void setWithAdvance(CoffeeBrew.AdvancedState advancedState){
         this.waterTemp = advancedState.waterState.temp;
-        //this.waterPress = advancedState.waterState.press;
         this.waterDisp = advancedState.waterState.disp;
-        this.milkTemp = advancedState.milkState.temp;
         this.milkDisp = advancedState.milkState.disp;
-        this.frothPress = advancedState.frothState.press;
-        this.frothDisp = advancedState.frothState.disp;
+        this.frothStr = advancedState.frothState.str;
         this.coffeeDisp = advancedState.coffeeState.disp;
-        this.syrupDisp = advancedState.syrupState.disp;
-        this.syrup = advancedState.syrupState.type;
     }
 
     @Override
@@ -103,10 +88,9 @@ public class RequestData{
 
         RequestData r = (RequestData) o;
 
-        if(this.waterDisp == r.waterDisp && /*this.waterPress == r.waterPress*/ this.waterTemp == r.waterTemp &&
-                this.milkDisp == r.milkDisp && this.milkTemp == r.milkTemp && this.frothDisp == r.frothDisp &&
-                this.frothPress == r.frothPress && this.coffeeDisp == r.coffeeDisp &&
-                this.syrupDisp == r.syrupDisp && this.syrup == r.syrup)
+        if(this.waterDisp == r.waterDisp && this.waterTemp == r.waterTemp &&
+                this.milkDisp == r.milkDisp && this.frothStr == r.frothStr &&
+                this.coffeeDisp == r.coffeeDisp)
             return true;
 
         return false;
@@ -116,15 +100,10 @@ public class RequestData{
     public String toString(){
         StringBuilder builder = new StringBuilder();
         builder.append("Water Temp: " + waterTemp + "\n");
-        //builder.append("Water Press: " + waterPress + "\n");
         builder.append("Water Disp: " + waterDisp + "\n");
-        builder.append("Milk Temp: " + milkTemp + "\n");
         builder.append("Milk Disp: " + milkDisp + "\n");
-        builder.append("Froth Press: " + frothPress + "\n");
-        builder.append("Froth Disp: " + frothDisp + "\n");
+        builder.append("Froth Disp: " + frothStr + "\n");
         builder.append("Coffee Disp: " + coffeeDisp + "\n");
-        builder.append("Syrup Disp: " + syrupDisp + "\n");
-        builder.append("Syrup Choice: " + syrup + "\n");
         return builder.toString();
     }
 }

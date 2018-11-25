@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.wifi;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 import android.util.Log;
+
+import com.example.ndonaldson.beanster.data.Device;
 
 import java.io.EOFException;
 import java.io.File;
@@ -91,7 +93,7 @@ public class WifiRunner implements Runnable {
                 fis.close();
             }
         }
-        catch(EOFException e){
+        catch(Exception e){
             e.printStackTrace();
             Log.i("WifiRunner", "" + e.getLocalizedMessage());
         }
@@ -237,6 +239,9 @@ public class WifiRunner implements Runnable {
                                 connectStatus = ConnectStatus.WAITING_FOR_USER;
                                 sendIntent("status");
                             }
+                        } else{
+                            connectStatus = ConnectStatus.WAITING_FOR_USER;
+                            sendIntent("status");
                         }
                         firstConnect = false;
                         if(client != null) client.disconnect();

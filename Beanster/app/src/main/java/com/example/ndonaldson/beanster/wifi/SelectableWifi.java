@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.wifi;
 
 /**
  * Wrapper to identify if viewHolder is selected

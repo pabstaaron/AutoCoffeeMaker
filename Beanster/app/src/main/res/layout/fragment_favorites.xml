@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:background="#A0522D"
-    tools:context="com.example.ndonaldson.beanster.LoginFragment">
+    tools:context="com.example.ndonaldson.beanster.fragments.LoginFragment">
 
     <ImageView
         android:id="@+id/image3"

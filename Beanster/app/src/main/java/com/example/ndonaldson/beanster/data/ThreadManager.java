@@ -1,8 +1,6 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.data;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -17,6 +15,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
+
+import com.example.ndonaldson.beanster.activities.main;
 
 /**
  * Utility class to efficiently use background threads, report

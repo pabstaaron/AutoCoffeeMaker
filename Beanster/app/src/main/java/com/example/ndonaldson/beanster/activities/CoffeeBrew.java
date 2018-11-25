@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +22,12 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
+import com.example.ndonaldson.beanster.fragments.FavoritesFragment;
+import com.example.ndonaldson.beanster.fragments.LoginFragment;
+import com.example.ndonaldson.beanster.R;
+import com.example.ndonaldson.beanster.data.RequestData;
+import com.example.ndonaldson.beanster.data.UserData;
+import com.example.ndonaldson.beanster.wifi.WifiRunner;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.warkiz.widget.IndicatorSeekBar;
@@ -36,14 +41,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 
+/**
+This activity keeps track of RequestData information that is to be sent to the RaspberryPi and the UI surrounding that changing data. This
+ sends this info to the Pi via http POST calls.
+ */
 public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener, FavoritesFragment.OnFragmentInteractionListener {
 
     private WifiRunner.ConnectStatus mConnectStatus;
@@ -72,7 +78,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     private Button milkButton;
     private Button frothButton;
     private Button coffeeButton;
-    private Button syrupButton;
 
     //Labels
     private EditText label1;
@@ -81,22 +86,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
     //Seekbars
     private IndicatorSeekBar tempSeekbar;
-    private IndicatorSeekBar pressSeekbar;
+    private IndicatorSeekBar strSeekbar;
     private IndicatorSeekBar dispSeekbar;
 
     //GridLayouts
-    private android.support.v7.widget.GridLayout basicGridLayout;
     private android.support.v7.widget.GridLayout basicGridLayout2;
 
     //IndicatorLayouts
     private IndicatorStayLayout indicatorLayout1;
     private IndicatorStayLayout indicatorLayout2;
     private IndicatorStayLayout indicatorLayout3;
-
-
-    //Spinner
-    private Spinner mySpinner;
-    private String[] syrups = {"Disabled", "Enabled"};
 
     //Data
     private String connectedPassword;
@@ -105,14 +104,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     private RequestData requestData;
     private ActiveState activeState;
     private int prevDisp = 70;
-    private int prevPress = 70;
     private int prevTemp = 70;
+    private int prevStr = 70;
     private float dispDiff = 70;
-    private float pressDiff = 70;
     private float tempDiff = 70;
+    private float strDiff = 70;
     private Context mContext;
-    private String userName;
-    private FrameLayout fragmentContainer;
     private boolean favoritedBrew = false;
     private UserData currentUserData;
 
@@ -143,7 +140,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         activeState = ActiveState.BASIC;
         advancedState = new AdvancedState();
         basicState = new BasicState();
-        fragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer3);
         requestData = new RequestData();
 
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
@@ -426,7 +422,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             public void onClick(View v) {
                 playSliders(advancedState.activeSection, AdvancedState.ActiveSection.FROTH);
                 advancedState.activeSection = AdvancedState.ActiveSection.FROTH;
-                frothButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                frothButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 frothButton.setTextColor(Color.parseColor("#664400"));
                 selectAdvancedButton(advancedState.activeSection);
             }
@@ -443,19 +439,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 selectAdvancedButton(advancedState.activeSection);
             }
         });
-
-        syrupButton = (Button) findViewById(R.id.syrupButton);
-        syrupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playSliders(advancedState.activeSection, AdvancedState.ActiveSection.SYRUP);
-                advancedState.activeSection = AdvancedState.ActiveSection.SYRUP;
-                syrupButton.setBackground(getDrawable(R.drawable.rightroundedselected));
-                syrupButton.setTextColor(Color.parseColor("#664400"));
-                selectAdvancedButton(advancedState.activeSection);
-            }
-        });
-
 
         /**
          * LABELS
@@ -488,13 +471,14 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             }
         });
 
-        pressSeekbar = (IndicatorSeekBar) this.findViewById(R.id.pressSlider);
-        pressSeekbar.setIndicatorTextFormat("${PROGRESS} psi");
-        pressSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
+        strSeekbar = (IndicatorSeekBar) this.findViewById(R.id.pressSlider);
+        strSeekbar.setIndicatorTextFormat("${PROGRESS}%");
+
+        strSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
                 if(seekParams.progress % 1 == 0) {
-                    pressSeekbar.setIndicatorTextFormat("${PROGRESS} psi");
+                    strSeekbar.setIndicatorTextFormat("${PROGRESS}%");
                 }
             }
 
@@ -530,26 +514,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             }
         });
 
-        /**
-         * SPINNER
-         */
-        mySpinner = (Spinner)findViewById(R.id.syrupSpinner);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, R.layout.spinner_item, syrups);
-        spinnerAdapter.setDropDownViewResource(R.layout.spinner_item);
-        mySpinner.setAdapter(spinnerAdapter);
-        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            public void onItemSelected(AdapterView<?> arg0, View view, int position, long id) {
-                advancedState.syrupState.type = position;
-
-            }
-            public void onNothingSelected(AdapterView<?> arg0) { }
-        });
 
         /**
          * GRID LAYOUT
          */
-        basicGridLayout = (android.support.v7.widget.GridLayout) findViewById(R.id.gridLayout);
         basicGridLayout2 = (android.support.v7.widget.GridLayout) findViewById(R.id.gridLayout2);
         basicGridLayout2.setVisibility(View.INVISIBLE);
 
@@ -589,21 +557,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
     }
 
-
-
-
-    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
-        String line = "";
-        String result = "";
-        while((line = bufferedReader.readLine()) != null)
-            result += line;
-
-        inputStream.close();
-        return result;
-
-    }
-
+    /**
+     * Sends POST to Raspberry Pi
+     */
     class SendPost extends AsyncTask {
         @Override
         protected Object doInBackground(Object[] params) {
@@ -728,7 +684,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         public MilkState milkState;
         public FrothState frothState;
         public CoffeeState coffeeState;
-        public SyrupState syrupState;
 
         public AdvancedState(){
             activeSection = ActiveSection.WATER;
@@ -736,15 +691,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             milkState = new MilkState();
             frothState = new FrothState();
             coffeeState = new CoffeeState();
-            syrupState = new SyrupState();
         }
 
         public enum ActiveSection{
             WATER,
             MILK,
             FROTH,
-            COFFEE,
-            SYRUP
+            COFFEE
         }
     }
 
@@ -769,32 +722,26 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     public static class WaterState{
         public int temp;
         public int disp;
-       // public int press;
 
         public WaterState(){
             temp = 70;
             disp = 70;
-           // press = 70;
         }
     }
 
     public static class MilkState{
-        public int temp;
         public int disp;
 
         public MilkState(){
-            temp = 70;
             disp = 70;
         }
     }
 
     public static class FrothState{
-        public int disp;
-        public int press;
+        public int str;
 
         public FrothState(){
-            disp = 70;
-            press = 70;
+            str = 70;
         }
     }
 
@@ -806,21 +753,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
     }
 
-    public static class SyrupState{
-        public int type;
-        public int disp;
-
-        public SyrupState(){
-            disp = 70;
-            type = 0;
-        }
-    }
 
     public enum ActiveState{
         ADVANCED,
         BASIC
     }
 
+
+    /**
+     * Changes the UI to hide the advanced layout
+     */
     public void hideAdvanced(){
 
         waterButton.setVisibility(View.INVISIBLE);
@@ -835,12 +777,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         frothButton.setVisibility(View.INVISIBLE);
         frothButton.setEnabled(false);
 
-        syrupButton.setVisibility(View.INVISIBLE);
-        syrupButton.setEnabled(false);
-
-        mySpinner.setVisibility(View.GONE);
-        mySpinner.setEnabled(false);
-
         dispSeekbar.setVisibility(View.INVISIBLE);
         dispSeekbar.setEnabled(false);
 
@@ -850,8 +786,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         dispSeekbar.setVisibility(View.INVISIBLE);
         dispSeekbar.setEnabled(false);
 
-        pressSeekbar.setVisibility(View.INVISIBLE);
-        pressSeekbar.setEnabled(false);
+        strSeekbar.setVisibility(View.INVISIBLE);
+        strSeekbar.setEnabled(false);
 
         indicatorLayout1.setVisibility(View.INVISIBLE);
 
@@ -863,6 +799,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         favoritesButton.setEnabled(false);
     }
 
+    /**
+     * Changes the UI to display the advanced UI
+     */
     public void showAdvanced(){
 
         basicGridLayout2.setEnabled(true);
@@ -880,9 +819,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         frothButton.setEnabled(true);
         frothButton.setVisibility(View.VISIBLE);
 
-        syrupButton.setEnabled(true);
-        syrupButton.setVisibility(View.VISIBLE);
-
         indicatorLayout1.setVisibility(View.VISIBLE);
         indicatorLayout2.setVisibility(View.VISIBLE);
         indicatorLayout3.setVisibility(View.VISIBLE);
@@ -899,11 +835,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 indicatorLayout1.setVisibility(View.VISIBLE);
                 indicatorLayout1.setEnabled(true);
@@ -915,12 +848,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 dispSeekbar.setVisibility(View.VISIBLE);
 
                 indicatorLayout2.setEnabled(false);
-                pressSeekbar.setVisibility(View.VISIBLE);
-                pressSeekbar.setEnabled(false);
+                strSeekbar.setVisibility(View.VISIBLE);
+                strSeekbar.setEnabled(false);
 
                 label1.setText("Temperature(" + (char) 0x00B0 + "F):");
                 label2.setText("");
-                label3.setText("Dispense(oz):");
+                label3.setText("Dispense(Oz):");
                 break;
             }
             case MILK:{
@@ -933,11 +866,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
 
                 indicatorLayout1.setVisibility(View.VISIBLE);
                 indicatorLayout1.setEnabled(true);
@@ -945,20 +875,20 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 tempSeekbar.setVisibility(View.VISIBLE);
 
                 indicatorLayout2.setEnabled(false);
-                pressSeekbar.setVisibility(View.VISIBLE);
-                pressSeekbar.setEnabled(false);
+                strSeekbar.setVisibility(View.VISIBLE);
+                strSeekbar.setEnabled(false);
 
                 indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
 
-                label1.setText("Temperature(" + (char) 0x00B0 + "F):");
+                label1.setText("");
                 label2.setText("");
-                label3.setText("Dispense(oz):");
+                label3.setText("Dispense(Oz):");
                 break;
             }
             case FROTH:{
-                frothButton.setBackground(getDrawable(R.drawable.gridbuttonselected));
+                frothButton.setBackground(getDrawable(R.drawable.rightroundedselected));
                 frothButton.setTextColor(Color.parseColor("#664400"));
 
                 milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
@@ -970,9 +900,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
-
                 indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
                 dispSeekbar.setVisibility(View.VISIBLE);
@@ -983,49 +910,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 tempSeekbar.setEnabled(false);
 
                 indicatorLayout2.setEnabled(true);
-                pressSeekbar.setEnabled(true);
-                pressSeekbar.setVisibility(View.VISIBLE);
+                strSeekbar.setEnabled(true);
+                strSeekbar.setVisibility(View.VISIBLE);
 
                 label1.setText("");
-                label2.setText("Pressure(psi):");
-                label3.setText("Dispense(oz):");
-                break;
-            }
-            case SYRUP:{
-                syrupButton.setBackground(getDrawable(R.drawable.rightroundedselected));
-                syrupButton.setTextColor(Color.parseColor("#664400"));
-
-                milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
-                milkButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-                coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
-                frothButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
-                waterButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                mySpinner.setEnabled(true);
-                mySpinner.setVisibility(View.VISIBLE);
-
-                indicatorLayout1.setVisibility(View.INVISIBLE);
-                indicatorLayout1.setEnabled(false);
-                tempSeekbar.setVisibility(View.INVISIBLE);
-                tempSeekbar.setEnabled(false);
-
-                indicatorLayout2.setEnabled(false);
-                pressSeekbar.setVisibility(View.VISIBLE);
-                pressSeekbar.setEnabled(false);
-
-                indicatorLayout3.setEnabled(true);
-                dispSeekbar.setEnabled(true);
-                dispSeekbar.setVisibility(View.VISIBLE);
-
-                label1.setText("Syrup:");
-                label2.setText("");
-                label3.setText("Dispense(oz):");
+                label2.setText("Strength(%):");
+                label3.setText("");
                 break;
             }
             case COFFEE:{
@@ -1038,12 +928,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
                 waterButton.setTextColor(Color.parseColor("#ffefcc"));
 
-                frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+                frothButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
                 frothButton.setTextColor(Color.parseColor("#ffefcc"));
-
-                syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-                syrupButton.setTextColor(Color.parseColor("#ffefcc"));
-
 
                 indicatorLayout1.setVisibility(View.VISIBLE);
                 indicatorLayout1.setEnabled(false);
@@ -1051,8 +937,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 tempSeekbar.setEnabled(false);
 
                 indicatorLayout2.setEnabled(false);
-                pressSeekbar.setVisibility(View.VISIBLE);
-                pressSeekbar.setEnabled(false);
+                strSeekbar.setVisibility(View.VISIBLE);
+                strSeekbar.setEnabled(false);
 
                 indicatorLayout3.setEnabled(true);
                 dispSeekbar.setEnabled(true);
@@ -1062,7 +948,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
                 label1.setText("");
                 label2.setText("");
-                label3.setText("Dispense(oz):");
+                label3.setText("Dispense(Oz):");
                 break;
             }
         }
@@ -1073,6 +959,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
     }
 
+
+    /**
+     * Changes the UI to hide the basic UI
+     */
     public void hideBasic(){
         amountSmallButton.setVisibility(View.GONE);
         amountSmallButton.setEnabled(false);
@@ -1138,6 +1028,11 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         favoritesButton.setEnabled(false);
     }
 
+    /**
+     * Updates sliders to whatever value they should be at on different tabs. Slides them into correct positions.
+     * @param prevState
+     * @param currState
+     */
     public void playSliders(final AdvancedState.ActiveSection prevState, AdvancedState.ActiveSection currState){
 
         Log.i("CoffeeBrew", "prevState: " + prevState.name());
@@ -1146,125 +1041,100 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         switch(prevState){
             case WATER:{
                 prevDisp = advancedState.waterState.disp;
-                //prevPress = advancedState.waterState.press;
                 prevTemp = advancedState.waterState.temp;
+                prevStr = 70;
                 break;
             }
             case MILK:{
                 prevDisp = advancedState.milkState.disp;
-                prevTemp = advancedState.milkState.temp;
-                prevPress = 70;
+                prevStr = 70;
+                prevTemp = 70;
                 break;
             }
             case COFFEE:{
                 prevDisp = advancedState.coffeeState.disp;
-                prevPress = 70;
                 prevTemp = 70;
-                break;
-            }
-            case SYRUP:{
-                prevDisp = advancedState.syrupState.disp;
-                prevPress = 70;
-                prevTemp = 70;
+                prevStr = 70;
                 break;
             }
             case FROTH:{
-                prevDisp = advancedState.frothState.disp;
-                prevPress = advancedState.frothState.press;
+                prevStr = advancedState.frothState.str;
                 prevTemp = 70;
+                prevDisp = 70;
                 break;
             }
         }
 
         if(currState == prevState){
             advancedState.coffeeState.disp = requestData.coffeeDisp;
-            advancedState.frothState.disp = requestData.frothDisp;
-            advancedState.frothState.press = requestData.frothPress;
+            advancedState.frothState.str = requestData.frothStr;
             advancedState.milkState.disp = requestData.milkDisp;
-            advancedState.milkState.temp = requestData.milkTemp;
             advancedState.waterState.disp = requestData.waterDisp;
             advancedState.waterState.temp = requestData.waterTemp;
-            advancedState.syrupState.disp = requestData.syrupDisp;
-            advancedState.syrupState.disp = requestData.syrup;
         }
 
         switch(currState){
             case WATER:{
                 dispDiff = prevDisp - advancedState.waterState.disp;
                 tempDiff = prevTemp - advancedState.waterState.temp;
-                //pressDiff = prevPress - advancedState.waterState.press;
                 break;
             }
             case MILK:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
-                tempDiff = prevTemp - advancedState.milkState.temp;
-                pressDiff = prevTemp;
                 break;
             }
             case COFFEE:{
                 dispDiff = prevDisp - advancedState.coffeeState.disp;
-                tempDiff = prevTemp;
-                pressDiff = prevPress;
-                break;
-            }
-            case SYRUP:{
-                dispDiff = prevDisp - advancedState.syrupState.disp;
-                tempDiff = prevTemp;
-                pressDiff = prevPress;
                 break;
             }
             case FROTH:{
-                dispDiff = prevDisp - advancedState.frothState.disp;
-                pressDiff = prevPress - advancedState.frothState.press;
-                tempDiff = prevTemp;
+                strDiff = prevStr - advancedState.frothState.str;
                 break;
             }
         }
 
-        if(currState != AdvancedState.ActiveSection.SYRUP) {
-            new Thread(new Runnable() {
-                float diffDispOverTime = Math.abs(dispDiff)/1000;
-                @Override
-                public void run() {
-                    if(dispDiff < 0){
-                        float desiredValue = prevDisp + Math.abs(dispDiff);
-                        float actualValue = prevDisp;
-                        long currentTime = System.currentTimeMillis();
-                        while(actualValue < desiredValue){
-                            if(System.currentTimeMillis() > currentTime){
+        new Thread(new Runnable() {
+            float diffDispOverTime = Math.abs(dispDiff)/1000;
+            @Override
+            public void run() {
+                if(dispDiff < 0){
+                    float desiredValue = prevDisp + Math.abs(dispDiff);
+                    float actualValue = prevDisp;
+                    long currentTime = System.currentTimeMillis();
+                    while(actualValue < desiredValue){
+                        if(System.currentTimeMillis() > currentTime){
                             currentTime = System.currentTimeMillis();
                             actualValue = actualValue + diffDispOverTime;
-                                final float finalActualValue = actualValue;
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dispSeekbar.setProgress(finalActualValue);
-                                    }
-                                });
-                            }
-                        }
-                    }
-                    else{
-                        float desiredValue = prevDisp - dispDiff;
-                        float actualValue = prevDisp;
-                        long currentTime = System.currentTimeMillis();
-                        while(actualValue > desiredValue){
-                            if(System.currentTimeMillis() > currentTime){
-                                currentTime = System.currentTimeMillis();
-                                actualValue = actualValue - diffDispOverTime;
-                                final float finalActualValue = actualValue;
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dispSeekbar.setProgress(finalActualValue);
-                                    }
-                                });
-                            }
+                            final float finalActualValue = actualValue;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dispSeekbar.setProgress(finalActualValue);
+                                }
+                            });
                         }
                     }
                 }
-            }).start();
-        }
+                else{
+                    float desiredValue = prevDisp - dispDiff;
+                    float actualValue = prevDisp;
+                    long currentTime = System.currentTimeMillis();
+                    while(actualValue > desiredValue){
+                        if(System.currentTimeMillis() > currentTime){
+                            currentTime = System.currentTimeMillis();
+                            actualValue = actualValue - diffDispOverTime;
+                            final float finalActualValue = actualValue;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dispSeekbar.setProgress(finalActualValue);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        }).start();
 
         new Thread(new Runnable() {
             float diffTempOverTime = Math.abs(tempDiff)/1000;
@@ -1310,40 +1180,40 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }).start();
 
         new Thread(new Runnable() {
-            float diffPressOverTime = Math.abs(pressDiff)/1000;
+            float diffStrOverTime = Math.abs(strDiff)/1000;
             @Override
             public void run() {
-                if(pressDiff < 0){
-                    float desiredValue = prevTemp + Math.abs(pressDiff);
-                    float actualValue = prevTemp;
+                if(strDiff < 0){
+                    float desiredValue = prevStr + Math.abs(strDiff);
+                    float actualValue = prevStr;
                     long currentTime = System.currentTimeMillis();
                     while(actualValue < desiredValue){
                         if(System.currentTimeMillis() > currentTime){
                             currentTime = System.currentTimeMillis();
-                            actualValue = actualValue + diffPressOverTime;
+                            actualValue = actualValue + diffStrOverTime;
                             final float finalActualValue = actualValue;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    pressSeekbar.setProgress((int) finalActualValue);
+                                    strSeekbar.setProgress((int) finalActualValue);
                                 }
                             });
                         }
                     }
                 }
                 else{
-                    float desiredValue = prevTemp - pressDiff;
-                    float actualValue = prevTemp;
+                    float desiredValue = prevStr - strDiff;
+                    float actualValue = prevStr;
                     long currentTime = System.currentTimeMillis();
                     while(actualValue > desiredValue){
                         if(System.currentTimeMillis() > currentTime){
                             currentTime = System.currentTimeMillis();
-                            actualValue = actualValue - diffPressOverTime;
+                            actualValue = actualValue - diffStrOverTime;
                             final float finalActualValue = actualValue;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    pressSeekbar.setProgress((int) finalActualValue);
+                                    strSeekbar.setProgress((int) finalActualValue);
                                 }
                             });
                         }
@@ -1354,6 +1224,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
     }
 
+    /**
+     * Updates UI depending on what advanced button UI is pressed
+     * @param state
+     */
     private void selectAdvancedButton(AdvancedState.ActiveSection state){
 
         if(state == AdvancedState.ActiveSection.FROTH) {
@@ -1367,33 +1241,27 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-            syrupButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            mySpinner.setEnabled(false);
-            mySpinner.setVisibility(View.INVISIBLE);
-
             label1.setText("");
-            label2.setText("Pressure(psi):");
-            label3.setText("Dispense(Oz):");
+            label2.setText("Strength(%):");
+            label3.setText(":");
 
             tempSeekbar.setVisibility(View.VISIBLE);
             tempSeekbar.setEnabled(false);
             indicatorLayout1.setVisibility(View.VISIBLE);
             indicatorLayout1.setEnabled(false);
 
-            pressSeekbar.setVisibility(View.VISIBLE);
-            pressSeekbar.setEnabled(true);
+            strSeekbar.setVisibility(View.VISIBLE);
+            strSeekbar.setEnabled(true);
             indicatorLayout2.setEnabled(true);
 
             dispSeekbar.setVisibility(View.VISIBLE);
-            dispSeekbar.setEnabled(true);
-            indicatorLayout3.setEnabled(true);
+            dispSeekbar.setEnabled(false);
+            indicatorLayout3.setEnabled(false);
         }
 
         if(state == AdvancedState.ActiveSection.WATER) {
 
-            frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            frothButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
             milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
@@ -1401,12 +1269,6 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-            syrupButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            mySpinner.setEnabled(false);
-            mySpinner.setVisibility(View.INVISIBLE);
 
             tempSeekbar.setEnabled(true);
             tempSeekbar.setVisibility(View.VISIBLE);
@@ -1417,8 +1279,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             dispSeekbar.setVisibility(View.VISIBLE);
             indicatorLayout3.setEnabled(true);
 
-            pressSeekbar.setVisibility(View.VISIBLE);
-            pressSeekbar.setEnabled(false);
+            strSeekbar.setVisibility(View.VISIBLE);
+            strSeekbar.setEnabled(false);
             indicatorLayout2.setEnabled(false);
 
             label1.setText("Temperature(" + (char) 0x00B0 + "F):");
@@ -1428,7 +1290,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
         if(state == AdvancedState.ActiveSection.MILK) {
 
-            frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            frothButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
             waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
@@ -1437,58 +1299,17 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-            syrupButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            mySpinner.setEnabled(false);
-            mySpinner.setVisibility(View.INVISIBLE);
-
-            tempSeekbar.setEnabled(true);
-            tempSeekbar.setVisibility(View.VISIBLE);
-            indicatorLayout1.setVisibility(View.VISIBLE);
-            indicatorLayout1.setEnabled(true);
-
-            dispSeekbar.setEnabled(true);
-            dispSeekbar.setVisibility(View.VISIBLE);
-            indicatorLayout3.setEnabled(true);
-
-            pressSeekbar.setEnabled(false);
-            pressSeekbar.setVisibility(View.VISIBLE);
-            indicatorLayout2.setEnabled(false);
-
-            label1.setText("Temperature(" + (char) 0x00B0 + "F):");
-            label2.setText("");
-            label3.setText("Dispense(oz):");
-        }
-
-        if(state == AdvancedState.ActiveSection.COFFEE) {
-
-            frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
-            frothButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
-            waterButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
-            milkButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            syrupButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-            syrupButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            mySpinner.setEnabled(false);
-            mySpinner.setVisibility(View.INVISIBLE);
-
-            tempSeekbar.setVisibility(View.VISIBLE);
             tempSeekbar.setEnabled(false);
+            tempSeekbar.setVisibility(View.VISIBLE);
             indicatorLayout1.setVisibility(View.VISIBLE);
             indicatorLayout1.setEnabled(false);
 
-            dispSeekbar.setVisibility(View.VISIBLE);
             dispSeekbar.setEnabled(true);
+            dispSeekbar.setVisibility(View.VISIBLE);
             indicatorLayout3.setEnabled(true);
 
-            pressSeekbar.setVisibility(View.VISIBLE);
-            pressSeekbar.setEnabled(false);
+            strSeekbar.setEnabled(false);
+            strSeekbar.setVisibility(View.VISIBLE);
             indicatorLayout2.setEnabled(false);
 
             label1.setText("");
@@ -1496,9 +1317,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             label3.setText("Dispense(oz):");
         }
 
-        if(state == AdvancedState.ActiveSection.SYRUP) {
+        if(state == AdvancedState.ActiveSection.COFFEE) {
 
-            frothButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
+            frothButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
             frothButton.setTextColor(Color.parseColor("#ffefcc"));
 
             waterButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
@@ -1507,37 +1328,36 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             milkButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
             milkButton.setTextColor(Color.parseColor("#ffefcc"));
 
-            coffeeButton.setBackground(getDrawable(R.drawable.rightroundedunselected));
-            coffeeButton.setTextColor(Color.parseColor("#ffefcc"));
-
-            mySpinner.setEnabled(true);
-            mySpinner.setVisibility(View.VISIBLE);
-
-            tempSeekbar.setVisibility(View.INVISIBLE);
+            tempSeekbar.setVisibility(View.VISIBLE);
             tempSeekbar.setEnabled(false);
-            indicatorLayout1.setVisibility(View.INVISIBLE);
+            indicatorLayout1.setVisibility(View.VISIBLE);
             indicatorLayout1.setEnabled(false);
 
-            dispSeekbar.setEnabled(true);
             dispSeekbar.setVisibility(View.VISIBLE);
+            dispSeekbar.setEnabled(true);
             indicatorLayout3.setEnabled(true);
 
-            pressSeekbar.setVisibility(View.VISIBLE);
-            pressSeekbar.setEnabled(false);
+            strSeekbar.setVisibility(View.VISIBLE);
+            strSeekbar.setEnabled(false);
             indicatorLayout2.setEnabled(false);
 
-            label1.setText("Syrup:");
+            label1.setText("");
             label2.setText("");
             label3.setText("Dispense(oz):");
         }
     }
 
+    /**
+     * Updates UI depending on what basic button is pushed.
+     * @param row
+     * @param button
+     */
     private void selectBasicButton(int row, Button button){
         switch(row){
             case 0:{
                 if(button.getId() != R.id.basicAmountButton){
                     amountSmallButton.setBackground(getDrawable(R.drawable.leftroundedunselected));
-                    amountSmallButton.setTextColor(Color.parseColor("#ffefcc"));
+                                    amountSmallButton.setTextColor(Color.parseColor("#ffefcc"));
                 }
                 if(button.getId() != R.id.basicAmountButton2){
                     amountMediumButton.setBackground(getDrawable(R.drawable.gridbuttonunselected));
@@ -1582,14 +1402,17 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         }
     }
 
+    /**
+     * Sets a specific seekbarValue
+     * @param state
+     * @param val
+     * @param bar
+     */
     private void setSeekBarValue(AdvancedState.ActiveSection state, int val, int bar){
         switch(state){
             case WATER:{
                 if(bar == 0){
                     advancedState.waterState.temp = val;
-                }
-                else if (bar == 1){
-                    //advancedState.waterState.press = val;
                 }
                 else{
                     advancedState.waterState.disp = val;
@@ -1597,12 +1420,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
             case MILK:{
-                if(bar == 0){
-                    advancedState.milkState.temp = val;
-                }
-                else{
-                    advancedState.milkState.disp = val;
-                }
+                advancedState.milkState.disp = val;
                 break;
             }
             case COFFEE:{
@@ -1610,20 +1428,12 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 break;
             }
             case FROTH:{
-                if (bar == 1){
-                    advancedState.frothState.press = val;
-                }
-                else{
-                    advancedState.frothState.disp = val;
-                }
-                break;
-            }
-            case SYRUP:{
-                    advancedState.waterState.disp = val;
+                    advancedState.frothState.str = val;
                 break;
             }
         }
     }
+
 
     @Override
     public void startActivity(Intent intent) {
@@ -1636,6 +1446,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
     }
 
+    /**
+     * Opens the loginFragment
+     */
     private void openLoginFragment(){
         LoginFragment fragment = LoginFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -1645,6 +1458,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         fragmentTransaction.add(R.id.fragmentContainer3, fragment, "LOGIN_FRAGMENT").commit();
     }
 
+    /**
+     * Opens the FavoritesFragment
+     */
     private void openFavoritesFragment(){
         FavoritesFragment fragment = FavoritesFragment.newInstance(loginButton.getText().toString());
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -1654,6 +1470,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         fragmentTransaction.add(R.id.fragmentContainer3, fragment, "FAVORITES_FRAGMENT").commit();
     }
 
+    /**
+     * Callback for favoritesFragment
+     * @param requestData
+     */
     @Override
     public void onFragmentInteraction(RequestData requestData) {
         if(requestData != null) {
@@ -1664,6 +1484,10 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         getSupportFragmentManager().popBackStack();
     }
 
+    /**
+     * Callback for LoginFragment
+     * @param sendBackUsername
+     */
     @Override
     public void onFragmentInteraction(String sendBackUsername) {
         if(!sendBackUsername.isEmpty()){
@@ -1676,6 +1500,9 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         getSupportFragmentManager().popBackStack();
     }
 
+    /**
+     * Called on successful brew request sent to RaspberryPi
+     */
     public void onResponse() {
         try {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);

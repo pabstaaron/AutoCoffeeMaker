@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,9 +14,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.ndonaldson.beanster.R;
+import com.example.ndonaldson.beanster.data.RequestData;
+import com.example.ndonaldson.beanster.wifi.SelectableWifi;
+import com.example.ndonaldson.beanster.data.UserData;
+import com.example.ndonaldson.beanster.wifi.WifiAdapter;
+import com.example.ndonaldson.beanster.wifi.WifiSelectItem;
+import com.example.ndonaldson.beanster.wifi.WifiViewHolder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,7 +34,7 @@ import java.util.List;
  * Created by ndonaldson on 10/8/18.
  */
 
-public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItemSelectedListener{
+public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItemSelectedListener {
 
     private RequestData requestData;
     private String requestDataName;

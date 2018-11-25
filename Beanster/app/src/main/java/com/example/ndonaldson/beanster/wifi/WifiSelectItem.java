@@ -1,4 +1,4 @@
-package com.example.ndonaldson.beanster;
+package com.example.ndonaldson.beanster.wifi;
 
 /**
  * Holds info for selectable wifi, right now just a string.

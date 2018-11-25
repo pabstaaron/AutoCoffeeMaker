@@ -4,7 +4,7 @@
     android:id="@+id/deviceScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DeviceSelection"
+    tools:context=".activities.DeviceSelection"
     android:stateListAnimator="@null"
     >
     <LinearLayout
