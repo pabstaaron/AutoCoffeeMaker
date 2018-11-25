@@ -304,12 +304,6 @@ altered after the acrylic housing was cut, so some mounting positions had to be
 manually opended with a drill.
 
 
-\begin{figure*}
-  \centering
-    \includegraphics[width=1.8\columnwidth]{render}
-    \caption{A render of the phyical system design.}
-\end{figure*}
-
 \subsection{Electronics and Control}
 The electronics for the system were intially designed as a custom PCB that would
 be responsible for all low-level control tasks. This PCB would communicate over
@@ -609,18 +603,9 @@ costs somewhere between $1000 and $2000. If our machine were to be produced and
 sold as is, it would likely cost twice that amount. Although we set out with a
 final product in mind, this machine is a prototype. Additional work by a full
 engineering team with substantial funding would be needed to take the machine to
-a point where it could be a competive product. 
+a point where it could be a competive product.
 
-Our machine does, however, demonstrate that the espresso making process can be
-automated in a way that mimics the way in which a human would manually produce
-espresso.
-
-% 
 \section{Appendix A: Discoveries and Pitfalls}
-% Large stepper motor control system are hard, especially when super accurate
-% positioning is required
-
-% AccelStepper is a lifesaver
 
 \section{Appendix B: Bill of Materials}
 \begin{itemize}

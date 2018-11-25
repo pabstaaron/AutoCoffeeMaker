@@ -615,12 +615,8 @@ Our machine does, however, demonstrate that the espresso making process can be
 automated in a way that mimics the way in which a human would manually produce
 espresso.
 
-% 
 \section{Appendix A: Discoveries and Pitfalls}
-% Large stepper motor control system are hard, especially when super accurate
-% positioning is required
 
-% AccelStepper is a lifesaver
 
 \section{Appendix B: Bill of Materials}
 \begin{itemize}
