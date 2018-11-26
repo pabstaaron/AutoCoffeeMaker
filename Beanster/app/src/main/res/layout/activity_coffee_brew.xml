@@ -532,10 +532,8 @@
 
     <FrameLayout
         android:id="@+id/fragmentContainer3"
-        android:layout_height="0dp"
-        android:layout_width="0dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp">
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

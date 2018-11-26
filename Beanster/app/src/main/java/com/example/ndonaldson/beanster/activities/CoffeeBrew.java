@@ -112,6 +112,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
     private Context mContext;
     private boolean favoritedBrew = false;
     private UserData currentUserData;
+    private FrameLayout fragmentContainer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +143,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         advancedState = new AdvancedState();
         basicState = new BasicState();
         requestData = new RequestData();
+        fragmentContainer = (FrameLayout) findViewById(R.id.fragmentContainer3);
+
 
         mConnectStatus = WifiRunner.ConnectStatus.WAITING_FOR_USER;
         if(!getIntent().hasExtra("passWord")){
@@ -214,7 +218,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!loginButton.getText().toString().equals("Login")) {
+                if(!loginButton.getText().equals("Login")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                     builder.setCancelable(false);
                     builder.setMessage("Would you like to logout?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -1077,151 +1081,164 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             case WATER:{
                 dispDiff = prevDisp - advancedState.waterState.disp;
                 tempDiff = prevTemp - advancedState.waterState.temp;
+                strDiff = prevStr - 70;
                 break;
             }
             case MILK:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
+                tempDiff = prevTemp - 70;
+                strDiff = prevStr - 70;
                 break;
             }
             case COFFEE:{
                 dispDiff = prevDisp - advancedState.coffeeState.disp;
+                tempDiff = prevTemp - 70;
+                strDiff = prevStr - 70;
                 break;
             }
             case FROTH:{
+                tempDiff = prevTemp - 70;
+                dispDiff = prevDisp - 70;
                 strDiff = prevStr - advancedState.frothState.str;
                 break;
             }
         }
 
-        new Thread(new Runnable() {
-            float diffDispOverTime = Math.abs(dispDiff)/1000;
-            @Override
-            public void run() {
-                if(dispDiff < 0){
-                    float desiredValue = prevDisp + Math.abs(dispDiff);
-                    float actualValue = prevDisp;
-                    long currentTime = System.currentTimeMillis();
-                    while(actualValue < desiredValue){
-                        if(System.currentTimeMillis() > currentTime){
-                            currentTime = System.currentTimeMillis();
-                            actualValue = actualValue + diffDispOverTime;
-                            final float finalActualValue = actualValue;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dispSeekbar.setProgress(finalActualValue);
-                                }
-                            });
-                        }
-                    }
-                }
-                else{
-                    float desiredValue = prevDisp - dispDiff;
-                    float actualValue = prevDisp;
-                    long currentTime = System.currentTimeMillis();
-                    while(actualValue > desiredValue){
-                        if(System.currentTimeMillis() > currentTime){
-                            currentTime = System.currentTimeMillis();
-                            actualValue = actualValue - diffDispOverTime;
-                            final float finalActualValue = actualValue;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dispSeekbar.setProgress(finalActualValue);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        }).start();
+        if(dispDiff != 0) {
+            new Thread(new Runnable() {
+                float diffDispOverTime = Math.abs(dispDiff) / 1000;
 
-        new Thread(new Runnable() {
-            float diffTempOverTime = Math.abs(tempDiff)/1000;
-            @Override
-            public void run() {
-                if(tempDiff < 0){
-                    float desiredValue = prevTemp + Math.abs(tempDiff);
-                    float actualValue = prevTemp;
-                    long currentTime = System.currentTimeMillis();
-                    while(actualValue < desiredValue){
-                        if(System.currentTimeMillis() > currentTime){
-                            currentTime = System.currentTimeMillis();
-                            actualValue = actualValue + diffTempOverTime;
-                            final float finalActualValue = actualValue;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tempSeekbar.setProgress(finalActualValue);
-                                }
-                            });
+                @Override
+                public void run() {
+                    if (dispDiff < 0) {
+                        float desiredValue = prevDisp + Math.abs(dispDiff);
+                        float actualValue = prevDisp;
+                        long currentTime = System.currentTimeMillis();
+                        while (actualValue < desiredValue) {
+                            if (System.currentTimeMillis() > currentTime) {
+                                currentTime = System.currentTimeMillis();
+                                actualValue = actualValue + diffDispOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dispSeekbar.setProgress(finalActualValue);
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        float desiredValue = prevDisp - dispDiff;
+                        float actualValue = prevDisp;
+                        long currentTime = System.currentTimeMillis();
+                        while (actualValue > desiredValue) {
+                            if (System.currentTimeMillis() > currentTime) {
+                                currentTime = System.currentTimeMillis();
+                                actualValue = actualValue - diffDispOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dispSeekbar.setProgress(finalActualValue);
+                                    }
+                                });
+                            }
                         }
                     }
                 }
-                else{
-                    float desiredValue = prevTemp - tempDiff;
-                    float actualValue = prevTemp;
-                    long currentTime = System.currentTimeMillis();
-                    while(actualValue > desiredValue){
-                        if(System.currentTimeMillis() > currentTime){
-                            currentTime = System.currentTimeMillis();
-                            actualValue = actualValue - diffTempOverTime;
-                            final float finalActualValue = actualValue;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tempSeekbar.setProgress((int) finalActualValue);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        }).start();
+            }).start();
+        }
 
-        new Thread(new Runnable() {
-            float diffStrOverTime = Math.abs(strDiff)/1000;
-            @Override
-            public void run() {
-                if(strDiff < 0){
-                    float desiredValue = prevStr + Math.abs(strDiff);
-                    float actualValue = prevStr;
-                    long currentTime = System.currentTimeMillis();
-                    while(actualValue < desiredValue){
-                        if(System.currentTimeMillis() > currentTime){
-                            currentTime = System.currentTimeMillis();
-                            actualValue = actualValue + diffStrOverTime;
-                            final float finalActualValue = actualValue;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    strSeekbar.setProgress((int) finalActualValue);
-                                }
-                            });
-                        }
-                    }
-                }
-                else{
-                    float desiredValue = prevStr - strDiff;
-                    float actualValue = prevStr;
-                    long currentTime = System.currentTimeMillis();
-                    while(actualValue > desiredValue){
-                        if(System.currentTimeMillis() > currentTime){
-                            currentTime = System.currentTimeMillis();
-                            actualValue = actualValue - diffStrOverTime;
-                            final float finalActualValue = actualValue;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    strSeekbar.setProgress((int) finalActualValue);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        }).start();
+        if(tempDiff != 0) {
+            new Thread(new Runnable() {
+                float diffTempOverTime = Math.abs(tempDiff) / 1000;
 
+                @Override
+                public void run() {
+                    if (tempDiff < 0) {
+                        float desiredValue = prevTemp + Math.abs(tempDiff);
+                        float actualValue = prevTemp;
+                        long currentTime = System.currentTimeMillis();
+                        while (actualValue < desiredValue) {
+                            if (System.currentTimeMillis() > currentTime) {
+                                currentTime = System.currentTimeMillis();
+                                actualValue = actualValue + diffTempOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tempSeekbar.setProgress(finalActualValue);
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        float desiredValue = prevTemp - tempDiff;
+                        float actualValue = prevTemp;
+                        long currentTime = System.currentTimeMillis();
+                        while (actualValue > desiredValue) {
+                            if (System.currentTimeMillis() > currentTime) {
+                                currentTime = System.currentTimeMillis();
+                                actualValue = actualValue - diffTempOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tempSeekbar.setProgress((int) finalActualValue);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }).start();
+        }
+
+
+        if(strDiff != 0) {
+            new Thread(new Runnable() {
+                float diffStrOverTime = Math.abs(strDiff) / 1000;
+
+                @Override
+                public void run() {
+                    if (strDiff < 0) {
+                        float desiredValue = prevStr + Math.abs(strDiff);
+                        float actualValue = prevStr;
+                        long currentTime = System.currentTimeMillis();
+                        while (actualValue < desiredValue) {
+                            if (System.currentTimeMillis() > currentTime) {
+                                currentTime = System.currentTimeMillis();
+                                actualValue = actualValue + diffStrOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        strSeekbar.setProgress((int) finalActualValue);
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        float desiredValue = prevStr - strDiff;
+                        float actualValue = prevStr;
+                        long currentTime = System.currentTimeMillis();
+                        while (actualValue > desiredValue) {
+                            if (System.currentTimeMillis() > currentTime) {
+                                currentTime = System.currentTimeMillis();
+                                actualValue = actualValue - diffStrOverTime;
+                                final float finalActualValue = actualValue;
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        strSeekbar.setProgress((int) finalActualValue);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }).start();
+        }
     }
 
     /**
