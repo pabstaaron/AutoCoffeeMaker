@@ -95,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/deviceSelectCancel"
         android:layout_centerHorizontal="true"
-        android:text="Search" />
+        android:text="Refresh" />
 
         <Button
             android:id="@+id/deviceConnect"

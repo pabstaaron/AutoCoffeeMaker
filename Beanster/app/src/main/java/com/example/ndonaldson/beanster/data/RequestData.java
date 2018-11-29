@@ -21,48 +21,56 @@ public class RequestData{
     public int coffeeDisp;
 
     public RequestData(){
-        this.waterTemp = 70;
-        this.waterDisp = 70;
-        this.milkDisp = 70;
-        this.frothStr = 70;
-        this.coffeeDisp = 70;
+        this.waterTemp = 100;
+        this.waterDisp = 40;
+        this.milkDisp = 40;
+        this.frothStr = 0;
+        this.coffeeDisp = 15;
     }
 
 
-    //TODO: NEED DEFAULT VALUES
     public void setWithBasic(CoffeeBrew.BasicState basicState){
         switch (basicState.amount){
             case FIRST:{
+                this.waterDisp = 40;
                 break;
             }
             case SECOND:{
+                this.waterDisp = 80;
                 break;
             }
             case THIRD:{
+                this.waterDisp = 120;
                 break;
             }
         }
 
         switch (basicState.froth){
             case FIRST:{
+                this.frothStr = 0;
                 break;
             }
             case SECOND:{
+                this.frothStr = 50;
                 break;
             }
             case THIRD:{
+                this.frothStr = 100;
                 break;
             }
         }
 
         switch (basicState.strength){
             case FIRST:{
+                this.coffeeDisp = 15;
                 break;
             }
             case SECOND:{
+                this.coffeeDisp = 30;
                 break;
             }
             case THIRD:{
+                this.coffeeDisp = 45;
                 break;
             }
         }

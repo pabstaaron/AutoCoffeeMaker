@@ -400,11 +400,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         waterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playSliders(advancedState.activeSection, AdvancedState.ActiveSection.WATER);
-                advancedState.activeSection = AdvancedState.ActiveSection.WATER;
-                waterButton.setBackground(getDrawable(R.drawable.leftroundedselected));
-                waterButton.setTextColor(Color.parseColor("#664400"));
-                selectAdvancedButton(advancedState.activeSection);
+                if(advancedState.activeSection != AdvancedState.ActiveSection.WATER) {
+                    dispSeekbar.setMin(30);
+                    dispSeekbar.setMax(120);
+                    dispSeekbar.setIndicatorTextFormat("${PROGRESS} mL");
+                    playSliders(advancedState.activeSection, AdvancedState.ActiveSection.WATER);
+                    advancedState.activeSection = AdvancedState.ActiveSection.WATER;
+                    waterButton.setBackground(getDrawable(R.drawable.leftroundedselected));
+                    waterButton.setTextColor(Color.parseColor("#664400"));
+                    selectAdvancedButton(advancedState.activeSection);
+                }
             }
         });
 
@@ -412,11 +417,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         milkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playSliders(advancedState.activeSection, AdvancedState.ActiveSection.MILK);
-                advancedState.activeSection = AdvancedState.ActiveSection.MILK;
-                milkButton.setBackground(getDrawable(R.drawable.leftroundedselected));
-                milkButton.setTextColor(Color.parseColor("#664400"));
-                selectAdvancedButton(advancedState.activeSection);
+                if(advancedState.activeSection != AdvancedState.ActiveSection.MILK) {
+                    dispSeekbar.setMin(30);
+                    dispSeekbar.setMax(120);
+                    dispSeekbar.setIndicatorTextFormat("${PROGRESS} mL");
+                    playSliders(advancedState.activeSection, AdvancedState.ActiveSection.MILK);
+                    advancedState.activeSection = AdvancedState.ActiveSection.MILK;
+                    milkButton.setBackground(getDrawable(R.drawable.leftroundedselected));
+                    milkButton.setTextColor(Color.parseColor("#664400"));
+                    selectAdvancedButton(advancedState.activeSection);
+                }
             }
         });
 
@@ -424,11 +434,13 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         frothButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playSliders(advancedState.activeSection, AdvancedState.ActiveSection.FROTH);
-                advancedState.activeSection = AdvancedState.ActiveSection.FROTH;
-                frothButton.setBackground(getDrawable(R.drawable.rightroundedselected));
-                frothButton.setTextColor(Color.parseColor("#664400"));
-                selectAdvancedButton(advancedState.activeSection);
+                if(advancedState.activeSection != AdvancedState.ActiveSection.FROTH) {
+                    playSliders(advancedState.activeSection, AdvancedState.ActiveSection.FROTH);
+                    advancedState.activeSection = AdvancedState.ActiveSection.FROTH;
+                    frothButton.setBackground(getDrawable(R.drawable.rightroundedselected));
+                    frothButton.setTextColor(Color.parseColor("#664400"));
+                    selectAdvancedButton(advancedState.activeSection);
+                }
             }
         });
 
@@ -436,11 +448,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         coffeeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playSliders(advancedState.activeSection, AdvancedState.ActiveSection.COFFEE);
-                advancedState.activeSection = AdvancedState.ActiveSection.COFFEE;
-                coffeeButton.setBackground(getDrawable(R.drawable.rightroundedselected));
-                coffeeButton.setTextColor(Color.parseColor("#664400"));
-                selectAdvancedButton(advancedState.activeSection);
+                if(advancedState.activeSection != AdvancedState.ActiveSection.COFFEE) {
+                    dispSeekbar.setMin(15);
+                    dispSeekbar.setMax(45);
+                    dispSeekbar.setIndicatorTextFormat("${PROGRESS} g");
+                    playSliders(advancedState.activeSection, AdvancedState.ActiveSection.COFFEE);
+                    advancedState.activeSection = AdvancedState.ActiveSection.COFFEE;
+                    coffeeButton.setBackground(getDrawable(R.drawable.rightroundedselected));
+                    coffeeButton.setTextColor(Color.parseColor("#664400"));
+                    selectAdvancedButton(advancedState.activeSection);
+                }
             }
         });
 
@@ -498,12 +515,16 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         });
 
         dispSeekbar = (IndicatorSeekBar) this.findViewById(R.id.dispSlider);
-        dispSeekbar.setIndicatorTextFormat("${PROGRESS} oz");
+        dispSeekbar.setIndicatorTextFormat("${PROGRESS} mL");
         dispSeekbar.setOnSeekChangeListener(new OnSeekChangeListener() {
             @Override
             public void onSeeking(SeekParams seekParams) {
                 if(seekParams.progress % 1 == 0) {
-                    dispSeekbar.setIndicatorTextFormat("${PROGRESS} oz");
+                    if(advancedState.activeSection == AdvancedState.ActiveSection.COFFEE){
+                        dispSeekbar.setIndicatorTextFormat("${PROGRESS} g");
+                    } else {
+                        dispSeekbar.setIndicatorTextFormat("${PROGRESS} mL");
+                    }
                 }
             }
 
@@ -517,6 +538,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 setSeekBarValue(advancedState.activeSection, seekBar.getProgress(), 2);
             }
         });
+        dispSeekbar.setMin(30);
+        dispSeekbar.setMax(120);
 
 
         /**
@@ -729,7 +752,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
         public WaterState(){
             temp = 70;
-            disp = 70;
+            disp = 30;
         }
     }
 
@@ -737,7 +760,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         public int disp;
 
         public MilkState(){
-            disp = 70;
+            disp = 30;
         }
     }
 
@@ -745,7 +768,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         public int str;
 
         public FrothState(){
-            str = 70;
+            str = 0;
         }
     }
 
@@ -753,7 +776,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
         public int disp;
 
         public CoffeeState(){
-            disp = 70;
+            disp = 15;
         }
     }
 
@@ -857,7 +880,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
                 label1.setText("Temperature(" + (char) 0x00B0 + "F):");
                 label2.setText("");
-                label3.setText("Dispense(Oz):");
+                label3.setText("Dispense(mL):");
                 break;
             }
             case MILK:{
@@ -888,7 +911,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
                 label1.setText("");
                 label2.setText("");
-                label3.setText("Dispense(Oz):");
+                label3.setText("Dispense(mL):");
                 break;
             }
             case FROTH:{
@@ -952,7 +975,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
                 label1.setText("");
                 label2.setText("");
-                label3.setText("Dispense(Oz):");
+                label3.setText("Dispense(g):");
                 break;
             }
         }
@@ -1046,25 +1069,25 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             case WATER:{
                 prevDisp = advancedState.waterState.disp;
                 prevTemp = advancedState.waterState.temp;
-                prevStr = 70;
+                prevStr = 0;
                 break;
             }
             case MILK:{
                 prevDisp = advancedState.milkState.disp;
-                prevStr = 70;
+                prevStr = 0;
                 prevTemp = 70;
                 break;
             }
             case COFFEE:{
                 prevDisp = advancedState.coffeeState.disp;
                 prevTemp = 70;
-                prevStr = 70;
+                prevStr = 0;
                 break;
             }
             case FROTH:{
                 prevStr = advancedState.frothState.str;
                 prevTemp = 70;
-                prevDisp = 70;
+                prevDisp = 15;
                 break;
             }
         }
@@ -1081,24 +1104,28 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             case WATER:{
                 dispDiff = prevDisp - advancedState.waterState.disp;
                 tempDiff = prevTemp - advancedState.waterState.temp;
-                strDiff = prevStr - 70;
+                strDiff = prevStr - 0;
                 break;
             }
             case MILK:{
                 dispDiff = prevDisp - advancedState.milkState.disp;
                 tempDiff = prevTemp - 70;
-                strDiff = prevStr - 70;
+                strDiff = prevStr - 0;
                 break;
             }
             case COFFEE:{
                 dispDiff = prevDisp - advancedState.coffeeState.disp;
                 tempDiff = prevTemp - 70;
-                strDiff = prevStr - 70;
+                strDiff = prevStr - 0;
                 break;
             }
             case FROTH:{
                 tempDiff = prevTemp - 70;
-                dispDiff = prevDisp - 70;
+                if(prevState == AdvancedState.ActiveSection.COFFEE) {
+                    dispDiff = prevDisp - 15;
+                } else{
+                    dispDiff = prevDisp - 30;
+                }
                 strDiff = prevStr - advancedState.frothState.str;
                 break;
             }
@@ -1260,7 +1287,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             label1.setText("");
             label2.setText("Strength(%):");
-            label3.setText(":");
+            label3.setText("");
 
             tempSeekbar.setVisibility(View.VISIBLE);
             tempSeekbar.setEnabled(false);
@@ -1302,7 +1329,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             label1.setText("Temperature(" + (char) 0x00B0 + "F):");
             label2.setText("");
-            label3.setText("Dispense(oz):");
+            label3.setText("Dispense(mL):");
         }
 
         if(state == AdvancedState.ActiveSection.MILK) {
@@ -1331,7 +1358,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             label1.setText("");
             label2.setText("");
-            label3.setText("Dispense(oz):");
+            label3.setText("Dispense(mL):");
         }
 
         if(state == AdvancedState.ActiveSection.COFFEE) {
@@ -1360,7 +1387,7 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
 
             label1.setText("");
             label2.setText("");
-            label3.setText("Dispense(oz):");
+            label3.setText("Dispense(g):");
         }
     }
 

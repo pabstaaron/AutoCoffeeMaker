@@ -151,8 +151,6 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     connectButton.setTextColor(Color.rgb(204, 204, 204));
                     connectButton.setEnabled(false);
                     mSearchProgress.setVisibility(View.VISIBLE);
-                    deviceSelectedName = "";
-
                 }
             });
             connectButton = (Button) findViewById(R.id.deviceConnect);
@@ -327,6 +325,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 wifiStatus.setBackground(getApplication().getDrawable(R.drawable.nowifi));
             }
 
+            sendIntent("sendLast");
             sendIntent("sendDevices");
         }
         catch(Exception e){
@@ -356,7 +355,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
      */
     @Override
     public void onItemSelected(SelectableWifi selectableItem) {
-        if(adapter.getSelectedItems().isEmpty()) {
+        if(adapter != null && adapter.getSelectedItems().isEmpty()) {
             connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
             connectButton.setTextColor(Color.rgb(204, 204, 204));
             deviceSelectedName = "";
@@ -417,7 +416,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                         searchButton.setEnabled(true);
                         searchButton.setBackground(getDrawable(R.drawable.buttonstyle));
                         searchButton.setTextColor(Color.rgb(255, 239, 204));
-                        if(!adapter.getSelectedItems().isEmpty()){
+                        if(adapter != null && !adapter.getSelectedItems().isEmpty()){
                             connectButton.setEnabled(true);
                             connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
                             connectButton.setTextColor(Color.rgb(255, 239, 204));
@@ -440,6 +439,14 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     case NO_WIFI:{
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
                         Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_LONG);
+                        mDeviceIds.clear();
+                        deviceSelected = null;
+                        deviceSelectedName = "";
+                        isConnected = false;
+                        connectButton.setBackground(getDrawable(R.drawable.buttonstyledisable));
+                        connectButton.setTextColor(Color.rgb(204, 204, 204));
+                        connectButton.setEnabled(false);
+                        makeWifiAdapter(deviceSelected);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }
@@ -454,7 +461,8 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.password: %s, d.hostName: %s", d.getMacAddress(), d.getPassWord(), d.getHostName()));
                     mDeviceIds.add(d);
                 }
-                makeWifiAdapter();
+
+                makeWifiAdapter(deviceSelected);
             }
             else if(intent.hasExtra("Failure") || intent.hasExtra("badRequest")) {
                 String previousPassword = "";
@@ -474,15 +482,26 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
+            else if(intent.hasExtra("lastDevice")){
+                deviceSelected = intent.getParcelableExtra("lastDevice");
+                if(deviceSelected != null){
+                    deviceSelectedName = deviceSelected.getHostName();
+                }
+            }
         }
     };
 
     /**
      * creates new recyclerview of raspberryPI devices on network.
      */
-    private void makeWifiAdapter(){
+    private void makeWifiAdapter(Device device){
+        if(device != null){
+            connectButton.setEnabled(true);
+            connectButton.setBackground(getDrawable(R.drawable.buttonstyle));
+            connectButton.setTextColor(Color.rgb(255, 239, 204));
+        }
         List<WifiSelectItem> selectableItems = generateItems();
-        adapter = new WifiAdapter(this, selectableItems, false);
+        adapter = new WifiAdapter(this, selectableItems, false, deviceSelectedName);
         recyclerView.setAdapter(adapter);
     }
 
@@ -503,6 +522,10 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
         }
         else if(type.equals("sendDevices")){
             intent.putExtra("sendDevices","");
+            intent.setAction("com.android.activity.WIFI_DATA_IN");
+        }
+        else if(type.equals("sendLast")){
+            intent.putExtra("sendLast", "");
             intent.setAction("com.android.activity.WIFI_DATA_IN");
         }
         if(!intent.getExtras().isEmpty()) {

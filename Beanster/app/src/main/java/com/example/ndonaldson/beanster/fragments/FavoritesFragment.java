@@ -238,7 +238,7 @@ public class FavoritesFragment extends Fragment implements WifiViewHolder.OnItem
     }
 
     public void setAdapter(List<WifiSelectItem> items){
-        adapter = new WifiAdapter(this, items, false);
+        adapter = new WifiAdapter(this, items, false, null);
         recyclerView.setAdapter(adapter);
     }
 }
