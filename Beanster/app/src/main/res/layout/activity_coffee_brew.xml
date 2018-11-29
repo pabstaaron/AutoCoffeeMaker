@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffefcc"
-    tools:context="com.example.ndonaldson.beanster.CoffeeBrew"
+    tools:context="com.example.ndonaldson.beanster.activities.CoffeeBrew"
     tools:layout_editor_absoluteY="25dp"
     tools:layout_editor_absoluteX="0dp"
     android:stateListAnimator="@null"
@@ -106,7 +106,7 @@
             android:id="@+id/frothButton"
             android:text="Froth"
             android:textColor="#ffefcc"
-            android:background="@drawable/gridbuttonunselected"
+            android:background="@drawable/rightroundedunselected"
             app:layout_row="0"
             app:layout_column="2"
             app:layout_gravity="fill_horizontal"
@@ -122,16 +122,7 @@
             app:layout_gravity="fill_horizontal"
             app:layout_columnWeight="1"
             app:layout_rowWeight="1"/>
-        <Button
-            android:id="@+id/syrupButton"
-            android:text="Syrup"
-            android:textColor="#ffefcc"
-            android:background="@drawable/rightroundedunselected"
-            app:layout_row="0"
-            app:layout_column="4"
-            app:layout_gravity="fill_horizontal"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1"/>
+
     </android.support.v7.widget.GridLayout>
 
     <com.warkiz.widget.IndicatorStayLayout
@@ -160,7 +151,7 @@
             app:isb_indicator_color="@android:color/black"
             app:isb_indicator_text_color="@android:color/holo_blue_light"
             app:isb_indicator_text_size="18sp"
-            app:isb_max="100"
+            app:isb_max="120"
             app:isb_min="70"
             app:isb_seek_smoothly="true"
             app:isb_show_indicator="rounded_rectangle"
@@ -172,7 +163,6 @@
             app:isb_tick_marks_size="13dp"
             app:isb_tick_texts_color="@color/colorPrimary"
             app:isb_tick_texts_size="15sp"
-            app:isb_ticks_count="2"
             app:isb_track_background_color="@android:color/black"
             app:isb_track_background_size="2dp"
             app:isb_track_progress_color="#9f6934"
@@ -212,7 +202,7 @@
             app:isb_indicator_text_color="@android:color/holo_blue_light"
             app:isb_indicator_text_size="18sp"
             app:isb_max="100"
-            app:isb_min="70"
+            app:isb_min="0"
             app:isb_seek_smoothly="true"
             app:isb_show_indicator="rounded_rectangle"
             app:isb_show_tick_marks_type="oval"
@@ -223,7 +213,6 @@
             app:isb_tick_marks_size="13dp"
             app:isb_tick_texts_color="@color/colorPrimary"
             app:isb_tick_texts_size="15sp"
-            app:isb_ticks_count="2"
             app:isb_track_background_color="@android:color/black"
             app:isb_track_background_size="2dp"
             app:isb_track_progress_color="#9f6934"
@@ -262,8 +251,6 @@
             app:isb_indicator_color="@android:color/black"
             app:isb_indicator_text_color="@android:color/holo_blue_light"
             app:isb_indicator_text_size="18sp"
-            app:isb_max="100"
-            app:isb_min="70"
             app:isb_seek_smoothly="true"
             app:isb_show_indicator="rounded_rectangle"
             app:isb_show_tick_marks_type="oval"
@@ -274,7 +261,6 @@
             app:isb_tick_marks_size="13dp"
             app:isb_tick_texts_color="@color/colorPrimary"
             app:isb_tick_texts_size="15sp"
-            app:isb_ticks_count="2"
             app:isb_track_background_color="@android:color/black"
             app:isb_track_background_size="2dp"
             app:isb_track_progress_color="#9f6934"
@@ -434,22 +420,6 @@
             android:layout_rowWeight="1"/>
     </GridLayout>
 
-    <Spinner
-        android:id="@+id/syrupSpinner"
-        android:textAlignment="center"
-        android:layout_width="333dp"
-        android:layout_height="71dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/indicatorLayout1"
-        android:spinnerMode="dropdown"
-        android:backgroundTint="#664400"
-        android:layout_marginTop="46dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp" />
-
     <Button
         android:stateListAnimator="@null"
         android:id="@+id/brewButton"
@@ -557,10 +527,8 @@
 
     <FrameLayout
         android:id="@+id/fragmentContainer3"
-        android:layout_height="0dp"
-        android:layout_width="0dp"
-        tools:layout_editor_absoluteY="8dp"
-        tools:layout_editor_absoluteX="8dp">
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>
