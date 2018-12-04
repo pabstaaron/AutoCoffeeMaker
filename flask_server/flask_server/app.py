@@ -36,7 +36,8 @@ def am_i_connected(serial):
                  'request': 'Connected',
                  'type': _settings,
                  'serial number': _serial}
-    if(_settings == "computer" or serial != _serial):
+    if(serial != _serial):
+        print("Returning because bad serial")
         return jsonify(post_data), 400
     else:
         return jsonify(post_data), 200
@@ -82,34 +83,76 @@ def make_me_a_coffee(serial):
         content = request.get_json()
     print(content)
 
-    if "pressure" not in content:
-        return _make_bad_data_return("pressure")
-    elif content["pressure"] < 0:
-        return _data_out_of_bounds("pressure")
+    # Payload: {u'waterDisp': 40, u'waterTemp': 100, u'coffeeDisp': 15, u'frothStr': 0, u'milkDisp': 40}
+    if "waterTemp" not in content:
+        print("Return because waterTemp not in payload")
+        return _make_bad_data_return("waterTemp")
+    elif content["waterTemp"] < 0:
+        print("Return because waterTemp OOB")
+        return _data_out_of_bounds("waterTemp")
 
-    if "temperature" not in content:
-        return _make_bad_data_return("temperature")
-    elif content["temperature"] < 0:
-        return _data_out_of_bounds("temperature")
+    if "waterDisp" not in content:
+        print("Return because waterDisp not in payload")
+        return _make_bad_data_return("waterDisp")
+    elif content["waterDisp"] < 0:
+        print("Return because waterDisp OOB")
+        return _data_out_of_bounds("waterDisp")
+    
+    if "coffeeDisp" not in content:
+        print("Return because coffeeDisp not in payload")
+        return _make_bad_data_return("coffeeDisp")
+    elif content["coffeeDisp"] < 0:
+        print("Return because coffeeDisp OOB")
+        return _data_out_of_bounds("coffeeDisp")
+    
+    if "frothStr" not in content:
+        print("Return because frothStr not in payload")
+        return _make_bad_data_return("frothStr")
+    elif content["frothStr"] < 0:
+        print("Return because frothStr OOB")
+        return _data_out_of_bounds("frothStr")
+    
+    if "milkDisp" not in content:
+        print("Return because milkDisp not in payload")
+        return _make_bad_data_return("milkDisp")
+    elif content["milkDisp"] < 0:
+        print("Return because milkDisp OOB")
+        return _data_out_of_bounds("milkDisp")
 
     if(serial != _serial):
         post_data = {'utc': int(time.time()),
                      'request': 'Make me a Coffee',
                      'type': _settings,
                      'serial number': _serial}
+        print("Returning because serial error")
         return jsonify(post_data), 400
     else:
         print("UART Command Trying to send")
-        serial = SerialUART("COM9")
+        serial = SerialUART("/dev/ttyACM0")
         # Start the process
-        reply = serial.demo(content["pressure"], content["temperature"])
-        print(reply)
-        post_data = {'utc': int(time.time()),
-                     'request': 'Make me a Coffee',
-                     'type': _settings,
-                     'reply': reply,
-                     'serial number': _serial}
-        return jsonify(post_data), 201
+        # Demo
+        # reply = serial.demo(content["waterTemp"], content["waterDisp"])
+        # Final
+        reply = serial.final(content["waterTemp"],
+                            content["waterDisp"],
+                            content["coffeeDisp"],
+                            content["frothStr"],
+                            content["milkDisp"])
+        if "Demo started" not in reply:
+            post_data = {'utc': int(time.time()),
+                         'request': 'Make me a Coffee',
+                         'type': _settings,
+                         'reply': reply,
+                         'serial number': _serial}
+            return jsonify(post_data), 200
+        else:   
+            print(reply)
+            post_data = {'utc': int(time.time()),
+                         'request': 'Make me a Coffee',
+                         'type': _settings,
+                         'reply': reply,
+                         'serial number': _serial}
+            return jsonify(post_data), 201
 
 
 def _make_bad_data_return(reason):
