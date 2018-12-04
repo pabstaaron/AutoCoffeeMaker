@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:stateListAnimator="@null"
-    tools:context="com.example.ndonaldson.beanster.MainMenu">
+    tools:context="com.example.ndonaldson.beanster.activities.MainMenu">
 
     <RelativeLayout
         android:layout_width="0dp"
@@ -88,6 +88,7 @@
             android:textColor="#ffefcc"
             android:width="130dp"
             android:background="@drawable/buttonstyle"
+            android:textAllCaps="false"
             android:text="Login"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true" />

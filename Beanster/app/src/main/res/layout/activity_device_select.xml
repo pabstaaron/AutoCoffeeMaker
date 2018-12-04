@@ -4,7 +4,7 @@
     android:id="@+id/deviceScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DeviceSelection"
+    tools:context=".activities.DeviceSelection"
     android:stateListAnimator="@null"
     >
     <LinearLayout
@@ -95,7 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/deviceSelectCancel"
         android:layout_centerHorizontal="true"
-        android:text="Search" />
+        android:text="Refresh" />
 
         <Button
             android:id="@+id/deviceConnect"
@@ -194,6 +194,7 @@
         android:layout_height="wrap_content"
         android:textColor="#ffefcc"
         android:width="130dp"
+        android:textAllCaps="false"
         android:background="@drawable/buttonstyle"
         android:text="Login"
         android:layout_alignParentBottom="true"
