@@ -22,6 +22,14 @@ void dispenserBackward(){
   dispenserMotor_t->step(1, BACKWARD, SINGLE);
 }
 
+void frothUp(){
+  frothMotor_t->step(1, FORWARD, SINGLE);
+}
+
+void frothDown(){
+  frothMotor_t->step(1, BACKWARD, SINGLE);
+}
+
 /*
  * Handles the tamp step:
  * 
@@ -62,6 +70,7 @@ void brewStep() {
     brewing = true;
 }
 
+
 /*
  * Handles the dispose step:
  * 
@@ -95,8 +104,8 @@ void disposeStep() {
  * Handles the dispense step.
  * As of right now, it will just spin the motor
  */
-void dispenseStep() {
-    dispenserMotor.moveTo(1000);
+void dispenseStep(int steps) {
+    dispenserMotor.moveTo(dispenserMotor.currentPosition() + steps);
     while(dispenserMotor.distanceToGo() != 0) {
       dispenserMotor.run();
     }
@@ -115,6 +124,7 @@ void calibrate() {
     disposeStep();
     Serial.println("End position: ");
     Serial.println(brewMotor.currentPosition());
+    endPosition = brewMotor.currentPosition();
     delay(500);
     
     tampStep();
