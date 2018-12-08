@@ -69,6 +69,7 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
                 holder.textView.setChecked(true);
                 creating = false;
             }
+
             TypedValue value = new TypedValue();
             holder.textView.getContext().getTheme().resolveAttribute(android.R.attr.listChoiceIndicatorSingle, value, true);
             int checkMarkDrawableResId = value.resourceId;
@@ -79,9 +80,11 @@ public class WifiAdapter extends RecyclerView.Adapter implements WifiViewHolder.
 
         if(selectableItem.isSelected()){
             holder.setColor(Color.LTGRAY);
+            holder.textView.setChecked(true);
         }
         else{
             holder.setColor(Color.DKGRAY);
+            holder.textView.setChecked(false);
         }
     }
 

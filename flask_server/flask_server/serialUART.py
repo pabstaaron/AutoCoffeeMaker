@@ -13,16 +13,13 @@ class SerialUART(object):
         Initializes a device @ COMPORT with settings baudrate=15200
         and timeout=1sec
         """
-        m = re.search("^COM[0-9]{1,}$", COMPORT)
-        if m is None:
-            raise Exception('COMPORT must be of COMXX format')
         self._COMPORT = COMPORT
         self.TERMINATOR = "\r\n"
         self.logger = None  # Add Logger mechanism
         try:
             self.dut = serial.Serial(port=self._COMPORT,
                                      baudrate=115200,
-                                     timeout=1)
+                                     timeout=2)
         except serial.serialutil.SerialException:
             print("Could not open {}".format(self._COMPORT))
             exit()
@@ -89,6 +86,23 @@ class SerialUART(object):
         Sends the DEMO command with values `val1` and `val2`
         """
         return self._cmd("DEMO,{},{}".format(val1, val2))
+    
+    def final(self, waterTemp, waterDisp, coffeeDisp, frothStr, milkDisp):
+        """
+        Sends final command over UART to iniate brewing process
+        @param: waterTemp- Temperature of the water (F)
+        @param: waterDisp- How much water is dispensed (oz)
+        @param: coffeeDisp- How much coffee is dispensed (grams)
+        @param: frothStr - Strength of the frother (%)
+        @param: milkDispensed- How much milk is dispensed
+        
+        ret: Arduino reply back
+        """
+        return self._cmd("FINAL,{},{},{},{},{}".format(waterTemp,
+                                                       waterDisp,
+                                                       coffeeDisp,
+                                                       frothStr,
+                                                       milkDisp))
     
     def pwm(self, dutyCyle):
         """

@@ -15,6 +15,7 @@ import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.ndonaldson.beanster.data.Device;
 
@@ -187,7 +188,7 @@ public class WifiRunner implements Runnable {
                                 String stackTrace = writer.toString();
                                 Log.i("WifiRunner", e.getLocalizedMessage());
                                 Log.i("WifiRunner", stackTrace);
-                                if(isConnected != false) sendIntent("failure");
+                                sendIntent("failure");
                                 lastDevice = null;
                             }
                             Log.i("WifiRunner", "responseCode:" + responseCode);
@@ -197,12 +198,12 @@ public class WifiRunner implements Runnable {
                                         sendIntent("badRequest");
                                 }
                                 Log.i("WifiRunner", "Failed to connect");
+                                if(isConnected) connectStatus = ConnectStatus.NO_WIFI;
                                 isConnected = false;
-                                connectStatus = ConnectStatus.NO_WIFI;
                                 if(connectStatus != ConnectStatus.CONNECT_TO_LAST) sendIntent("status");
                                 connectStatus = ConnectStatus.WAITING_FOR_USER;
-                                devicesInRange.clear();
-                                lastDevice = null;
+                               // devicesInRange.clear();
+                                //lastDevice = null;
 
                                 sendIntent("status");
                             } else {
@@ -287,12 +288,12 @@ public class WifiRunner implements Runnable {
                                     if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                                         sendIntent("badRequest");
                                     }
+                                    if(isConnected) connectStatus = ConnectStatus.NO_WIFI;
                                     isConnected = false;
-                                    connectStatus = ConnectStatus.NO_WIFI;
                                     sendIntent("status");
                                     connectStatus = ConnectStatus.WAITING_FOR_USER;
                                     sendIntent("status");
-                                    devicesInRange.clear();
+                                    //devicesInRange.clear();
                                 }
                                 client.disconnect();
                             }

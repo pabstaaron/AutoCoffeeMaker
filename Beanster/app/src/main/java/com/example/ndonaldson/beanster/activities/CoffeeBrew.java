@@ -401,8 +401,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             @Override
             public void onClick(View v) {
                 if(advancedState.activeSection != AdvancedState.ActiveSection.WATER) {
-                    dispSeekbar.setMin(30);
-                    dispSeekbar.setMax(120);
+                    dispSeekbar.setMin(100);
+                    dispSeekbar.setMax(400);
                     dispSeekbar.setIndicatorTextFormat("${PROGRESS} mL");
                     playSliders(advancedState.activeSection, AdvancedState.ActiveSection.WATER);
                     advancedState.activeSection = AdvancedState.ActiveSection.WATER;
@@ -418,8 +418,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
             @Override
             public void onClick(View v) {
                 if(advancedState.activeSection != AdvancedState.ActiveSection.MILK) {
-                    dispSeekbar.setMin(30);
-                    dispSeekbar.setMax(120);
+                    dispSeekbar.setMin(100);
+                    dispSeekbar.setMax(400);
                     dispSeekbar.setIndicatorTextFormat("${PROGRESS} mL");
                     playSliders(advancedState.activeSection, AdvancedState.ActiveSection.MILK);
                     advancedState.activeSection = AdvancedState.ActiveSection.MILK;
@@ -538,8 +538,8 @@ public class CoffeeBrew extends AppCompatActivity implements LoginFragment.OnFra
                 setSeekBarValue(advancedState.activeSection, seekBar.getProgress(), 2);
             }
         });
-        dispSeekbar.setMin(30);
-        dispSeekbar.setMax(120);
+        dispSeekbar.setMin(100);
+        dispSeekbar.setMax(400);
 
 
         /**

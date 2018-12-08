@@ -9,7 +9,7 @@ def grab_type():
 
 
 def grab_serial():
-    return "00001"
-    # with open('/home/pi/Desktop/AutoCoffeeMaker/flask_server/setup.json') as json_data:
-    #     data = json.load(json_data)
-    #     return data["serial"]
+    # return "beanster1"
+    with open('/home/pi/Documents/Project/AutoCoffeeMaker/flask_server/setup.json') as json_data:
+        data = json.load(json_data)
+        return data["serial"]

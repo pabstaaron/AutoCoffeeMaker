@@ -19,7 +19,7 @@
         app:layout_constraintGuide_percent="0.15"
         android:orientation="vertical"
         tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="90dp" />
+        tools:layout_editor_absoluteX="144dp" />
 
     <android.support.constraint.Guideline
         android:stateListAnimator="@null"
@@ -29,7 +29,7 @@
         app:layout_constraintGuide_percent="0.9"
         android:orientation="vertical"
         tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="540dp" />
+        tools:layout_editor_absoluteX="864dp" />
 
     <android.support.v7.widget.GridLayout
         android:stateListAnimator="@null"
@@ -141,6 +141,7 @@
 
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/tempSlider"
+            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="8dp"
@@ -151,7 +152,7 @@
             app:isb_indicator_color="@android:color/black"
             app:isb_indicator_text_color="@android:color/holo_blue_light"
             app:isb_indicator_text_size="18sp"
-            app:isb_max="120"
+            app:isb_max="200"
             app:isb_min="70"
             app:isb_seek_smoothly="true"
             app:isb_show_indicator="rounded_rectangle"
@@ -192,6 +193,8 @@
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/pressSlider"
             android:layout_width="match_parent"
+            android:visibility="invisible"
+
             android:layout_height="match_parent"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
@@ -242,6 +245,8 @@
         <com.warkiz.widget.IndicatorSeekBar
             android:id="@+id/dispSlider"
             android:layout_width="match_parent"
+            android:visibility="invisible"
+
             android:layout_height="match_parent"
             android:layout_marginBottom="8dp"
             android:layout_marginLeft="8dp"
@@ -321,55 +326,6 @@
             app:layout_columnWeight="1"
             app:layout_rowWeight="1"/>
     </android.support.v7.widget.GridLayout>
-
-    <GridLayout
-        android:stateListAnimator="@null"
-        android:layout_width="943dp"
-        android:layout_height="51dp"
-        android:layout_marginLeft="8dp"
-        android:columnCount="3"
-        android:rowCount="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayoutAmount"
-        android:layout_marginTop="55dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:id="@+id/gridLayoutStrength">
-        <Button
-            android:id="@+id/basicStrengthButton"
-            android:text="Mild"
-            android:textColor="#664400"
-            android:background="@drawable/leftroundedselected"
-            android:layout_row="0"
-            android:layout_column="0"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-
-        <Button
-            android:id="@+id/basicStrengthButton2"
-            android:text="Regular"
-            android:textColor="#ffefcc"
-            android:background="@drawable/gridbuttonunselected"
-            android:layout_row="0"
-            android:layout_column="1"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-
-        <Button
-            android:id="@+id/basicStrengthButton3"
-            android:text="Strong"
-            android:textColor="#ffefcc"
-            android:background="@drawable/rightroundedunselected"
-            android:layout_row="0"
-            android:layout_column="2"
-            android:layout_gravity="fill_horizontal"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"/>
-    </GridLayout>
 
     <GridLayout
         android:stateListAnimator="@null"
@@ -527,8 +483,59 @@
 
     <FrameLayout
         android:id="@+id/fragmentContainer3"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
+        android:layout_height="0dp"
+        android:layout_width="0dp"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp">
     </FrameLayout>
+
+    <GridLayout
+            android:stateListAnimator="@null"
+            android:layout_width="943dp"
+            android:layout_height="51dp"
+            android:layout_marginLeft="8dp"
+            android:columnCount="3"
+            android:rowCount="1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gridLayoutAmount"
+            android:layout_marginTop="55dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:id="@+id/gridLayoutStrength">
+            <Button
+                android:id="@+id/basicStrengthButton"
+                android:text="Mild"
+                android:textColor="#664400"
+                android:background="@drawable/leftroundedselected"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:layout_gravity="fill_horizontal"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"/>
+
+            <Button
+                android:id="@+id/basicStrengthButton2"
+                android:text="Regular"
+                android:textColor="#ffefcc"
+                android:background="@drawable/gridbuttonunselected"
+                android:layout_row="0"
+                android:layout_column="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"/>
+
+            <Button
+                android:id="@+id/basicStrengthButton3"
+                android:text="Strong"
+                android:textColor="#ffefcc"
+                android:background="@drawable/rightroundedunselected"
+                android:layout_row="0"
+                android:layout_column="2"
+                android:layout_gravity="fill_horizontal"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"/>
+        </GridLayout>
 
 </android.support.constraint.ConstraintLayout>

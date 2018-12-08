@@ -21,9 +21,9 @@ public class RequestData{
     public int coffeeDisp;
 
     public RequestData(){
-        this.waterTemp = 100;
-        this.waterDisp = 40;
-        this.milkDisp = 40;
+        this.waterTemp = 70;
+        this.waterDisp = 100;
+        this.milkDisp = 150;
         this.frothStr = 0;
         this.coffeeDisp = 15;
     }
@@ -32,15 +32,15 @@ public class RequestData{
     public void setWithBasic(CoffeeBrew.BasicState basicState){
         switch (basicState.amount){
             case FIRST:{
-                this.waterDisp = 40;
+                this.waterDisp = 150;
                 break;
             }
             case SECOND:{
-                this.waterDisp = 80;
+                this.waterDisp = 275;
                 break;
             }
             case THIRD:{
-                this.waterDisp = 120;
+                this.waterDisp = 400;
                 break;
             }
         }

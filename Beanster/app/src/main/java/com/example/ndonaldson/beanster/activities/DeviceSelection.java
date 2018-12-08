@@ -439,7 +439,7 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
                     case NO_WIFI:{
                         wifiStatus.setBackground(getApplicationContext().getDrawable(R.drawable.nowifi));
                         Toast toast = Toast.makeText(context, "Lost connection to device.....", Toast.LENGTH_LONG);
-                        mDeviceIds.clear();
+                        //mDeviceIds.clear();
                         deviceSelected = null;
                         deviceSelectedName = "";
                         isConnected = false;
@@ -467,15 +467,19 @@ public class DeviceSelection extends AppCompatActivity implements WifiViewHolder
             else if(intent.hasExtra("Failure") || intent.hasExtra("badRequest")) {
                 String previousPassword = "";
                 for (Device d : mDeviceIds) {
+                    Log.i("DeviceSelection", String.format("d.MacAddress: %s, d.password: %s, d.hostName: %s", d.getMacAddress(), d.getPassWord(), d.getHostName()));
                     if (deviceSelected != null && d.getMacAddress().equals(deviceSelected.getMacAddress())) {
+                        Log.i("DeviceSelection", String.format("deviceSelected.MacAddress: %s, deviceSelected.password: %s, deviceSelected.hostName: %s", deviceSelected.getMacAddress(), deviceSelected.getPassWord(), deviceSelected.getHostName()));
                         previousPassword = d.getPassWord();
                         d.setPassWord("");
                         deviceSelected = d;
+                        Log.i("DeviceSelection", String.format("AFTER BITCH!!! deviceSelected.MacAddress: %s, deviceSelected.password: %s, deviceSelected.hostName: %s", deviceSelected.getMacAddress(), deviceSelected.getPassWord(), deviceSelected.getHostName()));
                     }
                 }
                 String message = "";
-                if(intent.hasExtra("Failure"))
+                if(intent.hasExtra("Failure")) {
                     message = "Failure to get response from device...";
+                }
                 else if(!previousPassword.isEmpty())
                     message = "password " + previousPassword + " for device " + deviceSelected.getMacAddress() + " is not correct...";
                 Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);
