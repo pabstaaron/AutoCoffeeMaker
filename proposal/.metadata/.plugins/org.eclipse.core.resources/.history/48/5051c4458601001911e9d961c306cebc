@@ -478,24 +478,17 @@ pressed and the process shall be sent to the device. If the app
 recognizes that it is a brew that was not loaded from favourites
 and a user is logged in, it will ask the user if they would like
 to save it as one and leave a description.
-
-An extra feature was added to offer the user the option to
-keep user data when clearing cache or data from application
-settings in the Android settings. Since this information is not
-remote, losing user data means it is lost forever, that is why
-this feature was added.
+An extra feature was added to offer the user
 
 \subsection{Communication between FLASK and App}
-The Raspberry PI hosts it’s own web server that the
-user communicates with. It has a REST API that will
-allow us to control the board, and in turn the machine
-as well. Within the android application itself, we use
-Java.net. Within that class we are able to use things such
-as HttpURLConnection to send HTTP requests such as
-GET and POST requests. For Java HTTP GET requests we
-can get all the info we need in a browser URL. We can
-use static functions or functions with parameters within that
-URL. An example of a GET request would be something like: \\ \\
+The machine will be hosting it's own web server that the user application will
+be communicating with. It will have a REST API that will allow us to control the
+board, and in turn the machine as well. Within the android application itself,
+we can use a class called Java.net. Within that class we will be able to use
+things such as HttpURLConnection to send HTTP requests such as GET and POST
+requests. For Java HTTP GET requests we can get all the info we need in a
+browser URL. We can use static functions or functions with parameters within
+that URL. An example of a GET request would be something like: \\ \\
 \textbf{http://localhost:8080/CoffeeMaker/login?userName=Jim}\\ \\which could
 be a request for the user information on a user named "Jim". We could also send
 out information in a POST request that would be received on the local server
@@ -553,97 +546,45 @@ In the case that we cannot demonstrate our project at the University of Utah due
 we would buy / bring a popup wifi-network that we could connect to.
 
 \subsubsection{UI Skeleton}
+For the user interface, we aim to setup something simple for a user, then if we
+have more time, we will try to integrate a database into the machine that would
+effect the mobile app as well. For the first part of this section, the focus will be
+on what we aim to accomplish. The rest of the section will be on the database
+stretch goal skeleton. The mobile application will not be too complex and will
+probably consist of only a few activities in an Android Application. As usual
+for many UI applications, we will be using a Model View Controller (MVC)     
+concept.  Android studio can be nice, because it is completely possible to have
+the model and controller in one section and the view in XML or another class
+file that would most likely implement a canvas. Functionality is the first
+objective, so an XML View, and Model/Controller activity class would probably
+be the simplest form for a few activities.
 
-The mobile application consists of 6 activities,
-2 fragments, a connection state machine, some data
-classes, adapters, and customized widgets, etc. Quite a few
-animations, layouts, and drawables were used in the application,
-with the help of some 3rd party libraries as well. All
-device info is saved in EXTERNAL STORAGE and all user
-information is stored in Shared Preferences.
+For the main activity, the idea is to have a very simple main title screen
+with a single button. As usual with all widgets, we we have listeners that will
+react to an action on them. This button will most likely say "connect", which
+will then open a new activity, or if already connected to a device that is
+recognized as one of our machines, the application will skip the second
+activity and go straight to the brewing portion of our application. 
+If the mobile device had never been connected to the machine, the first
+activity would take you to the next activity on a "connect" button push that
+would let you connect to wireless access points around you (just as you
+normally would connect to wifi). The list of wireless access points will most
+likely be in a recycler view (basically a scrollable view with multiple
+entities) One of those access points will be the Raspberry PI's, and once that
+recycler view card is tapped, a listener will fire and highlight the card,
+letting the user know which one has been selected. There will also be a "back"
+button that will always be usable and a "connect" button that will only be
+usable once a card is selected. Once the "connect" button is selected, the
+application will send out a request to that access point. If that device is one
+of our coffee machines, it will send a specific message that will let the
+mobile app know that it is the correct device and open the brewing activity.
 
-Most of the application is controlled by the WifiRunner
-which has these main states: CONNECTED, WAITING
-FOR USER, SEARCHING, CONNECT TO LAST,
-WAITING FOR RESPONSE, NO WIFI, UNKNOWN. Each
-activity behaves differently depending on the state of the this
-thread. It also houses alot of the data communication for the
-entire application. Any time a user does something, it sends
-the WifiRunner into a different state and updates the current
-activity with its results. When connected to a device, the
-WifiRunner sends out a connection check requests to the flask
-server on the RaspberryPi every second.
-
-The MainMenu activity (shown in top half of Fig. 2)
-consists of a two buttons, an animated background, and some
-custom imageViews for backgrounds, logos, and buttons. A
-3rd party library was used for a loading progress bar called
-NewtonCradleLoading. This is used while trying to connect
-to the previous device on this page. The ”Connect Device”
-button on this page allows the user to continue to the DeviceSelectioon
-activity. The Login button opens a fragment
-(shown in the bottom half of Fig. 2) to login a user or
-opens dialogs, depending on the current active user state, and
-updates to the label to the current user when when is logged
-in. There is a logo in the top right labeled Beanster for the
-application and there is also a wifi indicator in the top left that
-displays whether or not the application is already successfully
-connected to a coffee machine currently. When the application
-starts, the WifiRunner tries to CONNECT TO LAST and
-disables everything until it confirms whether or not it has
-CONNECTED to the previous device or not. If it goes into a
-CONNECTED state it kicks the application into the brewing
-activity, otherwise it enables all of the buttons and displays a
-disconnected symbol and is WAITING FOR USER.
-
-The DeviceSelection activity (shown in Fig. 3) uses most
-of the same components of the first activity, but introduces a
-recyclerView and a couple other buttons as well. The recycler
-view is populated by information from the WifiRunner. The
-WifiRunner scans the network and looks for devices compatible
-with the application and then sends all of the information
-to the activity when it opens. The search button within this
-activity allows the user to refresh that information inside
-of the recyclerview. The back button returns to MainMenu
-activity and the connect button sets the WifiRunner into
-WAITING FOR RESPONSE to try and communicate with
-the flask server hosted on the Raspberry PI. Depending on
-the information on the device trying to be connected to, a
-dialog might popup, prompting the user for a password for
-the device. Depending on the response from the WifiRunner,
-the activity warns that it couldn’t connect or continues to the
-brewing activity.
-
-The CoffeeBrew activity (shown in top half of Fig. 4) uses
-a lot of the same widgets but a lot more of them. The new
-features in this activity is the use of a customized slider and
-spinner, but other than that, it is fairly simple. This page
-keeps all info internally as it keeps track of the RequestData
-information to be sent via http POST to the RaspberryPI. The
-top two buttons change the rest of the center screen and give
-different options. In the Basic State, a layout of 3 rows of
-buttons appears that are given specific values for RequestData
-and are set when pressed. When Advanced is clicked, more
-tab options open with sliders available for each tab. These
-are used to more finely adjust the RequestData before the
-POST request. If a user is logged in and the Advanced button
-is pressed, a favourites button is available, which opens a
-Favourites fragment (shown in bottom of Fig. 4), allowing
-loading and deletion of RequestData saves with labels that
-are shown in a recycler view like the one previously in the
-DeviceSelection activity.
-
-
-\begin{figure}
-    \begin{subfigure}
-        \includegraphics[width=1\columnwidth]{mainmenu}
-    \end{subfigure}
-\hspace{5mm}
-    \begin{subfigure}
-	\frame{\includegraphics[width=1\columnwidth]{login}}
-    \end{subfigure}
-\caption{Opening screen for application and login fragment}
-\end{figure}
+\begin{figure*}[!ht]
+\centering
+\includegraphics[width=0.5\columnwidth]{connect.png}
+\frame{\includegraphics[width=0.5\columnwidth]{wifi.png}}
+\caption{Basic mockup of the homescreen, and wifi connection}
+\end{figure*} 
 
 In the brewing activity there will be many different widgets that control options
 on the coffee machine. There are Spinners, Buttons, Sliders, Seekbars, etc. to control
@@ -652,23 +593,31 @@ mechanisms that will need control are temperatures of water/milk, PSI values for
 amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
 of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-\begin{figure}
-\begin{subfigure}
-\includegraphics[width=1\columnwidth]{deviceSelection}
-\end{subfigure}
-\caption{Device selection page}
-\end{figure} 
+\begin{figure*}[!ht]
+\centering
+\frame{\includegraphics[width=0.5\columnwidth]{BrewNoUser.png}}
+\caption{Basic mockup of brew activity}
+\end{figure*} 
 
-\begin{figure}
-    \begin{subfigure}
-\includegraphics[width=1\columnwidth]{brew}
-    \end{subfigure}
-\hspace{5mm}
-    \begin{subfigure}
-\frame{\includegraphics[width=1\columnwidth]{favorites}}
-    \end{subfigure}
-\caption{Opening screen for application and login fragment}
-\end{figure}
+
+\begin{figure*}[!ht]
+\centering
+\frame{\includegraphics[width=0.5\columnwidth]{loginStretch.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{brewStretch.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{menu.png}}
+
+\caption{Basic mockup of user login, brew, and menu screens}
+\end{figure*} 
+
+\begin{figure*}[!ht]
+\centering
+\frame{\includegraphics[width=0.3\columnwidth]{Schedule.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Scheduled.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Search.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Register.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Load.png}}
+\caption{Basic mockup of other screens such as: Creating schedules, searching, Registering, and a schedule screen, and waiting for email confirmation}
+\end{figure*} 
 
 %\subsection{Data Aggregation and Processing Overview}
 % The application will store user registrations, favorites, and other data in a standard SQL database. This database may be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in an application server. The application server provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the application server. Code running inside the application server will translate JSON or XML objects sent by the user into Java objects. Mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, the mapper can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 

@@ -634,16 +634,12 @@ are shown in a recycler view like the one previously in the
 DeviceSelection activity.
 
 
-\begin{figure}
-    \begin{subfigure}
-        \includegraphics[width=1\columnwidth]{mainmenu}
-    \end{subfigure}
-\hspace{5mm}
-    \begin{subfigure}
-	\frame{\includegraphics[width=1\columnwidth]{login}}
-    \end{subfigure}
-\caption{Opening screen for application and login fragment}
-\end{figure}
+\begin{figure*}[!ht]
+\centering
+\includegraphics[width=0.5\columnwidth]{connect.png}
+\frame{\includegraphics[width=0.5\columnwidth]{wifi.png}}
+\caption{Basic mockup of the homescreen, and wifi connection}
+\end{figure*} 
 
 In the brewing activity there will be many different widgets that control options
 on the coffee machine. There are Spinners, Buttons, Sliders, Seekbars, etc. to control
@@ -652,23 +648,31 @@ mechanisms that will need control are temperatures of water/milk, PSI values for
 amount of milk(ounces), amount of froth(percentage), what kind of syrup and how much, the amount of coffee, and the fineness
 of coffee grounds. These will all be represented as integer values. Below is a mockup of the brewing activity:
 
-\begin{figure}
-\begin{subfigure}
-\includegraphics[width=1\columnwidth]{deviceSelection}
-\end{subfigure}
-\caption{Device selection page}
-\end{figure} 
+\begin{figure*}[!ht]
+\centering
+\frame{\includegraphics[width=0.5\columnwidth]{BrewNoUser.png}}
+\caption{Basic mockup of brew activity}
+\end{figure*} 
 
-\begin{figure}
-    \begin{subfigure}
-\includegraphics[width=1\columnwidth]{brew}
-    \end{subfigure}
-\hspace{5mm}
-    \begin{subfigure}
-\frame{\includegraphics[width=1\columnwidth]{favorites}}
-    \end{subfigure}
-\caption{Opening screen for application and login fragment}
-\end{figure}
+
+\begin{figure*}[!ht]
+\centering
+\frame{\includegraphics[width=0.5\columnwidth]{loginStretch.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{brewStretch.png}}
+\frame{\includegraphics[width=0.5\columnwidth]{menu.png}}
+
+\caption{Basic mockup of user login, brew, and menu screens}
+\end{figure*} 
+
+\begin{figure*}[!ht]
+\centering
+\frame{\includegraphics[width=0.3\columnwidth]{Schedule.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Scheduled.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Search.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Register.png}}
+\frame{\includegraphics[width=0.3\columnwidth]{Load.png}}
+\caption{Basic mockup of other screens such as: Creating schedules, searching, Registering, and a schedule screen, and waiting for email confirmation}
+\end{figure*} 
 
 %\subsection{Data Aggregation and Processing Overview}
 % The application will store user registrations, favorites, and other data in a standard SQL database. This database may be hosted separately from the machine, and could potentially be on a cloud service provider. The server will be encapsulated in an application server. The application server provides a container that can manage the database and its communication with the user application. The REST protocol will be used to communicate with the application server. Code running inside the application server will translate JSON or XML objects sent by the user into Java objects. Mappers will be used to dynamically translate these objects into SQL statements to update the database. The database will posses a users, beverages, and favorite's table. The users table will store core user data: name, email, salted password hashes, etc. The beverages table will store all of the settings you would need to instruct the coffee maker to produce an exact drink. Each beverage and user table row has a unique UUID. Each favorites list row will be connected to a single user via the UUID. Finally, each row of the favorites list will store all of the UUIDs that are associated with that list. That way, when a user sends a REST protocol request to get all of the favorites list of a particular user, the mapper can generate a SELECT request to grab all the relevant lists from the favorites table and then use the uuids stored within those rows of the favorites table to grab the drinks associated with each list. All the aggregated data is then returned to the user via REST protocol. 
