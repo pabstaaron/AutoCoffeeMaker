@@ -53,6 +53,8 @@
 \documentclass[conference]{IEEEtran}
 \usepackage{url}
 \usepackage{graphicx}
+\usepackage{hyperref}
+%\usepackage[hyphens]{url}
 \graphicspath{ {images/} }
 
 \usepackage{listings}
@@ -144,50 +146,14 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract
 \begin{abstract}
-% Imagine having a machine that would allow you to make the perfect cup of coffee
-% right in your own home or office, without ever having to trek to the coffee
-% shop. A machine that allows you to specify exactly how you like your coffee
-% with exacting detail and optional scheduling at which point it will flawlessly
-% produce that beverage for you. A machine that can recommend new beverages based
-% on your and other users past preferences.
-% 
-% There are plenty of machines on the market that claim to be fully automatic,
-% but none are capable of going all the way from raw ingredients to a finished
-% beverage without any intervention from the user. With these
-% machines, the user still has to manually froth milk, dispense flavoring
-% syrup, and mix the beverage themselves; the machine only handles the grinding,
-% tamping, and brewing tasks.
-% These machines also provide a very limited scope of control to the user, giving them
-% only a few options for dictating how they would like their coffee to be
-% produced.
-% Finally, most of these machines have very limited user interfaces and few have
-% an option for remote control from a more user friendly device, such as a
-% smart phone or tablet.
-% 
-% Our product differs by focusing on automation, personalization, and
-% user-friendliness above all else. Our machine will house all ingredients
-% internally, receive instructions wirelessly, and will have an automatic
-% cleaning mechanism. The minimization of human interaction allows us to have
-% complete control of the brewing and mixing process, allowing us to make a
-% consistent cup of coffee. This also allows us to operate the machine
-% wirelessly, allowing for streamlined UI capabilities and scheduled events.
-% Autonomous control allows you to monitor the machine’s use, personal
-% consumption habits, and ingredient consumption, while also giving the user the
-% ability to tweak individual settings to make a personalized and reproducible
-% cup of coffee. The machine itself will consist of a series of boilers,
-% chillers, and pumps as well as a specially designed chamber for automatically
-% frothing milk. These components will be driven from custom heater and chiller
-% control circuitry as well as an embedded Linux controller. The physical device
-% will be backed by some remote user-interface and a database for storing
-% ingredient information and user data.
 
-Making espresso is difficult. It takes several pieces of bulky equipment and a
-lot of practice to consistently get right. However, most of the difficult tasks
+Making espresso is difficult. It takes several pieces of bulky equipment and months, sometimes
+years, of practice to do well. However, most of the difficult tasks
 involved in the espresso making process can be automated in a way that is predictable and
 consistent. There are several machines on the market that do successfully
 automate the process, but none of these machines make espresso in the same way that
 skilled baristas do and the quality of the output reflects this. By creating a
-machine that mimics a human barista, these automatic espresso machines can be
+machine that mimics a human barista, these automatic espresso machines can eventually be
 superseded.
 \end{abstract}
 
@@ -228,12 +194,12 @@ detailed description of how the device was designed and implemented.
 % TODO there may be some light plagerism in this section..
 
 There are many different types of coffee makers available. Each of these systems
-is unique in its own way and each has its pro's and con's. All coffee makers,
+is unique in its own way and each has its own set of pro's and con's. All coffee makers,
 however, have one thing in common: they all must push hot water through ground
 coffee beans in some way. In the case of espresso, hot water is heated to a near
 boiling temperature and pressurized in some way. This hot water is then forced
 through densely packed coffee grounds (known as a ``puck'') in order to produce
-a thick, creamy coffee \cite{wikiespresso}.  
+thick, creamy coffee \cite{wikiespresso}.   
 
 There are several different ways in which the water may be pressurized. One of
 the most common ways this is accomplished is to simply let the water pressurize
@@ -268,16 +234,16 @@ brewing boiler in order to produce the necessary steam pressure.
 % In-depth write up of how the project was completed
 \section{Project Implementation}
 The project was completed in three main parts. The design and construction of an
-automatic dispensing/grinding/brewing system, the creation of embedded C++ to
-control this mechanical system, and an Android application to provide a user
+automatic dispensing/grinding/brewing/frothing system, the creation of embedded
+C++ to control this mechanical system, and an Android application to provide a user
 interface.
 
 \subsection{Design Decisions}
-Our implementation utilizes a single boiler to heat water. Water is
+Our implementation utilizes a single boiler to heat water for the brewing and frothing process. Water is
 pressurized and moved though this boiler using an alternating current vibratory
-pump, found in many home esspresso machines. This pump and boiler setup does not
-provide good control over the output water pressure, but is cheap and accessible
-with the boiler and pump being salavgable from lower end home espresso machines.
+pump, found in many home espresso machines. These vibratory pumps provide poor output pressure
+regulation and tend to have short lifespans, but are cheap and easily salvageable from inexpensive
+home espresso machines.
 
 \subsection{The Brewing Process}
 The brewing mechanism consists of the three primary stages, a dispensing and
@@ -296,18 +262,35 @@ meter. Once a suffiecent amount of water has been dispensed, the puck is moved
 to sit under another actuator, which punches the grounds out of the puck and
 into a waste container.
 
+\subsection{The Frothing Process}
+The frothing system consists of two stages, a milk dispensing phase and a steaming phase.
+First, milk is pumped out of a small tube situated near the steam outlet via a peristaltic pump. 
+As the milk is dispensed, the wand is raised at roughly the same rate that the milk is being pumped
+in order to get an approximate location of the top of the liquid. After the milk has been dispensed, the 
+wand lowers itself to a position dictated by the user in order to obtain the desired froth intensity.
+
+The machine will then begin heating the boiler until it reaches 250 degrees Celsius, at which point it will
+actuate a valve on the boiler that allows steam to pass through the frothing wand. Steam will be dispensed
+for a fixed period of 30 seconds. The machine will then reset the boiler for the next brewing cycle.
+
 % TODO - Add renders and pictures here
 \subsection{Mechanical Design and Implementation}
 All of the design work for the machine was completed in the Fusion 360 CAD
 package. This design was then fabricated using a combination of 3D printing and
 laser cutting. 
 
+\begin{figure*}
+  \centering
+    \includegraphics[width=1.8\columnwidth]{render}
+    \caption{A render of the phyical system design.}
+\end{figure*}
+
 Initially, the brewing mechanism was designed by drawing all components as
 floating objects with no housing or support. Once the mechanism was designed and
 simulating properly, shelves were drawn under and behind the pieces to support
 the components. All mechanical pieces that couldn't be readily purchased
-(everything except motors and acutators) were 3D printed in PETG, which has good
-mechanical properties and is generally considered food safe in and of itself
+were 3D printed in PETG, which has good
+mechanical properties and is generally considered food safe
 (although fused deposition printing is not an FDA approved process). The
 housing/support components were then fabricated out of quarter inch acrylic using a laser cutter.
 
@@ -316,22 +299,28 @@ wheel, a chute for directing the grounds, motor mounts, and acutator mounts. The
 purchased componets included NEMA-17 stepper motors, linear servos (actuators),
 linear bearings, rails, rail mounts, and a timing belt.
 
+\begin{figure*}
+  \centering
+    \includegraphics[width=1\columnwidth]{chuteAndTamper}
+    \caption{An image of the ground dispenser and tamper.}
+\end{figure*}
+
 Once all pieces were fabricated, the acrylic housing was assembled using five
 minute epoxy. All mechanical pieces were then bolted into their approprate place
 and the timing belt was installed and tensioned between the stepper motor and
 the puck.
 
 At this point, not all of the components lined up with each other as initally
-designed due to the kerf of the laser cutter and assembly errors. Some mounting
+designed due to the kerf of the laser cutter not being taken into account 
+as well as assembly errors. Some mounting
 holes needed to be redone with a drill. Additionally, some of the pieces were
 altered after the acrylic housing was cut, so some mounting positions had to be
-manually opended with a drill.
-
+manually drilled.
 
 \begin{figure*}
   \centering
-    \includegraphics[width=1.8\columnwidth]{render}
-    \caption{A render of the phyical system design.}
+    \includegraphics[width=1.8\columnwidth]{fullSystem}
+    \caption{An image of the assembled system.}
 \end{figure*}
 
 \subsection{Electronics and Control}
@@ -355,7 +344,7 @@ homing switches.
 The stepper motor controller is an Adafruit Motor Controller
 Featherwing. This controller uses a TB6613 H-bridge chip
 along with the Arduino stepper motor library to control
-the stepper. We additionally added a library (AccelStepper)
+the stepper. We additionally added a library (AccelStepper \cite{accel})
 between the stepper motor library and the control chip for
 moving the stepper motor with acceleration and deceleration.
 We needed acceleration on the stepper movements for the puck
@@ -365,14 +354,14 @@ Mechanisms involving stepper motors generally have a
 certain point that is considered to be a starting, or home,
 position. However, the starting position of the mechanism
 may not necessarily be known. Therefore, the mechanism
-must be �homed,� that is, the starting position must be found.
+must be ``homed'',that is, the starting position must be found.
 We accomplish this task in the tamp/brew/dispose mechanism
 using two microswitches on either end of the device. On
 startup, the puck is moved slowly to the tamper side of the
 device until it runs into one of these homing switches. This
 position is noted and the motor moves to the disposer side of
 the machine until a switch on that end is hit, this position is
-also noted. It�s important that we have accurate positions on
+also noted. It is important that we have accurate positions on
 both ends of the mechanism in order to ensure that the tamper
 and disposer are accurately positioned above the puck.
 
@@ -384,7 +373,7 @@ voltage depending on the temperature it is exposed to. This
 voltage is too small for most microcontrollers to detect, so
 it must be amplified. The AD8494 takes the thermocouple
 voltage and amplifies it such that the output of the device is
-5mV per degree Celsius.
+5mV per degree Celsius \cite{thermo}.
 
 A liquid flow meter was used to monitor the amount of fluid
 being moved through the pump. This sensor has a pinwheel
@@ -432,16 +421,14 @@ This means that Flask is lightweight. Flask is designed for creating web applica
 with a database backend that operates through the browser. We will be using it to open
 a port on the local WiFi network that will act as a REST server. We will use
 this server to send commands through the Raspberry Pi to the microcontroller. Thus, Flask is a middleman from the 
-android application and the components inside the coffee machine.
+android application and the components inside the coffee machine \cite{flask}.
 
 \subsection{Mobile Application}
-The UI was implemented on an Amazon Fire 7 tablet
-running a Lollipop Android version application written in Java.
+The UI was implemented as an Android application written in Java.
 Upon opening the application, it will try to reconnect to the
-previous device it was connected to and login the previously
-logged in user, if either fields have been entered in the pase. If
-it successfully connects to the last known device, it will take
-them straight to main user control screen. If the tablet could
+previous device it was connected to and login the most recent user, if either
+fields have been entered in the past. If it successfully connects to the last
+known device, it will take them straight to main user control screen. If the tablet could
 not connect to the device, the user has the option to start the
 connection process, or decide to change the active profile.
 
@@ -452,20 +439,14 @@ one is selected, the user may try to connect. If the device
 had previously connected properly then it will not prompt the
 user for a password and attempt connection, otherwise the
 user must input a password that is associated with the device
-first. Ideally if this were a device being sold on a larger scale,
-these passwords would be unique and sent out with the device
-(perhaps a serial number would be used). Once the device is
-connected it will move to the brewing functionality page. The
-connection page also contains the functionality to change the
-active user, scan the area for more machines, and return to the
-main screen.
+first.
 
 The brewing page has both basic and advanced options.
 The basic options are the default active options and have just
 a few settings for brewing the coffee: choosing how much,
 how strong, and how frothy. The advanced settings have much
 more to offer; selecting pressure, amount, and temperature for
-milk, water, froth, syrup, and coffee. Not all of those will havethe same
+milk, water, froth, syrup, and coffee. Not all of those will have the same
 available selections to change, but there is much higher customization in
 advanced. We may be scrapping the ability to control pressure, but temperature
 and amount are staying. From the brewing page we are also allowed to change
@@ -479,14 +460,8 @@ recognizes that it is a brew that was not loaded from favourites
 and a user is logged in, it will ask the user if they would like
 to save it as one and leave a description.
 
-An extra feature was added to offer the user the option to
-keep user data when clearing cache or data from application
-settings in the Android settings. Since this information is not
-remote, losing user data means it is lost forever, that is why
-this feature was added.
-
 \subsection{Communication between FLASK and App}
-The Raspberry PI hosts it�s own web server that the
+The Raspberry PI hosts it's own web server that the
 user communicates with. It has a REST API that will
 allow us to control the board, and in turn the machine
 as well. Within the android application itself, we use
@@ -579,7 +554,7 @@ consists of a two buttons, an animated background, and some
 custom imageViews for backgrounds, logos, and buttons. A
 3rd party library was used for a loading progress bar called
 NewtonCradleLoading. This is used while trying to connect
-to the previous device on this page. The �Connect Device�
+to the previous device on this page. The ``Connect Device''
 button on this page allows the user to continue to the DeviceSelectioon
 activity. The Login button opens a fragment
 (shown in the bottom half of Fig. 2) to login a user or
@@ -598,7 +573,7 @@ disconnected symbol and is WAITING FOR USER.
 
 The DeviceSelection activity (shown in Fig. 3) uses most
 of the same components of the first activity, but introduces a
-recyclerView and a couple other buttons as well. The recycler
+recyclerView and a couple of other buttons as well. The recycler
 view is populated by information from the WifiRunner. The
 WifiRunner scans the network and looks for devices compatible
 with the application and then sends all of the information
@@ -611,17 +586,15 @@ the flask server hosted on the Raspberry PI. Depending on
 the information on the device trying to be connected to, a
 dialog might popup, prompting the user for a password for
 the device. Depending on the response from the WifiRunner,
-the activity warns that it couldn�t connect or continues to the
+the activity warns that it couldn't connect or continues to the
 brewing activity.
 
 The CoffeeBrew activity (shown in top half of Fig. 4) uses
-a lot of the same widgets but a lot more of them. The new
-features in this activity is the use of a customized slider and
-spinner, but other than that, it is fairly simple. This page
+a lot of the same widgets, but a lot more of them. This page
 keeps all info internally as it keeps track of the RequestData
-information to be sent via http POST to the RaspberryPI. The
+information to be sent via an HTTP POST to the Raspberry Pi. The
 top two buttons change the rest of the center screen and give
-different options. In the Basic State, a layout of 3 rows of
+different options. In the basic state, a layout of 3 rows of
 buttons appears that are given specific values for RequestData
 and are set when pressed. When Advanced is clicked, more
 tab options open with sliders available for each tab. These
@@ -713,19 +686,6 @@ automated in a way that mimics the way in which a human would manually produce
 espresso.
 % Include a section solely for Demo Day Evaluation
 \subsection{Demo Day Evaluation}
-% Each do a an individual evaluation, then stitch together
-% Ben
-% 
-% XXX - Uncomment before next push
-% The demo day presentation seemed to impress a lot of people. While we didn't 
-% have a functioning machine due to blowing out our pump on the day before, 
-% we still had a very precise and elegant machine. We were able to demo a 'dry-run' 
-% of exactly what would be happening throughout the entire process. 
-% This 'dry-run' showed off the multiple different application of motors and actuators used in our project.
-% I think people understood and appreciated the effort that was put into the precise machining and operation 
-% of our project even if it was not complete. People also seemed to appreciate the fluidity and ease of the 
-% mobile application which is a credit to Nathan and his hard work.
-% 
 
 The night before demo day, the pump being used to push water through the boiler
 failed (the exact cause of the failure is unknown, but it's likely due to
@@ -746,7 +706,7 @@ hard work we put into our machine.
 % Never open a project by designing a PCB
 \subsection{Never Start with a PCB}
 When we first started the project, the very first thing we did was design a
-large, complicated PCB that had all of the circuitry that we \italics{thought}
+large, complicated PCB that had all of the circuitry that we thought
 we would need.
 
 After we got the PCB back and assembled it we discovered that while the
@@ -800,13 +760,26 @@ It turns out we could have picked up an idential, never used, pump online for
 \$50, a price that would have been well worth saving our demo.
 
 \section{Appendix B: Code Archive}
+
 \begin{itemize}
-\item Embedded Code - \href{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/Arduino\%20Code}
-\item Android Code - \href{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/Beanster}
-\item Web Page Code - \href{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/docs}
-\item Flask Code - \href{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/flask\_server}
+\item Arduino Code -
+\url{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/Arduino\%20Code}
+\item Android Code -
+\url{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/Beanster}
+\item Web Page Code -
+\url{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/docs}
+\item Flask Code -
+\url{https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/flask\_server}
 \end{itemize}
 
+% \subsection{Arduino Code}
+% https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/Arduino\%20Code
+% \subsection{Android Code}
+% https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/Beanster
+% \subsection{Flash Code}
+% https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/flask\_server
+% \subsection{Website Code}
+% https://github.com/pabstaaron/AutoCoffeeMaker/tree/master/docs
 
 \section{Appendix B: Bill of Materials}
 \begin{itemize}
@@ -832,7 +805,7 @@ It turns out we could have picked up an idential, never used, pump online for
 \end{itemize}
 
 \bibliography{biblio}{}
-\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
 
 \end{document}
 \end

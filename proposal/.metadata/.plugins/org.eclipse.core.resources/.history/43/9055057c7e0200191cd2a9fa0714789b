@@ -1,0 +1,127 @@
+an article in a journal
+Note the use of the IEEE_J_EDL string, defined in the IEEEabrv.bib file,
+for the journal name. IEEEtran.bst defines the BibTeX standard three
+letter month codes per IEEE style.
+From the June 2002 issue of "IEEE Transactions on Electron Devices",
+page 996, reference #16.
+@article{IEEEexample:article_typical,
+  author        = "S. Zhang and C. Zhu and J. K. O. Sin and P. K. T. Mok",
+  title         = "A Novel Ultrathin Elevated Channel Low-temperature 
+                   Poly-{Si} {TFT}",
+  journal       = IEEE_J_EDL,
+  volume        = "20",
+  month         = nov,
+  year          = "1999",
+  pages         = "569-571"
+}
+
+
+journal article using et al.
+The (five) authors are actually: F. Delorme, S. Slempkes, G. Alibert, 
+B. Rose, J. Brandon
+The month (July) was not given here.
+From the September 1998 issue of "IEEE Journal on Selected Areas in
+Communications", page 1257, reference #28.
+@article{IEEEexample:articleetal,
+  author        = "F. Delorme and others",
+  title         = "Butt-jointed {DBR} Laser With 15 {nm} Tunability Grown
+                   in Three {MOVPE} Steps",
+  journal       = "Electron. Lett.",
+  volume        = "31",
+  number        = "15",
+  year          = "1995",
+  pages         = "1244-1245"
+}
+
+
+a paper in a conference proceedings
+"conference" can be used as an alias for "inproceedings"
+From the June 2002 issue of "Journal of Microelectromechanical Systems",
+page 205, reference #16.
+@inproceedings{IEEEexample:conf_typical,
+  author        = "R. K. Gupta and S. D. Senturia",
+  title         = "Pull-in Time Dynamics as a Measure of Absolute Pressure",
+  booktitle     = "Proc. {IEEE} International Workshop on
+                   Microelectromechanical Systems ({MEMS}'97)",
+  address       = "Nagoya, Japan",
+  month         = jan,
+  year          = "1997",
+  pages         = "290-294"
+}
+
+
+a book
+From the May 2002 issue of "IEEE Transactions on Magnetics",
+page 1466, reference #4.
+@book{IEEEexample:book_typical,
+  author        = "B. D. Cullity",
+  title         = "Introduction to Magnetic Materials",
+  publisher     = "Addison-Wesley",
+  address       = "Reading, MA",
+  year          = "1972"
+}
+
+
+@electronic{wikiespresso,
+ author   = "Smith, John",
+ title     = "Wikipedia - Espresso Machine",
+ url       = "https://en.wikipedia.org/wiki/Espresso_machine"
+}
+
+@electronic{howstuffworks,
+ author   = "Nice, Karim",
+ title     = "How Espresso Machines Work",
+ url       = "https://home.howstuffworks.com/espresso-machine.htm"
+}
+
+@electronic{flask,
+author = "Armin Ronacher",
+title = "Flask",
+url = "http://flask.pocoo.org/"
+}
+
+@electronic{mock,
+author = "Python Software Foundation",
+title = "26.5 unittest.mock - mock object library",
+url = "https://docs.python.org/3/library/unittest.mock.html"
+}
+
+@electronic{slip,
+author = "https://www.thespruce.com/how-to-slipcast-ceramics-4154220",
+title = " Sara D'Souza",
+url = "https://www.thespruce.com/how-to-slipcast-ceramics-4154220"
+}
+
+@manual{PWM,
+    organization  = "NXP USA Inc.",
+    title         = "16-channel, 12-bit PWM Fm+ I2C-bus LED controller",
+    number        = "PCA9685",
+    year          =  2015,
+    month         =  4,    
+    note          = "Rev. 4"
+}
+
+@manual{thermo,
+    organization  = "Analog Devices",
+    title         = "Precision Thermocouple Amplifiers with Cold Junction Compensation",
+    number        = "AD8494",
+    year          =  2018,
+    month         =  4,    
+    note          = "Rev. D"
+}
+
+@manual{RPi,
+    organization  = "Raspberry Pi Foundation",
+    title         = "Raspberry Pi Compute Module",
+    number        = "CM3",
+    year          =  2016,
+    month         =  10,    
+    note          = "Rev. 1"
+}
+
+@online{accel,
+author = "Mike McCauley",
+title = "AccelStepper",
+year = 2017,
+url = "https://www.airspayce.com/mikem/arduino/AccelStepper/"
+}
